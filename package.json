@@ -1,0 +1,22 @@
+{
+  "name": "planbook-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for Planbook lesson planning",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "refresh": "python3 refresh-cookies.py"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "node-fetch": "^3.3.2",
+    "playwright": "^1.40.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.7.0",
+    "chrome-cookies-secure": "^3.0.2",
+    "typescript": "^6.0.3"
+  }
+}

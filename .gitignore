@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Secrets — never commit these
+cookies.json
+
+# Python virtual environment
+venv/
+
+# macOS
+.DS_Store
+
+# Test files
+test.mjs
