@@ -381,13 +381,24 @@ server.tool(
   `Create or update a lesson plan on a specific date and class.
 Content fields (lessonText, homeworkText, etc.) accept plain text or HTML.
 Pass lessonId="0" to create a new lesson; pass an existing lessonId to update.
-Use get_lessons first to retrieve current content and the lessonId before updating.`,
+Use get_lessons first to retrieve current content and the lessonId before updating.
+
+FORMATTING RULES — always follow these when building lesson HTML:
+1. NO emojis anywhere in the lesson content (no 🔔, ⚡, 🚪, or any other emoji).
+2. Standards must each appear on their own line — use a <ul><li> list, never a single comma-separated line.
+3. Section headers use <p><strong>Header Text</strong></p> on their own line — no emoji prefixes.
+4. Content NEVER goes inline with a header. The header is always its own <p><strong>...</strong></p> line, and the content follows on the next line. For example:
+   CORRECT:   <p><strong>Essential Question</strong></p><p>How can discussion...</p>
+   WRONG:     <p><strong>Essential Question:</strong> How can discussion...</p>
+   This applies to Essential Question, Objectives, Standards, and all other section labels.
+5. NO <hr/> or <hr> dividers anywhere in the lesson. Never use horizontal rule tags to separate sections.
+6. Assessment items must be a <ul><li> list below a standalone <p><strong>Assessment</strong></p> header — never pipe-separated inline (e.g. "Bell Ringer – Formative | Exit Ticket – Formative" is WRONG). Each assessment item gets its own <li>.`,
   {
     classId: z.string().describe("Class/course ID (from get_classes)"),
     date: z.string().describe("Date MM/DD/YYYY e.g. 05/12/2026"),
     lessonId: z.string().default("0").describe("Lesson ID to update, or '0' to create new"),
     lessonTitle: z.string().optional().describe("Lesson title"),
-    lessonText: z.string().optional().describe("Main lesson body — HTML or plain text. Include standards, objectives, essential questions here if not using separate tabs."),
+    lessonText: z.string().optional().describe("Main lesson body — HTML only. Standards must be a <ul><li> list (one per line). No emojis anywhere. Section headers use <strong> tags only."),
     homeworkText: z.string().optional().describe("Homework section — HTML or plain text"),
     notesText: z.string().optional().describe("Teacher notes — HTML or plain text"),
     tab4Text: z.string().optional().describe("Extra tab 4 content"),
