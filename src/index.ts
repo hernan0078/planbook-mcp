@@ -385,7 +385,7 @@ Use get_lessons first to retrieve current content and the lessonId before updati
 
 FORMATTING RULES — always follow these when building lesson HTML:
 1. NO emojis anywhere in the lesson content (no 🔔, ⚡, 🚪, or any other emoji).
-2. Standards must each appear on their own line — use a <ul><li> list, never a single comma-separated line.
+2. Standards must each appear on their own line as a <ul><li> list — never comma-separated. Always include the full standard name after the code, separated by a dash: e.g. <li>ELA.K12.EE.4.1 – Use appropriate listening and collaboration skills</li>. Never list the code alone without its description.
 3. Section headers use <p><strong>Header Text</strong></p> on their own line — no emoji prefixes.
 4. Content NEVER goes inline with a header. The header is always its own <p><strong>...</strong></p> line, and the content follows on the next line. For example:
    CORRECT:   <p><strong>Essential Question</strong></p><p>How can discussion...</p>

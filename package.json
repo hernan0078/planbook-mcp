@@ -12,11 +12,10 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
     "node-fetch": "^3.3.2",
-    "playwright": "^1.40.0"
+    "zod": "^3.23.0"
   },
   "devDependencies": {
-    "@types/node": "^25.7.0",
-    "chrome-cookies-secure": "^3.0.2",
-    "typescript": "^6.0.3"
+    "@types/node": "^22.0.0",
+    "typescript": "^5.4.0"
   }
 }
