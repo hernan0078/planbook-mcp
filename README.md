@@ -1,154 +1,152 @@
-# Planbook MCP Server
+# Planbook MCP
 
-Connects Claude to the [Planbook](https://planbook.com) lesson planning app via direct REST API calls.  
-**10× cheaper and 12× faster than browser automation** — no screenshots, no clicking, just API calls.
+An unofficial, token-efficient MCP server for creating and updating lessons in
+[Planbook](https://planbook.com) through its web application's API.
 
----
+Version 2 is designed around one agent action: pass the date, period, and raw
+lesson plan to `upsert_lesson`. The server handles class lookup, existing-lesson
+lookup, formatting, replacement, saving, and verification.
 
-## What This Does
+## Why v2 is leaner
 
-Gives Claude tools to read and write lesson plans in Planbook:
+- One normal tool call instead of `get_classes` → `get_lessons` → HTML generation → `save_lesson`.
+- Raw pasted lesson text is formatted deterministically inside the server.
+- Tool results are compact structured objects, not full Planbook API responses.
+- Existing lessons are resolved from Planbook's full-year class payload, making retries idempotent.
+- Ambiguous classes produce a short actionable error; `list_classes` is only a fallback.
+- Session expiry is retried once after a safe Chrome-cookie refresh.
 
-| Tool | What it does |
-|------|-------------|
-| `get_classes` | List all your classes with their IDs |
-| `get_lessons` | Read lesson plans by date or date range |
-| `get_lesson_events` | Get lessons as calendar events |
-| `save_lesson` | Create or update a lesson plan |
-| `copy_lesson` | Copy a lesson to another date/class |
-| `get_schedule` | Get the cycle/page schedule |
-| `get_standards` | Get available standards |
-| `get_templates` | Get lesson plan templates |
-| `get_settings` | Get teacher ID, year, and config |
+The design aligns with modern schema-constrained tool calling: the model supplies
+small validated arguments while deterministic code owns repetitive transformation
+and API work.
 
----
+## Tools
 
-## How Authentication Works
+| Tool | Purpose |
+| --- | --- |
+| `upsert_lesson` | Create or replace one lesson in a single call; supports `dryRun` |
+| `get_lesson` | Read one lesson summary by date and period; HTML is optional |
+| `list_classes` | Compact date-aware diagnostic list used only when a period is ambiguous |
 
-Planbook's API (`api.planbook.com`) uses **three HttpOnly cookies** that must be sent together:
-- `SESSION` — session identifier
-- `U|...|.accesstoken` — JWT access token
-- `U|...|.refreshtoken` — refresh token
+### One-call example
 
-These cookies cannot be obtained by logging in programmatically (Planbook blocks bots with a 405 "Human Verification" error). Instead, we read them directly from **Chrome's encrypted cookie database** on disk.
-
-### The Cookie Refresh Script (`refresh-cookies.py`)
-- Reads Chrome's SQLite cookie database at `~/Library/Application Support/Google/Chrome/Default/Cookies`
-- Gets the decryption key from macOS Keychain ("Chrome Safe Storage")
-- Decrypts cookies using AES-128-CBC (PBKDF2-SHA1, 1003 iterations, IV = 16 spaces, strips `v10` prefix)
-- Saves the 3 api.planbook.com cookies to `cookies.json`
-
-### Auto-Refresh
-The MCP server **automatically runs `refresh-cookies.py`** whenever cookies are expired or missing — no manual intervention needed. If a session expires mid-run, it auto-refreshes and retries the failed call transparently.
-
----
-
-## Setup Instructions
-
-### Prerequisites
-- Node.js 18+
-- Python 3
-- Chrome browser (logged into Planbook)
-- Claude Desktop App
-
-### 1. Install dependencies and build
-```bash
-cd ~/Downloads/planbook-mcp-main   # or wherever you cloned it
-npm install
-npm run build
-```
-
-### 2. Install Python dependency
-```bash
-pip3 install pycryptodome
-```
-
-### 3. Get cookies (must be logged into Planbook in Chrome first)
-```bash
-python3 refresh-cookies.py
-```
-Expected output:
-```
-Reading Chrome encryption key from Keychain...
-Copying Chrome cookie database...
-✅ Saved 3 cookies to cookies.json
-```
-
-### 4. Configure Claude Desktop
-Run this command (replace the path if you installed somewhere other than Downloads):
-```bash
-mkdir -p ~/Library/Application\ Support/Claude && cat > ~/Library/Application\ Support/Claude/claude_desktop_config.json << 'EOF'
+```json
 {
-  "mcpServers": {
-    "planbook": {
-      "command": "node",
-      "args": ["/Users/YOUR_USERNAME/Downloads/planbook-mcp-main/dist/index.js"]
-    }
+  "date": "2026-05-11",
+  "period": 3,
+  "lessonPlan": "Lesson Title\nPoetry Assessment and Rhythm Analysis\n\nStandards\nELA.8.R.1.1 - Analyze how text structures contribute to meaning\n\nEssential Question\nHow does rhythm affect meaning?"
+}
+```
+
+The formatter automatically:
+
+- extracts a `Lesson Title` block when `title` is omitted;
+- removes separators and decorative emoji;
+- places standards in the lesson body;
+- uses Arial at the editor's default size;
+- bolds section and timed subsection headers;
+- converts lists to bullets, preserving explicitly numbered steps;
+- changes time-range hyphens to en dashes;
+- replaces the lesson body instead of retaining Planbook's dummy scaffold.
+
+## Install
+
+Requirements:
+
+- macOS
+- Node.js 20+
+- Python 3
+- Google Chrome logged into Planbook
+
+```bash
+git clone https://github.com/hernan0078/planbook-mcp.git
+cd planbook-mcp
+./install.sh
+npm run refresh
+```
+
+`npm run refresh` reads only `api.planbook.com` cookies from the selected local
+Chrome profile. Cookie values are never printed, and `cookies.json` is written
+with owner-only permissions and ignored by Git.
+
+If Planbook is logged in under a non-default Chrome profile:
+
+```bash
+PLANBOOK_CHROME_PROFILE="Profile 1" npm run refresh
+```
+
+## Configure an MCP client
+
+Use the absolute path to `dist/index.js`.
+
+### Codex
+
+Add to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.planbook]
+command = "node"
+args = ["/absolute/path/to/planbook-mcp/dist/index.js"]
+```
+
+### Claude Desktop
+
+Add under `mcpServers` in `claude_desktop_config.json`:
+
+```json
+{
+  "planbook": {
+    "command": "node",
+    "args": ["/absolute/path/to/planbook-mcp/dist/index.js"]
   }
 }
-EOF
-```
-Replace `YOUR_USERNAME` with your macOS username (run `whoami` to find it).
-
-### 5. Restart Claude Desktop
-Quit and reopen Claude. The Planbook tools will appear automatically.
-
----
-
-## File Structure
-
-```
-planbook-mcp/
-├── src/
-│   └── index.ts          # MCP server source (TypeScript)
-├── dist/
-│   └── index.js          # Compiled output (run by Claude)
-├── refresh-cookies.py    # Extracts Chrome cookies → cookies.json
-├── cookies.json          # Active session cookies (auto-generated, gitignored)
-├── package.json
-└── tsconfig.json
 ```
 
----
+Restart the MCP client after changing its configuration.
 
-## Troubleshooting
+## Agent workflow
 
-### "Could not authenticate even after cookie refresh"
-- Make sure you are **logged into Planbook in Chrome** on this Mac
-- Try opening https://app.planbook.com in Chrome, then run `python3 refresh-cookies.py` again
+For normal lesson entry, agents should call `upsert_lesson` immediately. Do not
+call `list_classes` or `get_lesson` first. If the server reports that a period is
+ambiguous, retry once with `className` from the error or from `list_classes`.
 
-### "Could not read Chrome Safe Storage key from Keychain"
-- Chrome must be installed (not just Chromium or Brave)
-- Run `security find-generic-password -w -s "Chrome Safe Storage" -a "Chrome"` to test
+Dates accept `YYYY-MM-DD` (preferred) or `MM/DD/YYYY`. Use `dryRun: true` to test
+parsing and formatting without authenticating or changing Planbook.
 
-### "No api.planbook.com cookies found"
-- Log into https://app.planbook.com in Chrome first
-- Wait for the page to fully load, then run the script again
+See [Agent handoff](docs/AGENT_HANDOFF.md) for complete usage and recovery rules.
 
-### MCP not showing up in Claude
-- Check the config path: `cat ~/Library/Application\ Support/Claude/claude_desktop_config.json`
-- Make sure the `dist/index.js` path is correct and the file exists
-- Restart Claude Desktop completely (Quit, not just close window)
+## Development
 
-### Rebuild after changes
 ```bash
-npm run build
+npm install
+npm test
 ```
-No restart needed — the MCP picks up rebuilt code on the next tool call.
 
----
+The test suite covers date validation, title extraction, lesson formatting,
+class resolution, ambiguity handling, and existing-lesson detection.
 
-## GitHub
-https://github.com/hernan0078/planbook-mcp
+Environment variables:
 
----
+| Variable | Purpose |
+| --- | --- |
+| `PLANBOOK_ID_TOKEN` | Optional short-lived API token instead of Chrome cookies |
+| `PLANBOOK_COOKIE_FILE` | Override the generated cookie file path |
+| `PLANBOOK_REFRESH_SCRIPT` | Override the Python refresh script path |
+| `PLANBOOK_CHROME_PROFILE` | Chrome profile path or name such as `Profile 1` |
+| `PLANBOOK_KEYCHAIN_SERVICE` | Override macOS Keychain service name |
+| `PLANBOOK_KEYCHAIN_ACCOUNT` | Override macOS Keychain account name |
 
-## How It Was Built
+## Migration from v1
 
-This MCP was built iteratively in a Claude session:
-1. Discovered Planbook's REST API endpoints by watching network requests in Chrome DevTools
-2. Found that login automation was blocked (bot detection) — switched to direct Chrome cookie extraction
-3. Discovered that SESSION cookie alone is insufficient — all 3 api.planbook.com cookies required
-4. Built Python AES-128-CBC decryption matching Chrome's exact encryption scheme
-5. Added dynamic cookie reloading so `refresh-cookies.py` takes effect without restarting the server
-6. Added auto-refresh: server detects expired sessions and re-runs the script automatically
+Version 2 intentionally replaces nine low-level tools with three goal-oriented
+tools. Calls to `save_lesson`, `get_lessons`, `get_settings`, and similar v1 tools
+must migrate to `upsert_lesson`, `get_lesson`, or `list_classes`.
+
+The v1 installer contained a second stale copy of the server and the lockfile did
+not match `package.json`; both issues are removed in v2.
+
+## Security and support
+
+This project is not affiliated with Planbook. It relies on web-application API
+behavior that Planbook may change. Never commit `cookies.json`, share its values,
+or expose this local stdio server to untrusted users.
