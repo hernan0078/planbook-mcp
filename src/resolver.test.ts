@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { extractClasses, findLesson, resolveClass } from "./resolver.js";
+import { extractClasses, findLesson, hasClassDate, resolveClass } from "./resolver.js";
 
 const classPayload = {
   data: {
@@ -88,4 +88,60 @@ test("finds a lesson in the current full-year class payload", () => {
   const lesson = findLesson(payload, "29565741", "05/11/2026");
   assert.equal(lesson?.id, "1505545014");
   assert.equal(lesson?.lessonText, '<div style="font-family: Arial, sans-serif;">Lesson</div>');
+});
+
+test("distinguishes scheduled dates from dates that require an extra lesson slot", () => {
+  const payload = {
+    lessons: [
+      {
+        date: "08/14/2026",
+        classId: 31993311,
+        extraLesson: 0,
+        lessonTitle: "",
+        lessonText: "",
+      },
+    ],
+  };
+
+  assert.equal(hasClassDate(payload, "31993311", "08/14/2026"), true);
+  assert.equal(hasClassDate(payload, "31993311", "08/13/2026"), false);
+});
+
+test("finds an extra lesson nested under a dated event day", () => {
+  const payload = {
+    day: {
+      date: "08/13/2026",
+      objects: [
+        {
+          classId: 31993311,
+          lessonId: 1539822999,
+          extraLesson: 1,
+          lessonTitle: "First Day",
+          lessonText: "<p>Lesson</p>",
+        },
+      ],
+    },
+  };
+
+  const lesson = findLesson(payload, "31993311", "08/13/2026");
+  assert.equal(lesson?.id, "1539822999");
+  assert.equal(lesson?.raw.extraLesson, 1);
+});
+
+test("never falls back to a lesson that explicitly belongs to another class", () => {
+  const payload = {
+    day: {
+      date: "08/13/2026",
+      objects: [
+        {
+          classId: 31993308,
+          lessonId: 1539769636,
+          lessonTitle: "Period 8 lesson",
+          lessonText: "<p>Lesson</p>",
+        },
+      ],
+    },
+  };
+
+  assert.equal(findLesson(payload, "31993311", "08/13/2026"), undefined);
 });

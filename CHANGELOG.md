@@ -1,5 +1,26 @@
 # Changelog
 
+## 2.0.2 - 2026-08-10
+
+### Fixed
+
+- New lessons in empty Planbook cells now mirror the first-party date/class/slot save contract and omit unsupported `lessonId`, conflict snapshot, fetch, and false linked-edit fields.
+- Dates outside a class's normal sequence now use Planbook's extra-lesson creation slot automatically.
+- Existing extra lessons are discovered and verified through the date-event feed so retries update the same lesson instead of duplicating it.
+- Lesson resolution no longer falls back to a record that explicitly belongs to another class.
+- Verification now normalizes Planbook-generated HTML entities and punctuation before comparing saved content.
+- Save verification now performs bounded read-back retries for short Planbook propagation delays.
+- Explicit `success: false`, `ok: false`, and error status responses are reported as failures instead of accepted saves.
+
+### Documented
+
+- Added empty-cell troubleshooting and the safe agent recovery sequence for verification failures.
+
+### Verified
+
+- Added regression tests for the first-party save field set, scheduled-date detection, nested extra-lesson discovery, wrong-class rejection, entity-safe verification, extra-slot selection, and preservation of untouched lesson tabs.
+- Ran the full automated test suite, package validation, skill validation, and a live out-of-sequence extra-lesson creation plus verified update.
+
 ## 2.0.1 - 2026-08-10
 
 ### Added

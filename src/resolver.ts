@@ -170,5 +170,18 @@ export function findLesson(payload: unknown, classId: string, date: string): Les
       (!lesson.classId || lesson.classId === classId) &&
       (!lesson.date || compactDate(lesson.date) === compactDate(date)),
   );
-  return exact ?? (lessons.length === 1 ? lessons[0] : undefined);
+  return exact;
+}
+
+export function hasClassDate(payload: unknown, classId: string, date: string): boolean {
+  return deepRecords(payload).some((record) => {
+    const recordClassId = firstString(record, ["classId", "subjectId", "courseId"]);
+    const recordDate = firstString(record, ["customDate", "lessonDate", "date"]);
+    return (
+      (!recordClassId || recordClassId === classId) &&
+      Boolean(recordDate) &&
+      compactDate(recordDate!) === compactDate(date) &&
+      ("lessonTitle" in record || "lessonText" in record || "extraLesson" in record)
+    );
+  });
 }

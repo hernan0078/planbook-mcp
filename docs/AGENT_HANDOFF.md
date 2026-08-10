@@ -34,7 +34,21 @@ formatting, class resolution, full-year lesson lookup, upsert, and verification.
 1. If the error says multiple classes match the period, retry with `className`.
 2. Call `list_classes` with the same target `date` only when the error does not provide enough context.
 3. If authentication expired, ask the user to log into Planbook in Chrome and run `npm run refresh`.
-4. If verification fails, do not immediately submit again; use `get_lesson` to inspect the target once.
+4. If verification fails, do not immediately submit again; the MCP has already retried its read-back. Use `get_lesson` to inspect the target once.
+5. Retry once with the resolved `className` only when `get_lesson` confirms the target cell is still empty.
+
+The MCP mirrors Planbook's first-party date/class/extra-slot save contract and
+intentionally omits browser-only identity and linked-edit flags. Agents should
+never construct or modify these payloads themselves; always use `upsert_lesson`.
+When the requested date is within the school year but outside the class's normal
+sequence, the MCP automatically creates an extra lesson for that date.
+Extra lessons are read back from the date-event feed because Planbook omits them
+from the class's full-year sequence; retries therefore update the existing extra
+slot instead of creating duplicates.
+Class IDs remain authoritative during recovery; the resolver never substitutes a
+single lesson record that explicitly belongs to another period.
+Verification normalizes Planbook-generated HTML entities, so typographic dashes
+and other editor encodings do not trigger false save failures.
 
 ## Formatting contract
 

@@ -13,8 +13,13 @@ lookup, formatting, replacement, saving, and verification.
 - Raw pasted lesson text is formatted deterministically inside the server.
 - Tool results are compact structured objects, not full Planbook API responses.
 - Existing lessons are resolved from Planbook's full-year class payload, making retries idempotent.
+- Save requests mirror Planbook's first-party date/class/slot contract and omit browser-only identity and linked-edit flags.
+- Dates outside a class's normal sequence automatically use Planbook's extra-lesson slot instead of silently no-oping.
+- Extra lessons are discovered and verified through Planbook's date-event feed, making retries update the same record.
+- Verification normalizes Planbook's HTML entities before comparing saved content with the formatted source.
 - Ambiguous classes produce a short actionable error; `list_classes` is only a fallback.
 - Session expiry is retried once after a safe Chrome-cookie refresh.
+- Save verification performs short bounded read-back retries to tolerate API propagation without agent retries.
 
 The design aligns with modern schema-constrained tool calling: the model supplies
 small validated arguments while deterministic code owns repetitive transformation
@@ -136,6 +141,11 @@ ambiguous, retry once with `className` from the error or from `list_classes`.
 
 Dates accept `YYYY-MM-DD` (preferred) or `MM/DD/YYYY`. Use `dryRun: true` to test
 parsing and formatting without authenticating or changing Planbook.
+
+If Planbook reports that a save was accepted but cannot be verified, do not
+immediately submit it again. `upsert_lesson` already performs bounded read-back
+retries. Call `get_lesson` once to inspect the target; retry only when it confirms
+that the cell is still empty, and pin the retry with `className`.
 
 See [Agent handoff](docs/AGENT_HANDOFF.md) for complete usage and recovery rules.
 See [Changelog](CHANGELOG.md) for release notes and validation history.

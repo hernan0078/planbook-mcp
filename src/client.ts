@@ -3,7 +3,7 @@ import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-import { extractClasses, findLesson, deepRecords } from "./resolver.js";
+import { deepRecords, extractClasses, findLesson, hasClassDate } from "./resolver.js";
 import type { JsonRecord, LessonRecord, PlanbookClass } from "./types.js";
 
 const API_URL = "https://api.planbook.com";
@@ -50,13 +50,37 @@ export class PlanbookClient {
   }
 
   async getLesson(date: string, classId: string, yearId?: string): Promise<LessonRecord | undefined> {
+    return (await this.getLessonContext(date, classId, yearId)).lesson;
+  }
+
+  private async getLessonContext(
+    date: string,
+    classId: string,
+    yearId?: string,
+  ): Promise<{ lesson?: LessonRecord; scheduled: boolean }> {
     await this.ensureLoggedIn(false);
     const payload = await this.request("GET", "/getClassLessons", {
       classId,
       teacherId: this.teacherId,
       yearId: yearId || this.yearsForDate(date)[0]?.id || this.yearId,
     });
-    return findLesson(payload, classId, date);
+    const scheduled = hasClassDate(payload, classId, date);
+    let lesson = findLesson(payload, classId, date);
+
+    // Extra lessons are omitted from the full-year sequence and only appear in the date event feed.
+    if (!lesson && !scheduled) {
+      const events = await this.request("GET", "/getLessonsEvents", {
+        date,
+        teacherId: this.teacherId,
+        yearId: yearId || this.yearsForDate(date)[0]?.id || this.yearId,
+      });
+      lesson = findLesson(events, classId, date);
+    }
+
+    return {
+      lesson,
+      scheduled,
+    };
   }
 
   async upsertLesson(args: {
@@ -68,71 +92,43 @@ export class PlanbookClient {
     overwrite: boolean;
     verify: boolean;
   }): Promise<{ action: "created" | "updated"; lessonId?: string; verified: boolean }> {
-    const existing = await this.getLesson(args.date, args.classId, args.yearId);
+    const context = await this.getLessonContext(args.date, args.classId, args.yearId);
+    const existing = context.lesson;
     if (existing && !args.overwrite) {
       throw new Error(
         `A lesson already exists on ${args.date} for class ${args.classId}. Set overwrite=true to replace it.`,
       );
     }
 
-    const lessonId = existing?.id ?? "0";
     const unitId = existing ? stringValue(existing.raw.unitId) || "0" : "0";
-    const extraLesson = existing ? stringValue(existing.raw.extraLesson) || "0" : "0";
+    const extraLesson = existing
+      ? stringValue(existing.raw.extraLesson) || "0"
+      : context.scheduled
+        ? "0"
+        : "999";
     const lessonLock = existing ? stringValue(existing.raw.lessonLock) || "N" : "N";
-    const collaborateSubjectId = existing
-      ? stringValue(existing.raw.collaborateSubjectId) || "0"
-      : "0";
     const customStart = existing ? stringValue(existing.raw.customStart) : "";
     const customEnd = existing ? stringValue(existing.raw.customEnd) : "";
-    const linkedLessonId = existing ? stringValue(existing.raw.linkedLessonId) || "0" : "0";
     const addClassDaysCode = existing ? stringValue(existing.raw.addClassDaysCode) : "";
-    const oldLesson = JSON.stringify({
+    const response = await this.request("POST", "/updateLesson", buildUpdateLessonPayload({
       classId: args.classId,
       date: args.date,
-      extraLesson: Number(extraLesson),
-      collaborateSubjectId: Number(collaborateSubjectId),
-      lessonTitle: existing?.title ?? "",
-      lessonText: existing?.lessonText ?? "",
-      homeworkText: existing?.homeworkText ?? "",
-      notesText: existing?.notesText ?? "",
-      tab4Text: existing?.tab4Text ?? "",
-      tab5Text: existing?.tab5Text ?? "",
-      tab6Text: existing?.tab6Text ?? "",
-    });
-
-    const response = await this.request("POST", "/updateLesson", {
-      classId: args.classId,
-      customDate: args.date,
-      lessonId,
+      title: args.title,
+      lessonText: args.lessonText,
+      existing,
       unitId,
       extraLesson,
       lessonLock,
-      strategySent: "Y",
-      unitStandardsSent: "Y",
-      statusesSent: "Y",
-      schoolWorks: "[]",
       addClassDaysCode,
       customStart,
       customEnd,
-      linkedLessonId,
-      isEditingALinkedLesson: "N",
-      fetchDay: "true",
-      updatedFields: "LESSONTITLE,LESSONTEXT",
-      oldLesson,
-      lessonTitle: args.title,
-      lessonText: args.lessonText,
-      homeworkText: existing?.homeworkText ?? "",
-      notesText: existing?.notesText ?? "",
-      tab4Text: existing?.tab4Text ?? "",
-      tab5Text: existing?.tab5Text ?? "",
-      tab6Text: existing?.tab6Text ?? "",
-    });
+    }));
 
     if (isErrorPayload(response)) {
       throw new Error(`Planbook rejected the lesson update: ${compactError(response)}.`);
     }
 
-    const responseLessonId = findFirstString(response, ["lessonId", "id"]);
+    const responseLessonId = findLessonIdForClass(response, args.classId);
     if (!args.verify) {
       return {
         action: existing ? "updated" : "created",
@@ -141,13 +137,8 @@ export class PlanbookClient {
       };
     }
 
-    const saved = await this.getLesson(args.date, args.classId, args.yearId);
-    const verified = Boolean(
-      saved &&
-      saved.title.trim() === args.title.trim() &&
-      comparableText(saved.lessonText).includes(comparableText(args.lessonText).slice(0, 120)),
-    );
-    if (!verified) {
+    const saved = await this.verifyLesson(args);
+    if (!saved) {
       throw new Error(
         "Planbook accepted the request, but the saved lesson could not be verified. Check the target date and class.",
       );
@@ -158,6 +149,30 @@ export class PlanbookClient {
       lessonId: saved?.id ?? existing?.id ?? responseLessonId,
       verified: true,
     };
+  }
+
+  private async verifyLesson(args: {
+    date: string;
+    classId: string;
+    yearId?: string;
+    title: string;
+    lessonText: string;
+  }): Promise<LessonRecord | undefined> {
+    const delays = [0, 250, 750];
+    for (const delay of delays) {
+      if (delay) await sleep(delay);
+      const saved = await this.getLesson(args.date, args.classId, args.yearId);
+      if (
+        saved &&
+        saved.title.trim() === args.title.trim() &&
+        comparableLessonText(saved.lessonText).includes(
+          comparableLessonText(args.lessonText).slice(0, 120),
+        )
+      ) {
+        return saved;
+      }
+    }
+    return undefined;
   }
 
   private async request(
@@ -344,7 +359,15 @@ function isLoggedOutPayload(value: unknown): boolean {
 
 function isErrorPayload(value: unknown): boolean {
   const record = asRecord(value);
-  return record?.error === true || record?.error === "true";
+  return (
+    record?.error === true ||
+    record?.error === "true" ||
+    record?.success === false ||
+    record?.success === "false" ||
+    record?.ok === false ||
+    record?.ok === "false" ||
+    record?.status === "error"
+  );
 }
 
 function compactError(value: unknown): string {
@@ -354,24 +377,66 @@ function compactError(value: unknown): string {
   return typeof message === "string" ? message.slice(0, 300) : "unexpected response";
 }
 
-function findFirstString(value: unknown, keys: readonly string[]): string | undefined {
+function findLessonIdForClass(value: unknown, classId: string): string | undefined {
   for (const record of deepRecords(value)) {
-    for (const key of keys) {
-      const candidate = stringValue(record[key]);
-      if (candidate && candidate !== "0") return candidate;
-    }
+    const recordClassId = stringValue(record.classId) || stringValue(record.subjectId);
+    const lessonId = stringValue(record.lessonId);
+    if (recordClassId === classId && lessonId && lessonId !== "0") return lessonId;
   }
   return undefined;
 }
 
-function comparableText(html: string): string {
+export function comparableLessonText(html: string): string {
   return html
     .replace(/<[^>]+>/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
+    .replace(/&nbsp;|&#160;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&(?:#\d+|#x[\da-f]+|[a-z][a-z\d]+);/gi, " ")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
     .replace(/\s+/g, " ")
     .trim()
     .toLowerCase();
+}
+
+export function buildUpdateLessonPayload(args: {
+  classId: string;
+  date: string;
+  title: string;
+  lessonText: string;
+  existing?: LessonRecord;
+  unitId?: string;
+  extraLesson?: string;
+  lessonLock?: string;
+  addClassDaysCode?: string;
+  customStart?: string;
+  customEnd?: string;
+}): Record<string, unknown> {
+  return {
+    classId: args.classId,
+    customDate: args.date,
+    unitId: args.unitId || "0",
+    extraLesson: args.extraLesson || "0",
+    lessonLock: args.lessonLock || "N",
+    strategySent: "Y",
+    unitStandardsSent: "Y",
+    statusesSent: "Y",
+    schoolWorks: "[]",
+    addClassDaysCode: args.addClassDaysCode || "",
+    customStart: args.customStart || "",
+    customEnd: args.customEnd || "",
+    updatedFields: "LESSONTITLE,LESSONTEXT",
+    lessonTitle: args.title,
+    lessonText: args.lessonText,
+    homeworkText: args.existing?.homeworkText ?? "",
+    notesText: args.existing?.notesText ?? "",
+    tab4Text: args.existing?.tab4Text ?? "",
+    tab5Text: args.existing?.tab5Text ?? "",
+    tab6Text: args.existing?.tab6Text ?? "",
+  };
+}
+
+function sleep(milliseconds: number): Promise<void> {
+  return new Promise((resolveSleep) => setTimeout(resolveSleep, milliseconds));
 }
 
 function parsePlanbookDate(value: string): number {

@@ -82,6 +82,15 @@ Open Planbook in Chrome, confirm you are logged in, then run `npm run refresh` a
 
 Run `./install-codex.sh` from the new location. It replaces only the `planbook` MCP entry with the new absolute path.
 
+### A new empty lesson is accepted but not visible
+
+Update to version 2.0.2 or newer and rerun `./install-codex.sh`. Earlier v2
+builds sent browser-only identity and linked-edit fields that Planbook's own
+save client omits, which could leave blank cells unchanged. Current releases
+mirror the first-party save contract, automatically select an extra-lesson slot
+for dates outside the class sequence, verify extras through the date-event feed,
+and perform bounded read-back retries.
+
 ## Safe Reinstallation
 
 Pull the latest release and rerun the installer:
