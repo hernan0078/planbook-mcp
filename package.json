@@ -1,6 +1,6 @@
 {
   "name": "planbook-mcp",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Token-efficient MCP server for creating and updating Planbook lessons",
   "type": "module",
   "main": "dist/index.js",
@@ -8,6 +8,8 @@
     "planbook-mcp": "dist/index.js"
   },
   "files": [
+    "AGENTS.md",
+    "CHANGELOG.md",
     "dist/client.d.ts",
     "dist/client.js",
     "dist/client.js.map",
@@ -24,7 +26,11 @@
     "dist/types.js",
     "dist/types.js.map",
     "docs/AGENT_HANDOFF.md",
+    "docs/CODEX_INSTALL.md",
+    "install-codex.sh",
     "refresh-cookies.py",
+    "skills/planbook-lesson-entry/SKILL.md",
+    "skills/planbook-lesson-entry/agents/openai.yaml",
     "README.md"
   ],
   "scripts": {

@@ -65,6 +65,30 @@ cd planbook-mcp
 npm run refresh
 ```
 
+### Fast Codex installation on macOS
+
+The Codex installer builds the server, registers the global `planbook` STDIO MCP,
+and installs the bundled `planbook-lesson-entry` skill:
+
+```bash
+git clone https://github.com/hernan0078/planbook-mcp.git
+cd planbook-mcp
+./install-codex.sh
+npm run refresh
+```
+
+Restart Codex once after installation. You can then paste a lesson plan with its
+date and period and ask Codex to add it to Planbook. The skill calls
+`upsert_lesson` directly with verified overwrite enabled, so the existing lesson
+body and dummy scaffold are replaced rather than appended.
+
+The installer checks the normal `codex` command first and falls back to the CLI
+bundled with the ChatGPT desktop app. It updates only the `planbook` MCP entry and
+the `planbook-lesson-entry` skill; other Codex configuration remains unchanged.
+
+See the complete [Codex installation guide](docs/CODEX_INSTALL.md) for
+verification, safe reinstallation, migration, and troubleshooting steps.
+
 `npm run refresh` reads only `api.planbook.com` cookies from the selected local
 Chrome profile. Cookie values are never printed, and `cookies.json` is written
 with owner-only permissions and ignored by Git.
@@ -114,6 +138,7 @@ Dates accept `YYYY-MM-DD` (preferred) or `MM/DD/YYYY`. Use `dryRun: true` to tes
 parsing and formatting without authenticating or changing Planbook.
 
 See [Agent handoff](docs/AGENT_HANDOFF.md) for complete usage and recovery rules.
+See [Changelog](CHANGELOG.md) for release notes and validation history.
 
 ## Development
 

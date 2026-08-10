@@ -1,5 +1,11 @@
 # Agent Handoff
 
+## Installation
+
+On a new macOS computer, follow [CODEX_INSTALL.md](CODEX_INSTALL.md). The bundled
+installer registers the `planbook` MCP and installs this workflow as a Codex
+skill. Restart Codex after installation or any MCP/skill update.
+
 ## Goal
 
 Use this MCP to place a pasted lesson plan into the correct Planbook date and
@@ -61,3 +67,9 @@ format summary. Dry runs do not authenticate and do not change Planbook.
 
 Do not echo the full lesson plan back to the user after a successful save. A
 confirmation with title, date, period, action, and verification state is enough.
+
+## Maintenance Handoff
+
+Every implementation or workflow update must also update the applicable guide,
+`CHANGELOG.md`, and release notes, then be pushed and published on GitHub. Follow
+the repository checklist in `AGENTS.md`.

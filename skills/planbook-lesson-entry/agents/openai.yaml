@@ -1,0 +1,14 @@
+interface:
+  display_name: "Planbook Lesson Entry"
+  short_description: "Add verified lessons to Planbook in one call"
+  default_prompt: "Use $planbook-lesson-entry to add this lesson to the correct Planbook date and period."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "planbook"
+      description: "Local Planbook lesson entry MCP server"
+      transport: "stdio"
+
+policy:
+  allow_implicit_invocation: true
