@@ -28,6 +28,9 @@ Defaults already match normal operation:
 
 Do not generate HTML. Do not call class or lesson discovery first. The MCP owns
 formatting, class resolution, full-year lesson lookup, upsert, and verification.
+Send Markdown plans unchanged: the formatter extracts a leading `#` title and
+removes Markdown heading, bold, inline-code, and escaped-character markers before
+applying Planbook formatting.
 
 ## Compact recovery flow
 
@@ -80,6 +83,7 @@ The server, not the agent, applies these rules:
 - numbered lists only when the source explicitly numbers items
 - plain narrative text
 - no decorative emoji or horizontal rules
+- no literal Markdown `#`, `**`, backtick, or escaped-underscore markers
 
 ## Dry run
 

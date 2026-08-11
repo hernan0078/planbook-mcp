@@ -25,6 +25,8 @@ The MCP owns school-year lookup, class resolution, existing-lesson lookup, forma
 
 Formatting is deterministic: all major headers, including `ESOL Strategies`, are bold; every timed section is bold with an explicit soft break; source bullets and explicit numbering are preserved; clear semantic lists receive bullets; narrative remains plain. Never request or reproduce Impact.
 
+Pass Markdown lesson plans unchanged. The MCP extracts a leading H1 as the title and removes Markdown heading, bold, inline-code, and escape markers before saving; the agent must not strip or convert them first.
+
 ## A/B2 Schedule
 
 - A day periods: P1, P3, P5, P7, P8.

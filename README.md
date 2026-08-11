@@ -48,6 +48,7 @@ and API work.
 The formatter automatically:
 
 - extracts a `Lesson Title` block when `title` is omitted;
+- extracts a leading Markdown H1 as the lesson title and removes Markdown heading, bold, code, and escape markers from the saved body;
 - removes separators and decorative emoji;
 - places standards in the lesson body;
 - uses Arial at the editor's default size;
@@ -57,6 +58,10 @@ The formatter automatically:
 - converts semantic and source-marked lists to bullets, preserving explicitly numbered steps;
 - changes time-range hyphens to en dashes;
 - replaces the lesson body instead of retaining Planbook's dummy scaffold.
+
+Agents should still pass the user's raw lesson text unchanged. Markdown cleanup is
+deterministic server behavior, so plans copied from ChatGPT, Markdown documents,
+or plain text follow the same Planbook formatting contract without agent-side HTML.
 
 ## Install
 

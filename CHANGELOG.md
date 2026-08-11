@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.0.4 - 2026-08-11
+
+### Fixed
+
+- Markdown lesson plans now save without literal `#`, `**`, backtick, or escaped-underscore markers.
+- A leading Markdown H1 is extracted as the lesson title and omitted from the lesson body.
+- Markdown section levels feed the existing bold-header, timed-header, bullet, Arial, and ESOL strategy formatting rules without agent-side preprocessing.
+
+### Documented
+
+- Clarified in the README, skill, and agent handoff that agents must send Markdown lesson text unchanged because deterministic server code owns cleanup.
+
+### Verified
+
+- Added a Markdown regression fixture covering H1 title extraction, major and timed headings, bold text, escaped blanks, standards, materials, and ESOL strategies.
+- Ran 18 automated tests and dry-ran the complete 5,062-character Unit 1 lesson with 14 headers, six timed soft breaks, 86 list items, Arial, and no leaked Markdown syntax.
+
 ## 2.0.3 - 2026-08-11
 
 ### Fixed

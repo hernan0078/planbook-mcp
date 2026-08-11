@@ -1,6 +1,7 @@
 import type { FormattedLesson } from "./types.js";
 
 const TITLE_LABEL = /^lesson\s+title\s*:?[\s]*$/i;
+const MARKDOWN_TITLE = /^#\s+(.+)$/u;
 const SEPARATOR = /^[\s\-_=⸻—–]{3,}$/u;
 const BULLET = /^\s*[*•-]\s+(.+)$/u;
 const NUMBERED = /^\s*(\d+|[A-Da-d])[.)]\s+(.+)$/u;
@@ -27,6 +28,14 @@ function stripEmoji(value: string): string {
     .trim();
 }
 
+function stripMarkdown(value: string): string {
+  return value
+    .replace(/^#{1,6}\s+/, "")
+    .replace(/\*\*([^*\n]+)\*\*/g, "$1")
+    .replace(/`([^`\n]+)`/g, "$1")
+    .replace(/\\([\\_*`])/g, "$1");
+}
+
 function normalizeTimeRanges(value: string): string {
   const normalized = value
     .replace(/(\d{1,2}:\d{2})\s*[-—]\s*(\d{1,2}:\d{2})/g, "$1–$2")
@@ -38,7 +47,7 @@ function normalizeTimeRanges(value: string): string {
 }
 
 function cleanLine(value: string): string {
-  return normalizeTimeRanges(stripEmoji(value)).trim();
+  return normalizeTimeRanges(stripMarkdown(stripEmoji(value))).trim();
 }
 
 function isHeading(value: string): boolean {
@@ -78,7 +87,18 @@ function implicitBulletIndexes(lines: string[]): Set<number> {
 function extractTitle(lines: string[]): { title?: string; body: string[] } {
   const body = [...lines];
   const labelIndex = body.findIndex((line) => TITLE_LABEL.test(cleanLine(line)));
-  if (labelIndex === -1) return { body };
+  if (labelIndex === -1) {
+    const firstContentIndex = body.findIndex((line) => {
+      const candidate = cleanLine(line);
+      return Boolean(candidate) && !SEPARATOR.test(candidate);
+    });
+    const markdownTitle = firstContentIndex >= 0
+      ? MARKDOWN_TITLE.exec((body[firstContentIndex] ?? "").trim())
+      : undefined;
+    if (!markdownTitle?.[1]) return { body };
+    body.splice(firstContentIndex, 1);
+    return { title: cleanLine(markdownTitle[1]), body };
+  }
 
   let titleIndex = labelIndex + 1;
   while (titleIndex < body.length) {

@@ -117,3 +117,32 @@ Choices:
   assert.match(result.html, /<ol><li>Read the prompt<\/li><li>Share an answer<\/li><\/ol>/);
   assert.match(result.html, /<ul><li>Beach<\/li><li>Pool<\/li><\/ul>/);
 });
+
+test("accepts Markdown lesson plans without leaking markup into Planbook", () => {
+  const result = formatLessonPlan(`# Community Vocabulary
+
+## Standards
+**ELA.8.V.1.1** - Use academic vocabulary.
+
+## Essential Question
+**How do words build community?**
+
+# Lesson - 50 Minutes
+### Word Warm-Up (0:00-0:05)
+- A new word is \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_.
+
+## Pages / Materials
+- **Vocabulary cards**
+
+## ESOL Strategies
+- **ESOL.A2 - Modeling**`);
+
+  assert.equal(result.title, "Community Vocabulary");
+  assert.doesNotMatch(result.html, /(?:##|\*\*|\\_)/);
+  assert.match(result.html, /<p><strong>Standards<\/strong><\/p><ul>/);
+  assert.match(result.html, /<li>ELA\.8\.V\.1\.1 – Use academic vocabulary\.<\/li>/);
+  assert.match(result.html, /<p>How do words build community\?<\/p>/);
+  assert.match(result.html, /<p><strong>Word Warm-Up \(0:00–0:05\)<\/strong><br><\/p>/);
+  assert.match(result.html, /<li>A new word is __________\.<\/li>/);
+  assert.match(result.html, /<p><strong>ESOL Strategies<\/strong><\/p><ul><li>ESOL\.A2 – Modeling<\/li>/);
+});
