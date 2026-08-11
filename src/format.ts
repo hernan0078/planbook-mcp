@@ -6,8 +6,10 @@ const BULLET = /^\s*[*•-]\s+(.+)$/u;
 const NUMBERED = /^\s*(\d+|[A-Da-d])[.)]\s+(.+)$/u;
 const STANDARD_CODE = /^(?:[A-Z]{2,}(?:\.[A-Z0-9]+)+|[A-Z]{2,}\.[A-Z0-9.]+)\s*[–—-]/u;
 const ASSESSMENT_ITEM = /\s[–—-]\s*(?:Formative|Summative|Classwork)\s*$/i;
+const ESOL_STRATEGY = /^ESOL\.[A-Z]\d+\s*[–—-]/i;
+const TIME_RANGE = /\d{1,2}:\d{2}\s*[–—-]\s*\d{1,2}:\d{2}/u;
 
-const KNOWN_HEADER = /^(?:standards|essential\s+question|objectives?|assessment|why\s+this\s+lesson\s+works|lesson(?:\s*\([^)]*\))?|part\s+\d+\b.*|bell\s+ringer(?:\s*\/\s*setup)?(?:\s*\([^)]*\))?|closure(?:\s*\([^)]*\))?|mini\s+lesson\b.*|guided\s+practice\b.*|independent\s+practice\b.*|reading\b.*|transition(?:\s*\([^)]*\))?|assessment\s+expectations\b.*|standards\s+mastery\s+quiz\b.*|early\s+finisher\s+task(?:\s*\([^)]*\))?)$/i;
+const KNOWN_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*\d+\s*minutes|\s*\([^)]*\))?|part\s+\d+\b.*|bell\s+ringer\b.*|closure\b.*|mini\s+lesson\b.*|guided\s+practice\b.*|independent\s+practice\b.*|reading\b.*|transition\b.*|assessment\s+expectations\b.*|standards\s+mastery\s+quiz\b.*|early\s+finisher\s+task\b.*)$/i;
 
 function escapeHtml(value: string): string {
   return value
@@ -26,9 +28,13 @@ function stripEmoji(value: string): string {
 }
 
 function normalizeTimeRanges(value: string): string {
-  return value
+  const normalized = value
     .replace(/(\d{1,2}:\d{2})\s*[-—]\s*(\d{1,2}:\d{2})/g, "$1–$2")
     .replace(/\s+-\s+/g, " – ");
+  return normalized.replace(
+    /^(.+?)\s+[–—-]\s+(\d{1,2}:\d{2}–\d{1,2}:\d{2})\s*$/u,
+    "$1 ($2)",
+  );
 }
 
 function cleanLine(value: string): string {
@@ -37,10 +43,36 @@ function cleanLine(value: string): string {
 
 function isHeading(value: string): boolean {
   const line = value.trim();
-  if (!line || line.endsWith(":")) return false;
-  if (KNOWN_HEADER.test(line)) return true;
-  if (/\(\d{1,2}:\d{2}–\d{1,2}:\d{2}\)\s*$/u.test(line)) return true;
-  return false;
+  if (!line) return false;
+  if (TIME_RANGE.test(line)) return true;
+  return KNOWN_HEADER.test(line.replace(/:\s*$/, ""));
+}
+
+function sectionName(value: string): string {
+  return value.replace(/:\s*$/, "").trim().toLowerCase();
+}
+
+function implicitBulletIndexes(lines: string[]): Set<number> {
+  const indexes = new Set<number>();
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const cue = cleanLine(lines[index] ?? "");
+    if (!cue.endsWith(":") || isHeading(cue)) continue;
+
+    const candidates: number[] = [];
+    for (let next = index + 1; next < lines.length; next += 1) {
+      const candidate = cleanLine(lines[next] ?? "");
+      if (!candidate || SEPARATOR.test(candidate) || isHeading(candidate)) break;
+      if (candidate.endsWith(":")) break;
+      candidates.push(next);
+    }
+
+    if (candidates.length >= 2) {
+      for (const candidate of candidates) indexes.add(candidate);
+    }
+  }
+
+  return indexes;
 }
 
 function extractTitle(lines: string[]): { title?: string; body: string[] } {
@@ -95,6 +127,7 @@ export function formatLessonPlan(source: string): FormattedLesson {
   const { title, body } = extractTitle(rawLines);
   const output: string[] = ['<div style="font-family: Arial, sans-serif;">'];
   const headings: string[] = [];
+  const inferredBullets = implicitBulletIndexes(body);
   let bulletCount = 0;
   let listType: "ul" | "ol" | undefined;
   let currentSection = "";
@@ -118,9 +151,11 @@ export function formatLessonPlan(source: string): FormattedLesson {
     bulletCount += 1;
   };
 
-  for (const rawLine of body) {
+  for (let index = 0; index < body.length; index += 1) {
+    const rawLine = body[index] ?? "";
     const line = cleanLine(rawLine);
-    if (!line || SEPARATOR.test(line)) {
+    if (!line) continue;
+    if (SEPARATOR.test(line)) {
       closeList();
       continue;
     }
@@ -140,14 +175,21 @@ export function formatLessonPlan(source: string): FormattedLesson {
     if (isHeading(line)) {
       closeList();
       headings.push(line);
-      currentSection = line.toLowerCase();
-      output.push(`<p><strong>${escapeHtml(line)}</strong></p>`);
+      currentSection = sectionName(line);
+      const softBreak = TIME_RANGE.test(line) ? "<br>" : "";
+      output.push(`<p><strong>${escapeHtml(line)}</strong>${softBreak}</p>`);
       continue;
     }
 
     const autoList =
       (currentSection === "standards" && STANDARD_CODE.test(line)) ||
-      (currentSection === "assessment" && ASSESSMENT_ITEM.test(line));
+      (currentSection === "objectives" && !/students\s+will\s+be\s+able\s+to:?$/i.test(line)) ||
+      currentSection === "agenda" ||
+      currentSection === "materials" ||
+      currentSection === "pages / materials" ||
+      (currentSection === "assessment" && ASSESSMENT_ITEM.test(line)) ||
+      (currentSection === "esol strategies" && ESOL_STRATEGY.test(line)) ||
+      inferredBullets.has(index);
     if (autoList) {
       addListItem("ul", line);
       continue;

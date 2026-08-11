@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { buildUpdateLessonPayload, comparableLessonText } from "./client.js";
+import {
+  assertActiveSchoolYear,
+  buildUpdateLessonPayload,
+  comparableLessonText,
+} from "./client.js";
 import type { LessonRecord } from "./types.js";
 
 test("uses Planbook's first-party field set when creating an empty lesson", () => {
@@ -54,4 +58,14 @@ test("compares Planbook HTML entities with their formatted source text", () => {
   const saved = "<p>First Day of ELA &ndash; Building Community &amp; Collaboration</p>";
 
   assert.equal(comparableLessonText(saved), comparableLessonText(source));
+});
+
+test("fails closed when Planbook has a different school year active", () => {
+  assert.doesNotThrow(() =>
+    assertActiveSchoolYear("year-2026", "year-2026", "MBA 2026-2027", "08/13/2026"),
+  );
+  assert.throws(
+    () => assertActiveSchoolYear("year-2025", "year-2026", "MBA 2026-2027", "08/13/2026"),
+    /Switch the Planbook year selector to MBA 2026-2027 in Chrome/,
+  );
 });

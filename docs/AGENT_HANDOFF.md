@@ -36,6 +36,7 @@ formatting, class resolution, full-year lesson lookup, upsert, and verification.
 3. If authentication expired, ask the user to log into Planbook in Chrome and run `npm run refresh`.
 4. If verification fails, do not immediately submit again; the MCP has already retried its read-back. Use `get_lesson` to inspect the target once.
 5. Retry once with the resolved `className` only when `get_lesson` confirms the target cell is still empty.
+6. If the MCP names a different active school year, switch Planbook's year selector in Chrome to the requested year, then retry once.
 
 The MCP mirrors Planbook's first-party date/class/extra-slot save contract and
 intentionally omits browser-only identity and linked-edit flags. Agents should
@@ -49,6 +50,20 @@ Class IDs remain authoritative during recovery; the resolver never substitutes a
 single lesson record that explicitly belongs to another period.
 Verification normalizes Planbook-generated HTML entities, so typographic dashes
 and other editor encodings do not trigger false save failures.
+Event-feed lessons inherit the date of their parent day record. Never accept a
+lesson ID returned for a neighboring day as proof that the requested cell exists.
+The MCP also refuses lesson reads and writes when Planbook's active year differs
+from the resolved class year; this prevents false-empty results and accidental
+extra lessons.
+
+## A/B2 Schedule
+
+- A day: P1, P3, P5, P7, P8
+- B2 day: P1, P2, P4, P6, P8
+- P1 and P8 meet every school day.
+
+Use the user's A/B2 designation and Planbook's scheduled class dates. Do not
+derive the rotation from weekday alone because holidays and closures can shift it.
 
 ## Formatting contract
 
@@ -57,9 +72,11 @@ The server, not the agent, applies these rules:
 - Arial, default editor size
 - no Planbook dummy scaffold
 - standards at the top of the lesson body
-- bold standalone section and timed subsection headers
+- bold standalone section headers, including `ESOL Strategies`, `Materials`, `Agenda`, and `Pages / Materials`
+- bold every timed subsection whether its source uses parentheses or a trailing dash
+- an explicit soft break after each timed header
 - en dashes in time ranges
-- bullet lists by default
+- source-marked bullets plus inferred bullets for clear standards, objectives, agenda, materials, assessment, ESOL strategy, and colon-introduced parallel lists
 - numbered lists only when the source explicitly numbers items
 - plain narrative text
 - no decorative emoji or horizontal rules

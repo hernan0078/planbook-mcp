@@ -10,6 +10,7 @@ Poetry Assessment and Rhythm Analysis: Scansion and Meter
 
 Standards
 ELA.8.R.1.1 - Analyze how text structures contribute to meaning
+
 ELA.8.R.3.1 – Explain how literary elements impact meaning
 
 Essential Question
@@ -44,7 +45,10 @@ test("formats a raw lesson deterministically", () => {
   assert.doesNotMatch(result.html, /Impact/);
   assert.doesNotMatch(result.html, /🔔/u);
   assert.match(result.html, /<p><strong>Standards<\/strong><\/p>/);
-  assert.match(result.html, /<li>ELA\.8\.R\.1\.1 – Analyze how text structures contribute to meaning<\/li>/);
+  assert.match(
+    result.html,
+    /<ul><li>ELA\.8\.R\.1\.1 – Analyze how text structures contribute to meaning<\/li><li>ELA\.8\.R\.3\.1 – Explain how literary elements impact meaning<\/li><\/ul>/,
+  );
   assert.match(result.html, /Bell Ringer \(0:00–0:10\)/);
   assert.match(result.html, /<ol><li>Break into syllables<\/li><li>Identify stress<\/li><\/ol>/);
   assert.match(result.html, /<p><strong>Assessment<\/strong><\/p><ul>/);
@@ -57,4 +61,59 @@ test("normalizes supported dates", () => {
   assert.equal(normalizeDate("5/1/2026"), "05/01/2026");
   assert.throws(() => normalizeDate("2026-02-30"), /Invalid calendar date/);
   assert.throws(() => normalizeDate("Monday May 11"), /Use YYYY-MM-DD/);
+});
+
+test("bolds and separates every timed header style", () => {
+  const result = formatLessonPlan(`Lesson Title
+Timing
+
+Lesson - 90 Minutes
+Bell Ringer - 0:00-0:10
+Students respond.
+Guided Practice (0:10-0:25)
+Students practice.`);
+
+  assert.match(result.html, /<p><strong>Lesson – 90 Minutes<\/strong><\/p>/);
+  assert.match(result.html, /<p><strong>Bell Ringer \(0:00–0:10\)<\/strong><br><\/p>/);
+  assert.match(result.html, /<p><strong>Guided Practice \(0:10–0:25\)<\/strong><br><\/p>/);
+});
+
+test("formats semantic sections and preserves explicit list markers", () => {
+  const result = formatLessonPlan(`Lesson Title
+Community
+
+Objectives
+Students will be able to:
+Ask questions.
+Answer questions.
+
+Materials
+Sticky notes
+Course syllabus
+
+Assessment
+Exit Ticket - Formative
+
+ESOL Strategies
+ESOL.A2 - Modeling
+ESOL.C56 - Collaborative Groups
+
+Teacher reviews:
+Respect others.
+Follow directions.
+
+Steps:
+1. Read the prompt
+2. Share an answer
+
+Choices:
+* Beach
+* Pool`);
+
+  assert.match(result.html, /<p><strong>ESOL Strategies<\/strong><\/p><ul>/);
+  assert.match(result.html, /<li>ESOL\.A2 – Modeling<\/li>/);
+  assert.match(result.html, /<p><strong>Materials<\/strong><\/p><ul>/);
+  assert.match(result.html, /<p>Teacher reviews:<\/p><ul><li>Respect others\.<\/li>/);
+  assert.match(result.html, /<ol><li>Read the prompt<\/li><li>Share an answer<\/li><\/ol>/);
+  assert.match(result.html, /<ul><li>Beach<\/li><li>Pool<\/li><\/ul>/);
 });

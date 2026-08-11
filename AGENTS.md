@@ -23,4 +23,7 @@ Never commit `cookies.json`, authentication tokens, cookie identifiers, or lesso
 - Send raw lesson text unchanged; deterministic server code owns formatting.
 - Default to `overwrite: true` and `verify: true` so dummy text is replaced and the saved target is checked.
 - Keep Arial at Planbook's default font size.
+- Bold all major headers, including ESOL Strategies, and every timed header; preserve source lists and soft-separate timed sections.
+- Remember the school rotation: A days are P1/P3/P5/P7/P8; B2 days are P1/P2/P4/P6/P8; P1 and P8 meet daily.
+- Treat Planbook's scheduled dates as authoritative and fail closed on an active-school-year mismatch.
 - Do not silently fall back to browser automation when the MCP is unavailable.

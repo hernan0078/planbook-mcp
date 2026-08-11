@@ -128,6 +128,27 @@ test("finds an extra lesson nested under a dated event day", () => {
   assert.equal(lesson?.raw.extraLesson, 1);
 });
 
+test("does not use an adjacent dated event for the requested day", () => {
+  const payload = {
+    days: [
+      {
+        date: "08/14/2026",
+        objects: [
+          {
+            classId: 31993309,
+            lessonId: 1539927448,
+            lessonTitle: "Friday lesson",
+            lessonText: "<p>Lesson</p>",
+          },
+        ],
+      },
+    ],
+  };
+
+  assert.equal(findLesson(payload, "31993309", "08/13/2026"), undefined);
+  assert.equal(findLesson(payload, "31993309", "08/14/2026")?.id, "1539927448");
+});
+
 test("never falls back to a lesson that explicitly belongs to another class", () => {
   const payload = {
     day: {

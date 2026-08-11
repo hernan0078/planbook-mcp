@@ -78,6 +78,13 @@ The installer automatically tries the CLI bundled with the ChatGPT desktop app a
 
 Open Planbook in Chrome, confirm you are logged in, then run `npm run refresh` again. The MCP also retries one expired session automatically.
 
+### Planbook has another school year active
+
+Planbook can return an empty lesson array for a valid class when its year selector
+is set to another school year, even when the API request includes the target year.
+Version 2.0.3 and later detects this mismatch and stops before saving. In Chrome,
+open Planbook, select the school year named in the error, and retry the MCP call.
+
 ### The repository moved
 
 Run `./install-codex.sh` from the new location. It replaces only the `planbook` MCP entry with the new absolute path.
@@ -90,6 +97,12 @@ save client omits, which could leave blank cells unchanged. Current releases
 mirror the first-party save contract, automatically select an extra-lesson slot
 for dates outside the class sequence, verify extras through the date-event feed,
 and perform bounded read-back retries.
+
+### A lesson appears unchanged after a verified update
+
+Planbook's open plan view may retain its pre-update class payload. Reload the
+Planbook page or leave and return to the date before judging the rendered result.
+Use `get_lesson` for the authoritative saved HTML check.
 
 ## Safe Reinstallation
 

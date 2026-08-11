@@ -13,6 +13,8 @@ lookup, formatting, replacement, saving, and verification.
 - Raw pasted lesson text is formatted deterministically inside the server.
 - Tool results are compact structured objects, not full Planbook API responses.
 - Existing lessons are resolved from Planbook's full-year class payload, making retries idempotent.
+- Nested event-feed lessons inherit their parent day, so an adjacent-day event can never satisfy the requested date.
+- Reads and writes fail closed when Planbook has a different school year active instead of treating the target as an empty lesson.
 - Save requests mirror Planbook's first-party date/class/slot contract and omit browser-only identity and linked-edit flags.
 - Dates outside a class's normal sequence automatically use Planbook's extra-lesson slot instead of silently no-oping.
 - Extra lessons are discovered and verified through Planbook's date-event feed, making retries update the same record.
@@ -50,7 +52,9 @@ The formatter automatically:
 - places standards in the lesson body;
 - uses Arial at the editor's default size;
 - bolds section and timed subsection headers;
-- converts lists to bullets, preserving explicitly numbered steps;
+- soft-separates every timed header for scanability;
+- bolds `ESOL Strategies`, `Materials`, `Agenda`, and `Pages / Materials` like other major sections;
+- converts semantic and source-marked lists to bullets, preserving explicitly numbered steps;
 - changes time-range hyphens to en dashes;
 - replaces the lesson body instead of retaining Planbook's dummy scaffold.
 
@@ -142,10 +146,19 @@ ambiguous, retry once with `className` from the error or from `list_classes`.
 Dates accept `YYYY-MM-DD` (preferred) or `MM/DD/YYYY`. Use `dryRun: true` to test
 parsing and formatting without authenticating or changing Planbook.
 
+For this school's rotating schedule, A days contain P1, P3, P5, P7, and P8;
+B2 days contain P1, P2, P4, P6, and P8. P1 and P8 meet every day. Do not infer
+the rotation from weekday alone because closures can shift it; use the user's A/B2
+designation and Planbook's scheduled class dates as the authoritative check.
+
 If Planbook reports that a save was accepted but cannot be verified, do not
 immediately submit it again. `upsert_lesson` already performs bounded read-back
 retries. Call `get_lesson` once to inspect the target; retry only when it confirms
 that the cell is still empty, and pin the retry with `className`.
+
+If the active-year guard reports a mismatch, switch the Planbook year selector in
+Chrome to the named year and retry. Do not save while another year is active;
+Planbook can otherwise return an empty lesson array for a valid future class.
 
 See [Agent handoff](docs/AGENT_HANDOFF.md) for complete usage and recovery rules.
 See [Changelog](CHANGELOG.md) for release notes and validation history.
@@ -157,8 +170,9 @@ npm install
 npm test
 ```
 
-The test suite covers date validation, title extraction, lesson formatting,
-class resolution, ambiguity handling, and existing-lesson detection.
+The test suite covers date validation, title extraction, timed and semantic lesson
+formatting, class resolution, ambiguity handling, exact event dates, active-year
+safety, and existing-lesson detection.
 
 Environment variables:
 

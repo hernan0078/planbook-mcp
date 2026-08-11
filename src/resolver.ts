@@ -132,29 +132,42 @@ function lessonField(record: JsonRecord, keys: readonly string[]): string {
 export function extractLessons(payload: unknown): LessonRecord[] {
   const lessons = new Map<string, LessonRecord>();
 
-  for (const record of deepRecords(payload)) {
+  const visit = (value: unknown, inheritedClassId?: string, inheritedDate?: string): void => {
+    if (value === null || typeof value !== "object") return;
+    if (Array.isArray(value)) {
+      for (const item of value) visit(item, inheritedClassId, inheritedDate);
+      return;
+    }
+
+    const record = value as JsonRecord;
+    const classId = firstString(record, ["classId", "subjectId", "courseId"]) ?? inheritedClassId;
+    const date = firstString(record, ["customDate", "lessonDate", "date"]) ?? inheritedDate;
     const id = lessonField(record, ["lessonId", "id"]);
     const hasLessonSignal =
       "lessonId" in record ||
       "lessonText" in record ||
       "lessonTitle" in record ||
       "customDate" in record;
-    if (!id || id === "0" || !hasLessonSignal) continue;
+    if (id && id !== "0" && hasLessonSignal) {
+      lessons.set(id, {
+        id,
+        classId,
+        date,
+        title: lessonField(record, ["lessonTitle", "title"]),
+        lessonText: lessonField(record, ["lessonText", "text"]),
+        homeworkText: lessonField(record, ["homeworkText"]),
+        notesText: lessonField(record, ["notesText"]),
+        tab4Text: lessonField(record, ["tab4Text"]),
+        tab5Text: lessonField(record, ["tab5Text"]),
+        tab6Text: lessonField(record, ["tab6Text"]),
+        raw: record,
+      });
+    }
 
-    lessons.set(id, {
-      id,
-      classId: firstString(record, ["classId", "subjectId", "courseId"]),
-      date: firstString(record, ["customDate", "lessonDate", "date"]),
-      title: lessonField(record, ["lessonTitle", "title"]),
-      lessonText: lessonField(record, ["lessonText", "text"]),
-      homeworkText: lessonField(record, ["homeworkText"]),
-      notesText: lessonField(record, ["notesText"]),
-      tab4Text: lessonField(record, ["tab4Text"]),
-      tab5Text: lessonField(record, ["tab5Text"]),
-      tab6Text: lessonField(record, ["tab6Text"]),
-      raw: record,
-    });
-  }
+    for (const child of Object.values(record)) visit(child, classId, date);
+  };
+
+  visit(payload);
 
   return [...lessons.values()];
 }
@@ -168,7 +181,8 @@ export function findLesson(payload: unknown, classId: string, date: string): Les
   const exact = lessons.find(
     (lesson) =>
       (!lesson.classId || lesson.classId === classId) &&
-      (!lesson.date || compactDate(lesson.date) === compactDate(date)),
+      Boolean(lesson.date) &&
+      compactDate(lesson.date!) === compactDate(date),
   );
   return exact;
 }

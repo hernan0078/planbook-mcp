@@ -59,10 +59,13 @@ export class PlanbookClient {
     yearId?: string,
   ): Promise<{ lesson?: LessonRecord; scheduled: boolean }> {
     await this.ensureLoggedIn(false);
+    const targetYearId = yearId || this.yearsForDate(date)[0]?.id || this.yearId;
+    const targetYear = this.schoolYears.find((year) => year.id === targetYearId);
+    assertActiveSchoolYear(this.yearId, targetYearId, targetYear?.name, date);
     const payload = await this.request("GET", "/getClassLessons", {
       classId,
       teacherId: this.teacherId,
-      yearId: yearId || this.yearsForDate(date)[0]?.id || this.yearId,
+      yearId: targetYearId,
     });
     const scheduled = hasClassDate(payload, classId, date);
     let lesson = findLesson(payload, classId, date);
@@ -72,7 +75,7 @@ export class PlanbookClient {
       const events = await this.request("GET", "/getLessonsEvents", {
         date,
         teacherId: this.teacherId,
-        yearId: yearId || this.yearsForDate(date)[0]?.id || this.yearId,
+        yearId: targetYearId,
       });
       lesson = findLesson(events, classId, date);
     }
@@ -328,6 +331,18 @@ export class PlanbookClient {
     if (matching.length) return matching;
     throw new Error(`No Planbook school year contains ${date}.`);
   }
+}
+
+export function assertActiveSchoolYear(
+  activeYearId: string,
+  targetYearId: string,
+  targetYearName: string | undefined,
+  date: string,
+): void {
+  if (!activeYearId || !targetYearId || activeYearId === targetYearId) return;
+  throw new Error(
+    `Planbook's active school year does not contain ${date}. Switch the Planbook year selector to ${targetYearName || targetYearId} in Chrome, then retry.`,
+  );
 }
 
 async function parsePayload(response: Response): Promise<unknown> {

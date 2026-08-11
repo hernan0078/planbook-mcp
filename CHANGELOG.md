@@ -1,5 +1,27 @@
 # Changelog
 
+## 2.0.3 - 2026-08-11
+
+### Fixed
+
+- `ESOL Strategies`, `Materials`, `Agenda`, and `Pages / Materials` now render as bold major headers.
+- Every timed section is recognized in parenthesized or trailing-dash form, normalized to an en-dash range, bolded, and followed by a soft break.
+- Source bullets and explicit numbering remain intact; clear standards, objectives, agenda, materials, assessment, ESOL strategy, and colon-introduced groups now receive consistent bullets.
+- Blank lines inside a copied list no longer split it into multiple one-item lists.
+- Nested Planbook event lessons now inherit their parent day, preventing a Friday lesson from being returned for Thursday.
+- Lesson reads and writes now fail closed when Planbook's active school year differs from the resolved class year, preventing false-empty lookups and accidental extra lessons.
+
+### Documented
+
+- Added the school rotation: A days use P1/P3/P5/P7/P8, B2 days use P1/P2/P4/P6/P8, and P1/P8 meet daily.
+- Added active-year recovery, stale browser-cache guidance, exact-date agent behavior, and the expanded formatting contract to the README, install guide, skill, and agent handoff.
+
+### Verified
+
+- Ran 17 automated formatter, resolver, payload, active-year, and verification tests.
+- Dry-ran the original lesson sources and updated all five scheduled lessons on Thursday, August 13, 2026 and all five scheduled lessons on Friday, August 14, 2026 with verified read-back.
+- Audited all saved HTML for Arial, bold/soft-separated timed sections, bullet lists, and bold ESOL strategy headers; confirmed the corrected rendering in a freshly reloaded Planbook day view.
+
 ## 2.0.2 - 2026-08-10
 
 ### Fixed
