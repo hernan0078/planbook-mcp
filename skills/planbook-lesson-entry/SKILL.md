@@ -25,7 +25,7 @@ The MCP owns school-year lookup, class resolution, existing-lesson lookup, forma
 
 Formatting is deterministic: all major headers, including `ESOL Strategies`, are bold; every timed section is bold with an explicit soft break; source bullets and explicit numbering are preserved; clear semantic lists receive bullets; narrative remains plain. Never request or reproduce Impact.
 
-Pass Markdown lesson plans unchanged. The MCP extracts a leading H1 as the title and removes Markdown heading, bold, inline-code, and escape markers before saving; the agent must not strip or convert them first.
+Pass Markdown lesson plans unchanged. The MCP extracts a leading H1 as the title and removes Markdown heading, nested bold/italic, inline-code, and escape markers before saving; the agent must not strip or convert them first. It preserves source punctuation except for en dashes inside time ranges.
 
 ## A/B2 Schedule
 
@@ -42,6 +42,8 @@ Do not infer A/B2 from the weekday alone. Use the user's day designation when su
 - If authentication fails, ask the user to log into Planbook in Chrome, run `npm run refresh` in the installed MCP folder, and retry.
 - If the active school year differs, ask the user to select the year named by the MCP in Planbook's Chrome year selector, then retry. Never treat that error as an empty lesson.
 - If the `planbook` MCP is unavailable, ask the user to restart Codex so the new MCP configuration loads. Do not silently fall back to browser automation.
+- After an MCP update, restart Codex before writing. A running process keeps the old formatter even when the repository has been rebuilt.
+- Treat a formatting verification failure as a real failure. Inspect once with `get_lesson`; do not accept matching text when Markdown, bold/list structure, Arial, or timed-header soft breaks are wrong.
 
 ## Multiple Lessons
 

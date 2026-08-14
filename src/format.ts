@@ -2,7 +2,7 @@ import type { FormattedLesson } from "./types.js";
 
 const TITLE_LABEL = /^lesson\s+title\s*:?[\s]*$/i;
 const MARKDOWN_TITLE = /^#\s+(.+)$/u;
-const SEPARATOR = /^[\s\-_=⸻—–]{3,}$/u;
+const SEPARATOR = /^(?:[\s\-_=—–]{3,}|⸻+)$/u;
 const BULLET = /^\s*[*•-]\s+(.+)$/u;
 const NUMBERED = /^\s*(\d+|[A-Da-d])[.)]\s+(.+)$/u;
 const STANDARD_CODE = /^(?:[A-Z]{2,}(?:\.[A-Z0-9]+)+|[A-Z]{2,}\.[A-Z0-9.]+)\s*[–—-]/u;
@@ -29,17 +29,26 @@ function stripEmoji(value: string): string {
 }
 
 function stripMarkdown(value: string): string {
-  return value
-    .replace(/^#{1,6}\s+/, "")
-    .replace(/\*\*([^*\n]+)\*\*/g, "$1")
-    .replace(/`([^`\n]+)`/g, "$1")
-    .replace(/\\([\\_*`])/g, "$1");
+  const headingFree = value.replace(/^#{1,6}\s+/, "");
+  const bullet = /^(\s*[*•-]\s+)(.*)$/u.exec(headingFree);
+  const prefix = bullet?.[1] ?? "";
+  const content = bullet?.[2] ?? headingFree;
+
+  return prefix + content
+    // Remove bold markers first so nested italics become a simple pair.
+    .replace(/\*\*/g, "")
+    .replace(/(?<!\w)\*([^*\n]+)\*(?!\w)/g, "$1")
+    .replace(/\\([\\_*`])/g, "$1")
+    .replace(/(?<!_)__([^_\n]+)__(?!_)/g, "$1")
+    .replace(/(?<!\w)_([^_\n]+)_(?!\w)/g, "$1")
+    .replace(/`([^`\n]+)`/g, "$1");
 }
 
 function normalizeTimeRanges(value: string): string {
-  const normalized = value
-    .replace(/(\d{1,2}:\d{2})\s*[-—]\s*(\d{1,2}:\d{2})/g, "$1–$2")
-    .replace(/\s+-\s+/g, " – ");
+  const normalized = value.replace(
+    /(\d{1,2}:\d{2})\s*[-—]\s*(\d{1,2}:\d{2})/g,
+    "$1–$2",
+  );
   return normalized.replace(
     /^(.+?)\s+[–—-]\s+(\d{1,2}:\d{2}–\d{1,2}:\d{2})\s*$/u,
     "$1 ($2)",

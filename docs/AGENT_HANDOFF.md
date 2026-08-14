@@ -29,8 +29,8 @@ Defaults already match normal operation:
 Do not generate HTML. Do not call class or lesson discovery first. The MCP owns
 formatting, class resolution, full-year lesson lookup, upsert, and verification.
 Send Markdown plans unchanged: the formatter extracts a leading `#` title and
-removes Markdown heading, bold, inline-code, and escaped-character markers before
-applying Planbook formatting.
+removes Markdown heading, nested bold/italic, inline-code, and escaped-character
+markers before applying Planbook formatting.
 
 ## Compact recovery flow
 
@@ -51,8 +51,10 @@ from the class's full-year sequence; retries therefore update the existing extra
 slot instead of creating duplicates.
 Class IDs remain authoritative during recovery; the resolver never substitutes a
 single lesson record that explicitly belongs to another period.
-Verification normalizes Planbook-generated HTML entities, so typographic dashes
-and other editor encodings do not trigger false save failures.
+Verification normalizes Planbook-generated HTML entities, compares the complete
+visible body, matches list and bold structure, and rejects visible Markdown or
+malformed timed headings. It no longer accepts a save merely because its first
+120 normalized characters match.
 Event-feed lessons inherit the date of their parent day record. Never accept a
 lesson ID returned for a neighboring day as proof that the requested cell exists.
 The MCP also refuses lesson reads and writes when Planbook's active year differs
@@ -84,6 +86,8 @@ The server, not the agent, applies these rules:
 - plain narrative text
 - no decorative emoji or horizontal rules
 - no literal Markdown `#`, `**`, backtick, or escaped-underscore markers
+- no literal single-asterisk italics, including nested emphasis around book or story titles
+- source punctuation remains unchanged except hyphens inside time ranges, which become en dashes
 
 ## Dry run
 
@@ -108,3 +112,8 @@ confirmation with title, date, period, action, and verification state is enough.
 Every implementation or workflow update must also update the applicable guide,
 `CHANGELOG.md`, and release notes, then be pushed and published on GitHub. Follow
 the repository checklist in `AGENTS.md`.
+
+After pulling or rebuilding the MCP, restart Codex before any live write. An open
+MCP process keeps its loaded formatter even when `dist/index.js` changes on disk.
+For a formatting release, audit existing lessons written by the older process;
+upgrading prevents future defects but does not rewrite already-saved HTML.

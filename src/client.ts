@@ -168,9 +168,7 @@ export class PlanbookClient {
       if (
         saved &&
         saved.title.trim() === args.title.trim() &&
-        comparableLessonText(saved.lessonText).includes(
-          comparableLessonText(args.lessonText).slice(0, 120),
-        )
+        savedLessonMatches(saved.lessonText, args.lessonText)
       ) {
         return saved;
       }
@@ -411,6 +409,63 @@ export function comparableLessonText(html: string): string {
     .replace(/\s+/g, " ")
     .trim()
     .toLowerCase();
+}
+
+export function savedLessonMatches(savedHtml: string, expectedHtml: string): boolean {
+  if (normalizedVisibleLessonText(savedHtml) !== normalizedVisibleLessonText(expectedHtml)) {
+    return false;
+  }
+  if (lessonFormattingIssues(savedHtml).length) return false;
+
+  return ["strong", "li", "ol", "ul"].every(
+    (tag) => countTag(savedHtml, tag) === countTag(expectedHtml, tag),
+  );
+}
+
+export function lessonFormattingIssues(html: string): string[] {
+  const issues: string[] = [];
+  const text = visibleLessonText(html);
+
+  if (!/font-family\s*:\s*Arial(?:\s*,|\s*;)/i.test(html)) issues.push("lesson is not Arial");
+  if (/(?:^|\n)\s*#{1,6}\s+/m.test(text)) issues.push("Markdown heading marker is visible");
+  if (/\*\*|(?<!_)__[^_\n]+__(?!_)|`[^`\n]+`|\\[_*`]/.test(text)) {
+    issues.push("Markdown emphasis or escape marker is visible");
+  }
+  if (/(^|\s)\*[^*\n]+\*(?=\s|[.,!?;:]|$)/m.test(text)) {
+    issues.push("Markdown italic marker is visible");
+  }
+
+  for (const match of html.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)) {
+    const paragraph = match[1] ?? "";
+    if (!/\d{1,2}:\d{2}\s*(?:[–—-]|&(?:ndash|mdash);|&#(?:8211|8212);)\s*\d{1,2}:\d{2}/i.test(paragraph)) {
+      continue;
+    }
+    if (!/<(?:strong|b)\b/i.test(paragraph)) issues.push("timed header is not bold");
+    if (!/<br\s*\/?>/i.test(paragraph)) issues.push("timed header has no soft break");
+  }
+
+  return [...new Set(issues)];
+}
+
+function countTag(html: string, tag: string): number {
+  return (html.match(new RegExp(`<${tag}\\b`, "gi")) ?? []).length;
+}
+
+function visibleLessonText(html: string): string {
+  return html
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/(?:p|li|ul|ol)>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;|&#160;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&ndash;|&#8211;/gi, "–")
+    .replace(/&mdash;|&#8212;/gi, "—")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'");
+}
+
+function normalizedVisibleLessonText(html: string): string {
+  return visibleLessonText(html).replace(/\s+/g, " ").trim();
 }
 
 export function buildUpdateLessonPayload(args: {

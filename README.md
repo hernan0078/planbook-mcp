@@ -18,7 +18,7 @@ lookup, formatting, replacement, saving, and verification.
 - Save requests mirror Planbook's first-party date/class/slot contract and omit browser-only identity and linked-edit flags.
 - Dates outside a class's normal sequence automatically use Planbook's extra-lesson slot instead of silently no-oping.
 - Extra lessons are discovered and verified through Planbook's date-event feed, making retries update the same record.
-- Verification normalizes Planbook's HTML entities before comparing saved content with the formatted source.
+- Verification compares the complete saved body and formatting structure, rejects visible Markdown, and normalizes Planbook's HTML entities.
 - Ambiguous classes produce a short actionable error; `list_classes` is only a fallback.
 - Session expiry is retried once after a safe Chrome-cookie refresh.
 - Save verification performs short bounded read-back retries to tolerate API propagation without agent retries.
@@ -48,7 +48,7 @@ and API work.
 The formatter automatically:
 
 - extracts a `Lesson Title` block when `title` is omitted;
-- extracts a leading Markdown H1 as the lesson title and removes Markdown heading, bold, code, and escape markers from the saved body;
+- extracts a leading Markdown H1 as the lesson title and removes Markdown heading, nested bold/italic, code, and escape markers from the saved body;
 - removes separators and decorative emoji;
 - places standards in the lesson body;
 - uses Arial at the editor's default size;
@@ -56,7 +56,7 @@ The formatter automatically:
 - soft-separates every timed header for scanability;
 - bolds `ESOL Strategies`, `Materials`, `Agenda`, and `Pages / Materials` like other major sections;
 - converts semantic and source-marked lists to bullets, preserving explicitly numbered steps;
-- changes time-range hyphens to en dashes;
+- changes only time-range hyphens to en dashes while preserving other source punctuation;
 - replaces the lesson body instead of retaining Planbook's dummy scaffold.
 
 Agents should still pass the user's raw lesson text unchanged. Markdown cleanup is
@@ -91,7 +91,9 @@ cd planbook-mcp
 npm run refresh
 ```
 
-Restart Codex once after installation. You can then paste a lesson plan with its
+Restart Codex once after installation. An already-running MCP process does not
+reload a rebuilt `dist/index.js`; continuing an old process can preserve a bug
+that has already been fixed on disk. You can then paste a lesson plan with its
 date and period and ask Codex to add it to Planbook. The skill calls
 `upsert_lesson` directly with verified overwrite enabled, so the existing lesson
 body and dummy scaffold are replaced rather than appended.
@@ -160,6 +162,11 @@ If Planbook reports that a save was accepted but cannot be verified, do not
 immediately submit it again. `upsert_lesson` already performs bounded read-back
 retries. Call `get_lesson` once to inspect the target; retry only when it confirms
 that the cell is still empty, and pin the retry with `className`.
+
+Verification is intentionally strict: the complete visible lesson text, list and
+bold structure, Arial wrapper, timed-header soft breaks, and absence of Markdown
+artifacts must all match. A verification failure can therefore mean Planbook
+saved the text but changed its formatting; inspect before retrying.
 
 If the active-year guard reports a mismatch, switch the Planbook year selector in
 Chrome to the named year and retry. Do not save while another year is active;

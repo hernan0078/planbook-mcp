@@ -5,6 +5,8 @@ import {
   assertActiveSchoolYear,
   buildUpdateLessonPayload,
   comparableLessonText,
+  lessonFormattingIssues,
+  savedLessonMatches,
 } from "./client.js";
 import type { LessonRecord } from "./types.js";
 
@@ -58,6 +60,28 @@ test("compares Planbook HTML entities with their formatted source text", () => {
   const saved = "<p>First Day of ELA &ndash; Building Community &amp; Collaboration</p>";
 
   assert.equal(comparableLessonText(saved), comparableLessonText(source));
+});
+
+test("rejects a save that preserves text but leaks Markdown and loses formatting", () => {
+  const expected = '<div style="font-family: Arial, sans-serif;"><p><strong>Standards</strong></p><ul><li>ELA.9.R.1.1 – Analyze a text.</li></ul><p><strong>Reading (0:05–0:20)</strong><br></p></div>';
+  const leaked = '<div style="font-family: Arial, sans-serif;"><p>## Standards</p><p>**ELA.9.R.1.1 – Analyze a text.**</p><p>### Reading (0:05&ndash;0:20)</p></div>';
+
+  assert.equal(comparableLessonText(leaked), comparableLessonText(expected));
+  assert.equal(savedLessonMatches(leaked, expected), false);
+  assert.deepEqual(lessonFormattingIssues(leaked), [
+    "Markdown heading marker is visible",
+    "Markdown emphasis or escape marker is visible",
+    "timed header is not bold",
+    "timed header has no soft break",
+  ]);
+});
+
+test("accepts an entity-normalized save with the complete expected structure", () => {
+  const expected = '<div style="font-family: Arial, sans-serif;"><p><strong>Reading (0:05–0:20)</strong><br></p><ul><li>Text &amp; evidence</li></ul></div>';
+  const saved = '<div style="font-family: Arial, sans-serif;"><p><strong>Reading (0:05&ndash;0:20)</strong><br></p><ul><li>Text &amp; evidence</li></ul></div>';
+
+  assert.equal(savedLessonMatches(saved, expected), true);
+  assert.equal(savedLessonMatches(saved.replace("Text &amp; evidence", "Text and evidence"), expected), false);
 });
 
 test("fails closed when Planbook has a different school year active", () => {

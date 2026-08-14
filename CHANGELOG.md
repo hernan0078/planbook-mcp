@@ -1,5 +1,25 @@
 # Changelog
 
+## 2.0.5 - 2026-08-14
+
+### Fixed
+
+- Nested Markdown emphasis, including bold prompts containing italicized titles, is removed without consuming source bullets or answer blanks.
+- Save verification now checks the complete normalized lesson body, Arial wrapper, list and bold structure, visible Markdown artifacts, and timed-header soft breaks instead of accepting a 120-character prefix.
+- Ordinary hyphens and source punctuation are preserved; only hyphens inside time ranges are normalized to en dashes.
+- Single-character `⸻` separators are removed consistently.
+
+### Documented
+
+- Added stale-MCP restart guidance and a post-upgrade saved-HTML audit checklist to the README, Codex installation guide, skill, and agent handoff.
+- Clarified that a rebuild prevents future formatting defects but does not rewrite lessons saved by an already-running older process.
+
+### Verified
+
+- Added regressions for nested bold/italic Markdown, escaped answer blanks, full-body save verification, formatting-structure mismatches, and Planbook HTML entities.
+- Ran 21 automated tests and dry-ran all original affected lesson sources.
+- Replaced and verified 17 affected lessons, then audited all 25 scheduled lessons for August 17–21, 2026: 25 passed with Arial, 208 bold soft-separated timed headers, 1,672 list items, bold major headers, and no visible Markdown.
+
 ## 2.0.4 - 2026-08-11
 
 ### Fixed

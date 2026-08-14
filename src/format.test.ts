@@ -47,7 +47,7 @@ test("formats a raw lesson deterministically", () => {
   assert.match(result.html, /<p><strong>Standards<\/strong><\/p>/);
   assert.match(
     result.html,
-    /<ul><li>ELA\.8\.R\.1\.1 – Analyze how text structures contribute to meaning<\/li><li>ELA\.8\.R\.3\.1 – Explain how literary elements impact meaning<\/li><\/ul>/,
+    /<ul><li>ELA\.8\.R\.1\.1 - Analyze how text structures contribute to meaning<\/li><li>ELA\.8\.R\.3\.1 – Explain how literary elements impact meaning<\/li><\/ul>/,
   );
   assert.match(result.html, /Bell Ringer \(0:00–0:10\)/);
   assert.match(result.html, /<ol><li>Break into syllables<\/li><li>Identify stress<\/li><\/ol>/);
@@ -73,7 +73,7 @@ Students respond.
 Guided Practice (0:10-0:25)
 Students practice.`);
 
-  assert.match(result.html, /<p><strong>Lesson – 90 Minutes<\/strong><\/p>/);
+  assert.match(result.html, /<p><strong>Lesson - 90 Minutes<\/strong><\/p>/);
   assert.match(result.html, /<p><strong>Bell Ringer \(0:00–0:10\)<\/strong><br><\/p>/);
   assert.match(result.html, /<p><strong>Guided Practice \(0:10–0:25\)<\/strong><br><\/p>/);
 });
@@ -111,7 +111,7 @@ Choices:
 * Pool`);
 
   assert.match(result.html, /<p><strong>ESOL Strategies<\/strong><\/p><ul>/);
-  assert.match(result.html, /<li>ESOL\.A2 – Modeling<\/li>/);
+  assert.match(result.html, /<li>ESOL\.A2 - Modeling<\/li>/);
   assert.match(result.html, /<p><strong>Materials<\/strong><\/p><ul>/);
   assert.match(result.html, /<p>Teacher reviews:<\/p><ul><li>Respect others\.<\/li>/);
   assert.match(result.html, /<ol><li>Read the prompt<\/li><li>Share an answer<\/li><\/ol>/);
@@ -140,9 +140,27 @@ test("accepts Markdown lesson plans without leaking markup into Planbook", () =>
   assert.equal(result.title, "Community Vocabulary");
   assert.doesNotMatch(result.html, /(?:##|\*\*|\\_)/);
   assert.match(result.html, /<p><strong>Standards<\/strong><\/p><ul>/);
-  assert.match(result.html, /<li>ELA\.8\.V\.1\.1 – Use academic vocabulary\.<\/li>/);
+  assert.match(result.html, /<li>ELA\.8\.V\.1\.1 - Use academic vocabulary\.<\/li>/);
   assert.match(result.html, /<p>How do words build community\?<\/p>/);
   assert.match(result.html, /<p><strong>Word Warm-Up \(0:00–0:05\)<\/strong><br><\/p>/);
   assert.match(result.html, /<li>A new word is __________\.<\/li>/);
-  assert.match(result.html, /<p><strong>ESOL Strategies<\/strong><\/p><ul><li>ESOL\.A2 – Modeling<\/li>/);
+  assert.match(result.html, /<p><strong>ESOL Strategies<\/strong><\/p><ul><li>ESOL\.A2 - Modeling<\/li>/);
+});
+
+test("removes nested Markdown emphasis without consuming source bullets", () => {
+  const result = formatLessonPlan(`# Lesson Title
+
+**Point of View - Seeing *Thank You, Ma'am* Through Roger's Eyes**
+
+## Standards
+- **ELA.6.R.1.3** - Explain point of view.
+
+### Reading - *Thank You, Ma'am* (0:05-0:20)
+- **Use *text evidence* in the response.**`);
+
+  assert.equal(result.title, "Point of View - Seeing Thank You, Ma'am Through Roger's Eyes");
+  assert.doesNotMatch(result.html, /(?:\*\*|##|`)/);
+  assert.match(result.html, /<li>ELA\.6\.R\.1\.3 - Explain point of view\.<\/li>/);
+  assert.match(result.html, /<p><strong>Reading - Thank You, Ma&#39;am \(0:05–0:20\)<\/strong><br><\/p>/);
+  assert.match(result.html, /<li>Use text evidence in the response\.<\/li>/);
 });

@@ -114,4 +114,12 @@ git pull --ff-only
 npm run refresh
 ```
 
-Restart Codex after an MCP or skill update.
+Restart Codex after an MCP or skill update. Rebuilding the repository does not
+hot-reload an MCP process that is already running.
+
+After a formatting-related update, use `get_lesson` with `includeHtml: true` to
+audit lessons written by the previous version. Confirm Arial, bold major and
+timed headers, a soft break after each timed header, preserved lists, and no
+visible `#`, `**`, single-asterisk italics, backticks, or escaped Markdown.
+Reinstalling prevents future defects but does not automatically rewrite saved
+Planbook lessons.
