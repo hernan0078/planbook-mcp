@@ -49,6 +49,7 @@ The formatter automatically:
 
 - extracts a `Lesson Title` block when `title` is omitted;
 - extracts a leading Markdown H1 as the lesson title and removes Markdown heading, nested bold/italic, code, and escape markers from the saved body;
+- extracts an unlabeled first-line title when the next section is `Standards`, preventing the title from being duplicated in the lesson body;
 - removes separators and decorative emoji;
 - places standards in the lesson body;
 - uses Arial at the editor's default size;

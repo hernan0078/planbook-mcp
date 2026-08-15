@@ -25,7 +25,7 @@ The MCP owns school-year lookup, class resolution, existing-lesson lookup, forma
 
 Formatting is deterministic: all major headers, including `ESOL Strategies`, are bold; every timed section is bold with an explicit soft break; source bullets and explicit numbering are preserved; clear semantic lists receive bullets; narrative remains plain. Never request or reproduce Impact.
 
-Pass Markdown lesson plans unchanged. The MCP extracts a leading H1 as the title and removes Markdown heading, nested bold/italic, inline-code, and escape markers before saving; the agent must not strip or convert them first. It preserves source punctuation except for en dashes inside time ranges.
+Pass lesson plans unchanged. The MCP extracts a `Lesson Title` block, a leading H1, or an unlabeled first-line title followed by `Standards`. It removes Markdown heading, nested bold/italic, inline-code, and escape markers before saving; the agent must not strip, label, or convert them first. It preserves source punctuation except for en dashes inside time ranges.
 
 ## A/B2 Schedule
 

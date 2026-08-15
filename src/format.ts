@@ -10,6 +10,7 @@ const ASSESSMENT_ITEM = /\s[–—-]\s*(?:Formative|Summative|Classwork)\s*$/i;
 const ESOL_STRATEGY = /^ESOL\.[A-Z]\d+\s*[–—-]/i;
 const TIME_RANGE = /\d{1,2}:\d{2}\s*[–—-]\s*\d{1,2}:\d{2}/u;
 
+const MAJOR_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*\d+\s*minutes|\s*\([^)]*\))?|part\s+\d+\b.*)$/i;
 const KNOWN_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*\d+\s*minutes|\s*\([^)]*\))?|part\s+\d+\b.*|bell\s+ringer\b.*|closure\b.*|mini\s+lesson\b.*|guided\s+practice\b.*|independent\s+practice\b.*|reading\b.*|transition\b.*|assessment\s+expectations\b.*|standards\s+mastery\s+quiz\b.*|early\s+finisher\s+task\b.*)$/i;
 
 function escapeHtml(value: string): string {
@@ -104,9 +105,24 @@ function extractTitle(lines: string[]): { title?: string; body: string[] } {
     const markdownTitle = firstContentIndex >= 0
       ? MARKDOWN_TITLE.exec((body[firstContentIndex] ?? "").trim())
       : undefined;
-    if (!markdownTitle?.[1]) return { body };
-    body.splice(firstContentIndex, 1);
-    return { title: cleanLine(markdownTitle[1]), body };
+    if (markdownTitle?.[1]) {
+      body.splice(firstContentIndex, 1);
+      return { title: cleanLine(markdownTitle[1]), body };
+    }
+
+    const firstLine = firstContentIndex >= 0 ? cleanLine(body[firstContentIndex] ?? "") : "";
+    const nextContentIndex = body.findIndex((line, index) => {
+      if (index <= firstContentIndex) return false;
+      const candidate = cleanLine(line);
+      return Boolean(candidate) && !SEPARATOR.test(candidate);
+    });
+    const nextLine = nextContentIndex >= 0 ? cleanLine(body[nextContentIndex] ?? "") : "";
+    if (firstLine && !isHeading(firstLine) && sectionName(nextLine) === "standards") {
+      body.splice(firstContentIndex, 1);
+      return { title: firstLine, body };
+    }
+
+    return { body };
   }
 
   let titleIndex = labelIndex + 1;
@@ -198,6 +214,14 @@ export function formatLessonPlan(source: string): FormattedLesson {
     const numbered = NUMBERED.exec(line);
     if (numbered?.[1] && numbered[2]) {
       addListItem("ol", numbered[2], numbered[1]);
+      continue;
+    }
+
+    const contextualList =
+      (currentSection === "agenda" && !MAJOR_HEADER.test(line.replace(/:\s*$/, ""))) ||
+      (currentSection === "assessment" && ASSESSMENT_ITEM.test(line));
+    if (contextualList) {
+      addListItem("ul", line);
       continue;
     }
 

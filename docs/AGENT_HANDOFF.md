@@ -31,6 +31,8 @@ formatting, class resolution, full-year lesson lookup, upsert, and verification.
 Send Markdown plans unchanged: the formatter extracts a leading `#` title and
 removes Markdown heading, nested bold/italic, inline-code, and escaped-character
 markers before applying Planbook formatting.
+An unlabeled first line is also extracted as the title when `Standards` is the
+next section. Do not add a synthetic `Lesson Title` label or remove that line.
 
 ## Compact recovery flow
 

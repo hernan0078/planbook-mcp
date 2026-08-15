@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.0.6 - 2026-08-15
+
+### Fixed
+
+- Plain-text plans whose first line is an unlabeled title and whose next section is `Standards` now extract that title automatically instead of duplicating it above Standards in the lesson body.
+- Heading-like entries inside Agenda and Assessment, such as `Bell Ringer - Formative`, remain list items while actual lesson section headers retain bold timed formatting.
+- Verification recognizes Planbook's `&rightarrow;` encoding as the original `→` character instead of reporting a false text mismatch.
+
+### Documented
+
+- Clarified in the README, skill, and agent handoff that agents must pass this title style unchanged without adding a synthetic label.
+
+### Verified
+
+- Added regression tests proving the title is used for Planbook metadata, omitted from the body, and followed immediately by Standards, that Agenda/Assessment preserve heading-like list items, and that Planbook's right-arrow entity round-trips exactly.
+
 ## 2.0.5 - 2026-08-14
 
 ### Fixed

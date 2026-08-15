@@ -460,6 +460,7 @@ function visibleLessonText(html: string): string {
     .replace(/&amp;/gi, "&")
     .replace(/&ndash;|&#8211;/gi, "–")
     .replace(/&mdash;|&#8212;/gi, "—")
+    .replace(/&rightarrow;|&#8594;/gi, "→")
     .replace(/&quot;/gi, '"')
     .replace(/&#39;|&apos;/gi, "'");
 }

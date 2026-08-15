@@ -164,3 +164,36 @@ test("removes nested Markdown emphasis without consuming source bullets", () => 
   assert.match(result.html, /<p><strong>Reading - Thank You, Ma&#39;am \(0:05–0:20\)<\/strong><br><\/p>/);
   assert.match(result.html, /<li>Use text evidence in the response\.<\/li>/);
 });
+
+test("extracts an unlabeled leading title when Standards follows", () => {
+  const result = formatLessonPlan(`Unit 1 - My Life: The Verb Be and Uncover the Story
+Standards
+ELA.9.C.3.1 - Follow standard English grammar.
+
+Essential Question
+How can we use the verb be?`);
+
+  assert.equal(result.title, "Unit 1 - My Life: The Verb Be and Uncover the Story");
+  assert.match(result.html, /^<div style="font-family: Arial, sans-serif;"><p><strong>Standards<\/strong><\/p>/);
+  assert.doesNotMatch(result.html, /Verb Be and Uncover the Story/);
+});
+
+test("keeps heading-like agenda and assessment entries as list items", () => {
+  const result = formatLessonPlan(`Lesson Title
+Context-Aware Lists
+
+Agenda
+Bell Ringer - Warm-Up
+Guided Practice
+Lesson - 50 Minutes
+Bell Ringer (0:00-0:05)
+Students respond.
+
+Assessment
+Bell Ringer - Formative
+Exit Ticket - Formative`);
+
+  assert.match(result.html, /<p><strong>Agenda<\/strong><\/p><ul><li>Bell Ringer - Warm-Up<\/li><li>Guided Practice<\/li><\/ul>/);
+  assert.match(result.html, /<p><strong>Lesson - 50 Minutes<\/strong><\/p>/);
+  assert.match(result.html, /<p><strong>Assessment<\/strong><\/p><ul><li>Bell Ringer - Formative<\/li><li>Exit Ticket - Formative<\/li><\/ul>/);
+});

@@ -77,8 +77,8 @@ test("rejects a save that preserves text but leaks Markdown and loses formatting
 });
 
 test("accepts an entity-normalized save with the complete expected structure", () => {
-  const expected = '<div style="font-family: Arial, sans-serif;"><p><strong>Reading (0:05–0:20)</strong><br></p><ul><li>Text &amp; evidence</li></ul></div>';
-  const saved = '<div style="font-family: Arial, sans-serif;"><p><strong>Reading (0:05&ndash;0:20)</strong><br></p><ul><li>Text &amp; evidence</li></ul></div>';
+  const expected = '<div style="font-family: Arial, sans-serif;"><p><strong>Reading (0:05–0:20)</strong><br></p><ul><li>Text &amp; evidence → response</li></ul></div>';
+  const saved = '<div style="font-family: Arial, sans-serif;"><p><strong>Reading (0:05&ndash;0:20)</strong><br></p><ul><li>Text &amp; evidence &rightarrow; response</li></ul></div>';
 
   assert.equal(savedLessonMatches(saved, expected), true);
   assert.equal(savedLessonMatches(saved.replace("Text &amp; evidence", "Text and evidence"), expected), false);
