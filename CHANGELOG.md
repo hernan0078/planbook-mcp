@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.0.7 - 2026-08-15
+
+### Fixed
+
+- Every Markdown heading in the lesson body now renders as a bold heading even when its label is lesson-specific, such as `Connect`, `Think`, or `Discuss`.
+- Markdown heading markers remain absent from saved Planbook text while their source hierarchy is retained visually.
+
+### Documented
+
+- Updated the README, skill, and agent handoff to clarify deterministic handling of unfamiliar Markdown subsection labels.
+
+### Verified
+
+- Added a regression fixture covering an extracted H1 title, a timed section, and three unfamiliar Markdown subsection headings.
+
 ## 2.0.6 - 2026-08-15
 
 ### Fixed

@@ -197,3 +197,24 @@ Exit Ticket - Formative`);
   assert.match(result.html, /<p><strong>Lesson - 50 Minutes<\/strong><\/p>/);
   assert.match(result.html, /<p><strong>Assessment<\/strong><\/p><ul><li>Bell Ringer - Formative<\/li><li>Exit Ticket - Formative<\/li><\/ul>/);
 });
+
+test("bolds unfamiliar Markdown subsection headings", () => {
+  const result = formatLessonPlan(`# Unit 2 Launch
+
+## Standards
+ELA.9.V.1.1 - Use academic vocabulary.
+
+### Explore the Essential Question (0:00-0:10)
+### Connect
+Students brainstorm.
+### Think
+Students complete a chart.
+### Discuss
+Partners share.`);
+
+  assert.equal(result.title, "Unit 2 Launch");
+  assert.match(result.html, /<p><strong>Connect<\/strong><\/p>/);
+  assert.match(result.html, /<p><strong>Think<\/strong><\/p>/);
+  assert.match(result.html, /<p><strong>Discuss<\/strong><\/p>/);
+  assert.doesNotMatch(result.html, /###/);
+});

@@ -198,6 +198,7 @@ export function formatLessonPlan(source: string): FormattedLesson {
 
   for (let index = 0; index < body.length; index += 1) {
     const rawLine = body[index] ?? "";
+    const markdownHeading = /^#{1,6}\s+/u.test(rawLine.trim());
     const line = cleanLine(rawLine);
     if (!line) continue;
     if (SEPARATOR.test(line)) {
@@ -225,7 +226,7 @@ export function formatLessonPlan(source: string): FormattedLesson {
       continue;
     }
 
-    if (isHeading(line)) {
+    if (markdownHeading || isHeading(line)) {
       closeList();
       headings.push(line);
       currentSection = sectionName(line);
