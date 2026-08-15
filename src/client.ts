@@ -417,7 +417,7 @@ export function savedLessonMatches(savedHtml: string, expectedHtml: string): boo
   }
   if (lessonFormattingIssues(savedHtml).length) return false;
 
-  return ["strong", "li", "ol", "ul"].every(
+  return ["strong", "li", "ol", "ul", "table", "tr", "th", "td"].every(
     (tag) => countTag(savedHtml, tag) === countTag(expectedHtml, tag),
   );
 }

@@ -1,5 +1,24 @@
 # Changelog
 
+## 2.0.8 - 2026-08-15
+
+### Added
+
+- Markdown tables now render as bordered HTML tables with preserved headers, rows, and cells instead of visible pipe and delimiter syntax.
+
+### Changed
+
+- Save verification now compares table, row, header-cell, and data-cell structure in addition to lesson text, headings, and lists.
+
+### Documented
+
+- Updated the README, skill, and agent handoff so agents pass lesson-plan tables unchanged and deterministic server code owns conversion.
+
+### Verified
+
+- Added a regression fixture for a subject/object-pronoun table and confirmed no Markdown table syntax remains in visible output.
+- Saved and read back `Unit 1 - Celebrating Family and Object Pronouns` for August 27, 2026, Period 3; Planbook preserved one table with a two-cell header and seven two-cell pronoun rows.
+
 ## 2.0.7 - 2026-08-15
 
 ### Fixed

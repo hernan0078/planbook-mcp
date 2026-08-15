@@ -71,6 +71,16 @@ function sectionName(value: string): string {
   return value.replace(/:\s*$/, "").trim().toLowerCase();
 }
 
+function markdownTableCells(value: string): string[] | undefined {
+  const line = value.trim();
+  if (!line.startsWith("|") || !line.endsWith("|")) return undefined;
+  return line.slice(1, -1).split("|").map((cell) => cleanLine(cell));
+}
+
+function isMarkdownTableDelimiter(cells: string[] | undefined): boolean {
+  return Boolean(cells?.length && cells.every((cell) => /^:?-{3,}:?$/.test(cell)));
+}
+
 function implicitBulletIndexes(lines: string[]): Set<number> {
   const indexes = new Set<number>();
 
@@ -203,6 +213,36 @@ export function formatLessonPlan(source: string): FormattedLesson {
     if (!line) continue;
     if (SEPARATOR.test(line)) {
       closeList();
+      continue;
+    }
+
+    const tableHeader = markdownTableCells(rawLine);
+    const tableDelimiter = markdownTableCells(body[index + 1] ?? "");
+    if (
+      tableHeader?.length &&
+      isMarkdownTableDelimiter(tableDelimiter) &&
+      tableDelimiter?.length === tableHeader.length
+    ) {
+      closeList();
+      output.push('<table style="border-collapse: collapse;">');
+      output.push("<thead><tr>");
+      for (const cell of tableHeader) {
+        output.push(`<th style="border: 1px solid #999; padding: 4px; text-align: left;">${escapeHtml(cell)}</th>`);
+      }
+      output.push("</tr></thead><tbody>");
+      index += 2;
+      while (index < body.length) {
+        const row = markdownTableCells(body[index] ?? "");
+        if (!row || row.length !== tableHeader.length) break;
+        output.push("<tr>");
+        for (const cell of row) {
+          output.push(`<td style="border: 1px solid #999; padding: 4px;">${escapeHtml(cell)}</td>`);
+        }
+        output.push("</tr>");
+        index += 1;
+      }
+      output.push("</tbody></table>");
+      index -= 1;
       continue;
     }
 

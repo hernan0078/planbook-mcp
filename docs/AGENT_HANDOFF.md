@@ -35,6 +35,8 @@ An unlabeled first line is also extracted as the title when `Standards` is the
 next section. Do not add a synthetic `Lesson Title` label or remove that line.
 Every remaining Markdown heading is preserved as a bold lesson heading even
 when its label is lesson-specific and not in the formatter's known-header list.
+Markdown tables are rendered as real HTML tables with their header and cell text
+preserved; agents must not flatten or pre-convert them.
 
 ## Compact recovery flow
 

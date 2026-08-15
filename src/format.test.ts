@@ -218,3 +218,19 @@ Partners share.`);
   assert.match(result.html, /<p><strong>Discuss<\/strong><\/p>/);
   assert.doesNotMatch(result.html, /###/);
 });
+
+test("renders Markdown tables without leaking pipe or delimiter syntax", () => {
+  const result = formatLessonPlan(`# Object Pronouns
+
+## Grammar
+
+| Subject | Object |
+| ------- | ------ |
+| I       | me     |
+| they    | them   |`);
+
+  assert.match(result.html, /<table[^>]*><thead><tr><th[^>]*>Subject<\/th><th[^>]*>Object<\/th><\/tr><\/thead><tbody>/);
+  assert.match(result.html, /<tr><td[^>]*>I<\/td><td[^>]*>me<\/td><\/tr>/);
+  assert.match(result.html, /<tr><td[^>]*>they<\/td><td[^>]*>them<\/td><\/tr>/);
+  assert.doesNotMatch(result.html.replace(/<[^>]+>/g, ""), /\||---/);
+});
