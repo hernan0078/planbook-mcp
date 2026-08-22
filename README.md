@@ -52,7 +52,7 @@ The formatter automatically:
 - renders every remaining Markdown heading level as a bold lesson or subsection heading, including lesson-specific labels such as `Connect`, `Think`, and `Discuss`;
 - converts Markdown tables into bordered HTML tables instead of exposing pipe and delimiter syntax;
 - removes pasted whitespace entities such as `&#x20;`, `&#32;`, and `&nbsp;`, plus trailing Markdown hard-break backslashes;
-- extracts an unlabeled first-line title when the next section is `Standards`, preventing the title from being duplicated in the lesson body;
+- extracts an unlabeled first-line title when the next content is a `Standards` header or a standard-coded bullet, preventing the title from being duplicated in the lesson body;
 - removes separators and decorative emoji;
 - places standards in the lesson body;
 - uses Arial at the editor's default size;

@@ -117,6 +117,10 @@ npm run refresh
 Restart Codex after an MCP or skill update. Rebuilding the repository does not
 hot-reload an MCP process that is already running.
 
+Unlabeled lesson titles may be followed by either a `Standards` header or a
+standard-coded bullet. Pass both forms unchanged; the MCP removes the title from
+the lesson body after using it for Planbook's title field.
+
 After a formatting-related update, use `get_lesson` with `includeHtml: true` to
 audit lessons written by the previous version. Confirm Arial, bold major and
 timed headers, a soft break after each timed header, preserved lists, and no

@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.0.10 - 2026-08-22
+
+### Fixed
+
+- Unlabeled first-line lesson titles are now extracted when the next meaningful line is a standard-coded bullet, even when the source omits a standalone `Standards` header.
+- The extracted title is removed from the lesson body, preventing duplication between Planbook's title field and lesson content.
+
+### Documented
+
+- Updated the README, Codex installation guide, skill, and agent handoff so agents pass this compact plain-text lesson format unchanged.
+
+### Verified
+
+- Added a regression based on a characterization lesson whose title is followed directly by ELA standard bullets.
+- Ran all 28 automated tests, the TypeScript build, package dry run, bundled skill validation, MCP startup smoke test, Git diff validation, and an exact-source dry run that preserved 155 bullets without duplicating the title or reporting formatting issues.
+
 ## 2.0.9 - 2026-08-22
 
 ### Fixed

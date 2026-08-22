@@ -78,6 +78,10 @@ function sectionName(value: string): string {
   return value.replace(/:\s*$/, "").trim().toLowerCase();
 }
 
+function isStandardEntry(value: string): boolean {
+  return STANDARD_CODE.test(cleanLine(value).replace(/^\s*[*•-]\s+/u, ""));
+}
+
 function markdownTableCells(value: string): string[] | undefined {
   const line = value.trim();
   if (!line.startsWith("|") || !line.endsWith("|")) return undefined;
@@ -134,7 +138,11 @@ function extractTitle(lines: string[]): { title?: string; body: string[] } {
       return Boolean(candidate) && !SEPARATOR.test(candidate);
     });
     const nextLine = nextContentIndex >= 0 ? cleanLine(body[nextContentIndex] ?? "") : "";
-    if (firstLine && !isHeading(firstLine) && sectionName(nextLine) === "standards") {
+    if (
+      firstLine &&
+      !isHeading(firstLine) &&
+      (sectionName(nextLine) === "standards" || isStandardEntry(body[nextContentIndex] ?? ""))
+    ) {
       body.splice(firstContentIndex, 1);
       return { title: firstLine, body };
     }

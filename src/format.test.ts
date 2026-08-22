@@ -178,6 +178,19 @@ How can we use the verb be?`);
   assert.doesNotMatch(result.html, /Verb Be and Uncover the Story/);
 });
 
+test("extracts an unlabeled title followed directly by standard bullets", () => {
+  const result = formatLessonPlan(`Characterization Quiz Review, Point of View, and Plot - Thank You, Ma'am
+- ELA.6.R.1.3 - Explain point of view.
+- ELA.6.R.1.1 - Analyze character interactions.
+
+Students will be able to:
+- Identify point of view.`);
+
+  assert.equal(result.title, "Characterization Quiz Review, Point of View, and Plot - Thank You, Ma'am");
+  assert.doesNotMatch(result.html, /Characterization Quiz Review/);
+  assert.match(result.html, /<ul><li>ELA\.6\.R\.1\.3 - Explain point of view\.<\/li>/);
+});
+
 test("keeps heading-like agenda and assessment entries as list items", () => {
   const result = formatLessonPlan(`Lesson Title
 Context-Aware Lists
