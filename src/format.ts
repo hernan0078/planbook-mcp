@@ -29,6 +29,13 @@ function stripEmoji(value: string): string {
     .trim();
 }
 
+function normalizePasteArtifacts(value: string): string {
+  return value
+    .replace(/&(?:#x0*20|#0*32|nbsp);/gi, " ")
+    .replace(/\u00a0/g, " ")
+    .replace(/\\\s*$/u, "");
+}
+
 function stripMarkdown(value: string): string {
   const headingFree = value.replace(/^#{1,6}\s+/, "");
   const bullet = /^(\s*[*•-]\s+)(.*)$/u.exec(headingFree);
@@ -57,7 +64,7 @@ function normalizeTimeRanges(value: string): string {
 }
 
 function cleanLine(value: string): string {
-  return normalizeTimeRanges(stripMarkdown(stripEmoji(value))).trim();
+  return normalizeTimeRanges(stripMarkdown(stripEmoji(normalizePasteArtifacts(value)))).trim();
 }
 
 function isHeading(value: string): boolean {

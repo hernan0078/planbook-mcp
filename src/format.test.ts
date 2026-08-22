@@ -234,3 +234,21 @@ test("renders Markdown tables without leaking pipe or delimiter syntax", () => {
   assert.match(result.html, /<tr><td[^>]*>they<\/td><td[^>]*>them<\/td><\/tr>/);
   assert.doesNotMatch(result.html.replace(/<[^>]+>/g, ""), /\||---/);
 });
+
+test("removes pasted whitespace entities and Markdown hard-break markers", () => {
+  const result = formatLessonPlan(`Unit 1 Vocabulary and Grammar Review and Quiz
+
+## Standards
+**ELA.9.C.3.1** - Follow standard English grammar.\\
+&#x20;**ELA.9.V.1.1** - Use academic vocabulary.
+
+## Objectives
+- &#32;Use subject pronouns.&#x20;
+- &nbsp;Select am, is, and are.\u00a0`);
+
+  assert.equal(result.title, "Unit 1 Vocabulary and Grammar Review and Quiz");
+  assert.doesNotMatch(result.html, /(?:&amp;#x20;|&amp;#32;|&amp;nbsp;|\\)/i);
+  assert.match(result.html, /<li>ELA\.9\.C\.3\.1 - Follow standard English grammar\.<\/li>/);
+  assert.match(result.html, /<li>ELA\.9\.V\.1\.1 - Use academic vocabulary\.<\/li>/);
+  assert.match(result.html, /<li>Use subject pronouns\.<\/li><li>Select am, is, and are\.<\/li>/);
+});

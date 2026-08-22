@@ -51,6 +51,7 @@ The formatter automatically:
 - extracts a leading Markdown H1 as the lesson title and removes Markdown heading, nested bold/italic, code, and escape markers from the saved body;
 - renders every remaining Markdown heading level as a bold lesson or subsection heading, including lesson-specific labels such as `Connect`, `Think`, and `Discuss`;
 - converts Markdown tables into bordered HTML tables instead of exposing pipe and delimiter syntax;
+- removes pasted whitespace entities such as `&#x20;`, `&#32;`, and `&nbsp;`, plus trailing Markdown hard-break backslashes;
 - extracts an unlabeled first-line title when the next section is `Standards`, preventing the title from being duplicated in the lesson body;
 - removes separators and decorative emoji;
 - places standards in the lesson body;
@@ -62,7 +63,7 @@ The formatter automatically:
 - changes only time-range hyphens to en dashes while preserving other source punctuation;
 - replaces the lesson body instead of retaining Planbook's dummy scaffold.
 
-Agents should still pass the user's raw lesson text unchanged. Markdown cleanup is
+Agents should still pass the user's raw lesson text unchanged. Markdown and paste-artifact cleanup is
 deterministic server behavior, so plans copied from ChatGPT, Markdown documents,
 or plain text follow the same Planbook formatting contract without agent-side HTML.
 

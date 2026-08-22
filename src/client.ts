@@ -428,9 +428,11 @@ export function lessonFormattingIssues(html: string): string[] {
 
   if (!/font-family\s*:\s*Arial(?:\s*,|\s*;)/i.test(html)) issues.push("lesson is not Arial");
   if (/(?:^|\n)\s*#{1,6}\s+/m.test(text)) issues.push("Markdown heading marker is visible");
+  if (/&(?:#x0*20|#0*32|nbsp);/i.test(text)) issues.push("pasted whitespace entity is visible");
   if (/\*\*|(?<!_)__[^_\n]+__(?!_)|`[^`\n]+`|\\[_*`]/.test(text)) {
     issues.push("Markdown emphasis or escape marker is visible");
   }
+  if (/\\\s*(?:\n|$)/m.test(text)) issues.push("Markdown hard-break marker is visible");
   if (/(^|\s)\*[^*\n]+\*(?=\s|[.,!?;:]|$)/m.test(text)) {
     issues.push("Markdown italic marker is visible");
   }

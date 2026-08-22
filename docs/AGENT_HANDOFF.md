@@ -31,6 +31,8 @@ formatting, class resolution, full-year lesson lookup, upsert, and verification.
 Send Markdown plans unchanged: the formatter extracts a leading `#` title and
 removes Markdown heading, nested bold/italic, inline-code, and escaped-character
 markers before applying Planbook formatting.
+It also removes copied whitespace entities (`&#x20;`, `&#32;`, `&nbsp;`) and
+trailing Markdown hard-break backslashes. Agents must not clean these manually.
 An unlabeled first line is also extracted as the title when `Standards` is the
 next section. Do not add a synthetic `Lesson Title` label or remove that line.
 Every remaining Markdown heading is preserved as a bold lesson heading even
@@ -93,6 +95,7 @@ The server, not the agent, applies these rules:
 - no decorative emoji or horizontal rules
 - no literal Markdown `#`, `**`, backtick, or escaped-underscore markers
 - no literal single-asterisk italics, including nested emphasis around book or story titles
+- no literal pasted whitespace entities or trailing Markdown hard-break backslashes
 - source punctuation remains unchanged except hyphens inside time ranges, which become en dashes
 
 ## Dry run

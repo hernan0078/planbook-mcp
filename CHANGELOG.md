@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.0.9 - 2026-08-22
+
+### Fixed
+
+- Raw lesson pastes now remove literal `&#x20;`, `&#32;`, and `&nbsp;` whitespace entities, nonbreaking spaces, and trailing Markdown hard-break backslashes before formatting.
+- Save verification now rejects visible pasted whitespace entities and trailing hard-break markers instead of accepting artifact-contaminated lesson text.
+
+### Documented
+
+- Updated the README, Codex installation guide, skill, and agent handoff so agents continue passing raw lesson text unchanged while deterministic server code owns paste-artifact cleanup.
+
+### Verified
+
+- Added formatter and saved-HTML verification regressions based on a Unit 1 vocabulary and grammar review lesson pasted with encoded spaces and line-continuation markers.
+- Ran all 27 automated tests, TypeScript build, package dry run, bundled skill validation, MCP startup smoke test, and Git diff validation successfully.
+
 ## 2.0.8 - 2026-08-15
 
 ### Added

@@ -27,6 +27,8 @@ Formatting is deterministic: all major headers, including `ESOL Strategies`, are
 
 Pass lesson plans unchanged. The MCP extracts a `Lesson Title` block, a leading H1, or an unlabeled first-line title followed by `Standards`. It removes Markdown syntax while preserving every remaining Markdown heading as a bold lesson/subsection heading, including lesson-specific labels. The agent must not strip, label, or convert the source first. It preserves source punctuation except for en dashes inside time ranges.
 
+Raw pastes may contain whitespace entities such as `&#x20;`, `&#32;`, or `&nbsp;` and trailing Markdown hard-break backslashes. Pass them unchanged; deterministic server cleanup removes them and verification rejects them if they remain visible.
+
 Markdown tables must also be passed unchanged. The formatter converts them into bordered HTML tables and verification checks that their rows and cells survive Planbook's save process.
 
 ## A/B2 Schedule

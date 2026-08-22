@@ -121,5 +121,7 @@ After a formatting-related update, use `get_lesson` with `includeHtml: true` to
 audit lessons written by the previous version. Confirm Arial, bold major and
 timed headers, a soft break after each timed header, preserved lists, and no
 visible `#`, `**`, single-asterisk italics, backticks, or escaped Markdown.
+Also confirm copied whitespace entities such as `&#x20;`, `&#32;`, and `&nbsp;`
+and trailing Markdown hard-break backslashes are absent.
 Reinstalling prevents future defects but does not automatically rewrite saved
 Planbook lessons.

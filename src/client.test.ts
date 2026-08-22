@@ -84,6 +84,15 @@ test("accepts an entity-normalized save with the complete expected structure", (
   assert.equal(savedLessonMatches(saved.replace("Text &amp; evidence", "Text and evidence"), expected), false);
 });
 
+test("rejects visible pasted whitespace entities and hard-break markers", () => {
+  const leaked = '<div style="font-family: Arial, sans-serif;"><p>Use vocabulary &amp;#x20;\\</p></div>';
+
+  assert.deepEqual(lessonFormattingIssues(leaked), [
+    "pasted whitespace entity is visible",
+    "Markdown hard-break marker is visible",
+  ]);
+});
+
 test("fails closed when Planbook has a different school year active", () => {
   assert.doesNotThrow(() =>
     assertActiveSchoolYear("year-2026", "year-2026", "MBA 2026-2027", "08/13/2026"),
