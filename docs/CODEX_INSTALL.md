@@ -127,5 +127,7 @@ timed headers, a soft break after each timed header, preserved lists, and no
 visible `#`, `**`, single-asterisk italics, backticks, or escaped Markdown.
 Also confirm copied whitespace entities such as `&#x20;`, `&#32;`, and `&nbsp;`
 and trailing Markdown hard-break backslashes are absent.
+Directional symbols may be returned by Planbook as equivalent HTML entities
+such as `&darr;`; v2.0.11 normalizes them during exact read-back verification.
 Reinstalling prevents future defects but does not automatically rewrite saved
 Planbook lessons.

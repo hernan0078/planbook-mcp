@@ -31,6 +31,8 @@ Raw pastes may contain whitespace entities such as `&#x20;`, `&#32;`, or `&nbsp;
 
 Markdown tables must also be passed unchanged. The formatter converts them into bordered HTML tables and verification checks that their rows and cells survive Planbook's save process.
 
+Directional symbols must be passed unchanged. Planbook may save arrows as equivalent HTML entities such as `&darr;`; verification normalizes those entities while still requiring the complete text and formatting structure to match.
+
 ## A/B2 Schedule
 
 - A day periods: P1, P3, P5, P7, P8.

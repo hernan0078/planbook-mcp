@@ -462,7 +462,11 @@ function visibleLessonText(html: string): string {
     .replace(/&amp;/gi, "&")
     .replace(/&ndash;|&#8211;/gi, "–")
     .replace(/&mdash;|&#8212;/gi, "—")
-    .replace(/&rightarrow;|&#8594;/gi, "→")
+    .replace(/&(?:larr|leftarrow);|&#8592;/gi, "←")
+    .replace(/&(?:uarr|uparrow);|&#8593;/gi, "↑")
+    .replace(/&(?:rarr|rightarrow);|&#8594;/gi, "→")
+    .replace(/&(?:darr|downarrow);|&#8595;/gi, "↓")
+    .replace(/&(?:harr|leftrightarrow);|&#8596;/gi, "↔")
     .replace(/&quot;/gi, '"')
     .replace(/&#39;|&apos;/gi, "'");
 }

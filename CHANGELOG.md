@@ -1,5 +1,23 @@
 # Changelog
 
+## 2.0.11 - 2026-08-26
+
+### Fixed
+
+- Exact save verification now treats Planbook's named and numeric directional-arrow entities as equivalent to the original arrow characters.
+- Lessons containing instructional flow diagrams such as `PLOT EVENT ↓ CHARACTER INTERACTION` no longer report a false verification failure after Planbook converts `↓` to `&darr;`.
+
+### Documented
+
+- Updated the README, Codex installation guide, bundled lesson-entry skill, and agent handoff with the arrow-entity normalization and recovery behavior.
+
+### Verified
+
+- Added a regression that accepts equivalent arrow entities while still rejecting lost bold structure.
+- Diagnosed the live August 26 Period 8 read-back: title, full visible text, 13 bold elements, 29 list items, one ordered list, four unordered lists, Arial formatting, and all end-of-lesson assessment content were preserved; only `↓` versus `&darr;` prevented v2.0.10 verification.
+- Rechecked that live lesson with v2.0.11 and obtained an exact structured match with seven timed headings, 29 bullets, zero formatting issues, and no duplicated title.
+- Ran all 29 automated tests, the TypeScript build, package dry run, bundled skill validation, MCP startup smoke test, and Git diff validation successfully.
+
 ## 2.0.10 - 2026-08-22
 
 ### Fixed

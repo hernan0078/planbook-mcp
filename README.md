@@ -18,7 +18,7 @@ lookup, formatting, replacement, saving, and verification.
 - Save requests mirror Planbook's first-party date/class/slot contract and omit browser-only identity and linked-edit flags.
 - Dates outside a class's normal sequence automatically use Planbook's extra-lesson slot instead of silently no-oping.
 - Extra lessons are discovered and verified through Planbook's date-event feed, making retries update the same record.
-- Verification compares the complete saved body and formatting structure, rejects visible Markdown, and normalizes Planbook's HTML entities.
+- Verification compares the complete saved body and formatting structure, rejects visible Markdown, and normalizes Planbook's HTML entities, including directional arrows such as `&darr;`.
 - Ambiguous classes produce a short actionable error; `list_classes` is only a fallback.
 - Session expiry is retried once after a safe Chrome-cookie refresh.
 - Save verification performs short bounded read-back retries to tolerate API propagation without agent retries.

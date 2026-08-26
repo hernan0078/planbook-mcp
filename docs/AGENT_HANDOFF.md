@@ -60,7 +60,8 @@ from the class's full-year sequence; retries therefore update the existing extra
 slot instead of creating duplicates.
 Class IDs remain authoritative during recovery; the resolver never substitutes a
 single lesson record that explicitly belongs to another period.
-Verification normalizes Planbook-generated HTML entities, compares the complete
+Verification normalizes Planbook-generated HTML entities, including directional
+arrow entities such as `&darr;`, compares the complete
 visible body, matches list and bold structure, and rejects visible Markdown or
 malformed timed headings. It no longer accepts a save merely because its first
 120 normalized characters match.
