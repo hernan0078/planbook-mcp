@@ -101,6 +101,17 @@ test("rejects visible pasted whitespace entities and hard-break markers", () => 
   ]);
 });
 
+test("requires bold and soft-break formatting for minute-range headers", () => {
+  const formatted = '<div style="font-family: Arial, sans-serif;"><p><strong>0–5 min | Bell Ringer</strong><br>Students respond.</p></div>';
+  const plain = '<div style="font-family: Arial, sans-serif;"><p>0–5 min | Bell Ringer Students respond.</p></div>';
+
+  assert.deepEqual(lessonFormattingIssues(formatted), []);
+  assert.deepEqual(lessonFormattingIssues(plain), [
+    "timed header is not bold",
+    "timed header has no soft break",
+  ]);
+});
+
 test("fails closed when Planbook has a different school year active", () => {
   assert.doesNotThrow(() =>
     assertActiveSchoolYear("year-2026", "year-2026", "MBA 2026-2027", "08/13/2026"),

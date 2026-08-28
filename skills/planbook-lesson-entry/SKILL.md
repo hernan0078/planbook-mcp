@@ -25,9 +25,11 @@ The MCP owns school-year lookup, class resolution, existing-lesson lookup, forma
 
 Formatting is deterministic: all major headers, including `ESOL Strategies`, are bold; every timed section is bold with an explicit soft break; source bullets and explicit numbering are preserved; clear semantic lists receive bullets; narrative remains plain. Never request or reproduce Impact.
 
-Pass lesson plans unchanged. The MCP extracts a `Lesson Title` block, a leading H1, or an unlabeled first-line title followed by a `Standards` header or standard-coded bullet. It removes Markdown syntax while preserving every remaining Markdown heading as a bold lesson/subsection heading, including lesson-specific labels. The agent must not strip, label, or convert the source first. It preserves source punctuation except for en dashes inside time ranges.
+Pass lesson plans unchanged. The MCP extracts a `Lesson Title` block, a leading H1, or an unlabeled first-line title followed by a `Standards` header or standard-coded bullet. It also supports one course subtitle or metadata line between an unlabeled title and `Standards`, preserving the subtitle in the lesson body. It removes Markdown syntax while preserving every remaining Markdown heading as a bold lesson/subsection heading, including lesson-specific labels. The agent must not strip, label, or convert the source first. It preserves source punctuation except for en dashes inside time ranges.
 
 Raw pastes may contain whitespace entities such as `&#x20;`, `&#32;`, or `&nbsp;` and trailing Markdown hard-break backslashes. Pass them unchanged; deterministic server cleanup removes them and verification rejects them if they remain visible.
+
+Raw pastes may also contain numeric character entities such as `&#x44;` and bold minute-range prefixes such as `**0-5 min | Bell Ringer**`. Pass them unchanged. The formatter decodes the character entities and renders the minute range as a bold, en-dash-normalized header with an explicit soft break before its directions.
 
 Markdown tables must also be passed unchanged. The formatter converts them into bordered HTML tables and verification checks that their rows and cells survive Planbook's save process.
 

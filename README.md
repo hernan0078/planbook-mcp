@@ -53,10 +53,13 @@ The formatter automatically:
 - converts Markdown tables into bordered HTML tables instead of exposing pipe and delimiter syntax;
 - removes pasted whitespace entities such as `&#x20;`, `&#32;`, and `&nbsp;`, plus trailing Markdown hard-break backslashes;
 - extracts an unlabeled first-line title when the next content is a `Standards` header or a standard-coded bullet, preventing the title from being duplicated in the lesson body;
+- extracts an unlabeled first-line title when one course subtitle or metadata line appears before `Standards`, while preserving that subtitle in the lesson body;
+- decodes pasted numeric character entities such as `&#x44;` before safe HTML escaping;
 - removes separators and decorative emoji;
 - places standards in the lesson body;
 - uses Arial at the editor's default size;
 - bolds section and timed subsection headers;
+- recognizes leading bold minute ranges such as `0-5 min | Bell Ringer`, converts the range to an en dash, and soft-separates the following directions;
 - soft-separates every timed header for scanability;
 - bolds `ESOL Strategies`, `Materials`, `Agenda`, and `Pages / Materials` like other major sections;
 - converts semantic and source-marked lists to bullets, preserving explicitly numbered steps;

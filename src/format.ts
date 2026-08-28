@@ -8,7 +8,7 @@ const NUMBERED = /^\s*(\d+|[A-Da-d])[.)]\s+(.+)$/u;
 const STANDARD_CODE = /^(?:[A-Z]{2,}(?:\.[A-Z0-9]+)+|[A-Z]{2,}\.[A-Z0-9.]+)\s*[–—-]/u;
 const ASSESSMENT_ITEM = /\s[–—-]\s*(?:Formative|Summative|Classwork)\s*$/i;
 const ESOL_STRATEGY = /^ESOL\.[A-Z]\d+\s*[–—-]/i;
-const TIME_RANGE = /\d{1,2}:\d{2}\s*[–—-]\s*\d{1,2}:\d{2}/u;
+const TIME_RANGE = /(?:\d{1,2}:\d{2}\s*[–—-]\s*\d{1,2}:\d{2}|\d{1,3}\s*[–—-]\s*\d{1,3}\s*(?:min|minutes?)\b)/iu;
 
 const MAJOR_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*\d+\s*minutes|\s*\([^)]*\))?|part\s+\d+\b.*)$/i;
 const KNOWN_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*\d+\s*minutes|\s*\([^)]*\))?|part\s+\d+\b.*|bell\s+ringer\b.*|closure\b.*|mini\s+lesson\b.*|guided\s+practice\b.*|independent\s+practice\b.*|reading\b.*|transition\b.*|assessment\s+expectations\b.*|standards\s+mastery\s+quiz\b.*|early\s+finisher\s+task\b.*)$/i;
@@ -31,7 +31,13 @@ function stripEmoji(value: string): string {
 
 function normalizePasteArtifacts(value: string): string {
   return value
-    .replace(/&(?:#x0*20|#0*32|nbsp);/gi, " ")
+    .replace(/&#(?:x([0-9a-f]+)|(\d+));/gi, (entity, hex: string | undefined, decimal: string | undefined) => {
+      const codePoint = Number.parseInt(hex ?? decimal ?? "", hex ? 16 : 10);
+      return Number.isInteger(codePoint) && codePoint >= 0 && codePoint <= 0x10ffff
+        ? String.fromCodePoint(codePoint)
+        : entity;
+    })
+    .replace(/&nbsp;/gi, " ")
     .replace(/\u00a0/g, " ")
     .replace(/\\\s*$/u, "");
 }
@@ -57,9 +63,13 @@ function normalizeTimeRanges(value: string): string {
     /(\d{1,2}:\d{2})\s*[-—]\s*(\d{1,2}:\d{2})/g,
     "$1–$2",
   );
-  return normalized.replace(
+  const clockNormalized = normalized.replace(
     /^(.+?)\s+[–—-]\s+(\d{1,2}:\d{2}–\d{1,2}:\d{2})\s*$/u,
     "$1 ($2)",
+  );
+  return clockNormalized.replace(
+    /(\d{1,3})\s*[-—]\s*(\d{1,3})(\s*(?:min|minutes?)\b)/gi,
+    "$1–$2$3",
   );
 }
 
@@ -80,6 +90,16 @@ function sectionName(value: string): string {
 
 function isStandardEntry(value: string): boolean {
   return STANDARD_CODE.test(cleanLine(value).replace(/^\s*[*•-]\s+/u, ""));
+}
+
+function leadingBoldTimedSection(value: string): { header: string; body: string } | undefined {
+  const normalized = normalizePasteArtifacts(value).trim();
+  const match = /^\*\*(.+?)\*\*\s*(.*)$/u.exec(normalized);
+  if (!match?.[1]) return undefined;
+
+  const header = cleanLine(match[1]);
+  if (!TIME_RANGE.test(header)) return undefined;
+  return { header, body: cleanLine(match[2] ?? "") };
 }
 
 function markdownTableCells(value: string): string[] | undefined {
@@ -132,16 +152,18 @@ function extractTitle(lines: string[]): { title?: string; body: string[] } {
     }
 
     const firstLine = firstContentIndex >= 0 ? cleanLine(body[firstContentIndex] ?? "") : "";
-    const nextContentIndex = body.findIndex((line, index) => {
-      if (index <= firstContentIndex) return false;
-      const candidate = cleanLine(line);
-      return Boolean(candidate) && !SEPARATOR.test(candidate);
-    });
-    const nextLine = nextContentIndex >= 0 ? cleanLine(body[nextContentIndex] ?? "") : "";
+    const followingContentIndexes = body
+      .map((line, index) => ({ index, line: cleanLine(line) }))
+      .filter(({ index, line }) => index > firstContentIndex && Boolean(line) && !SEPARATOR.test(line))
+      .map(({ index }) => index);
+    const titleContextIndexes = followingContentIndexes.slice(0, 2);
     if (
       firstLine &&
       !isHeading(firstLine) &&
-      (sectionName(nextLine) === "standards" || isStandardEntry(body[nextContentIndex] ?? ""))
+      titleContextIndexes.some((index) => {
+        const candidate = cleanLine(body[index] ?? "");
+        return sectionName(candidate) === "standards" || isStandardEntry(body[index] ?? "");
+      })
     ) {
       body.splice(firstContentIndex, 1);
       return { title: firstLine, body };
@@ -223,11 +245,21 @@ export function formatLessonPlan(source: string): FormattedLesson {
 
   for (let index = 0; index < body.length; index += 1) {
     const rawLine = body[index] ?? "";
+    const boldTimedSection = leadingBoldTimedSection(rawLine);
     const markdownHeading = /^#{1,6}\s+/u.test(rawLine.trim());
     const line = cleanLine(rawLine);
     if (!line) continue;
     if (SEPARATOR.test(line)) {
       closeList();
+      continue;
+    }
+
+    if (boldTimedSection) {
+      closeList();
+      headings.push(boldTimedSection.header);
+      currentSection = sectionName(boldTimedSection.header);
+      const bodyText = boldTimedSection.body ? escapeHtml(boldTimedSection.body) : "";
+      output.push(`<p><strong>${escapeHtml(boldTimedSection.header)}</strong><br>${bodyText}</p>`);
       continue;
     }
 

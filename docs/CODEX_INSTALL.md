@@ -120,6 +120,10 @@ hot-reload an MCP process that is already running.
 Unlabeled lesson titles may be followed by either a `Standards` header or a
 standard-coded bullet. Pass both forms unchanged; the MCP removes the title from
 the lesson body after using it for Planbook's title field.
+Starting in v2.0.12, one course subtitle may appear between the title and
+`Standards`; the subtitle remains in the body. Numeric paste entities such as
+`&#x44;` are decoded, and bold `0-5 min | ...` prefixes become verified timed
+headers with soft breaks.
 
 After a formatting-related update, use `get_lesson` with `includeHtml: true` to
 audit lessons written by the previous version. Confirm Arial, bold major and

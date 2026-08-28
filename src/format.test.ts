@@ -191,6 +191,23 @@ Students will be able to:
   assert.match(result.html, /<ul><li>ELA\.6\.R\.1\.3 - Explain point of view\.<\/li>/);
 });
 
+test("extracts a bold title before one subtitle and formats encoded minute-range blocks", () => {
+  const result = formatLessonPlan(`**Possessive Adjectives and Possessive Nouns**
+**ESOL 1-2 HS | 50-Minute Lesson**
+**Standards**
+ELA.9.C.3.1 - Follow standard English grammar.
+**Lesson**
+**0-5 min | Bell Ringer -&#x20;**&#x44;isplay three classroom objects.
+**5-15 min | Direct Instruction -&#x20;**&#x55;se the presentation.`);
+
+  assert.equal(result.title, "Possessive Adjectives and Possessive Nouns");
+  assert.doesNotMatch(result.html, /\*\*|&#x(?:44|55);|&amp;#x(?:44|55);/i);
+  assert.doesNotMatch(result.html, /<p>Possessive Adjectives and Possessive Nouns<\/p>/);
+  assert.match(result.html, /<p>ESOL 1-2 HS \| 50-Minute Lesson<\/p>/);
+  assert.match(result.html, /<p><strong>0–5 min \| Bell Ringer -<\/strong><br>Display three classroom objects\.<\/p>/);
+  assert.match(result.html, /<p><strong>5–15 min \| Direct Instruction -<\/strong><br>Use the presentation\.<\/p>/);
+});
+
 test("keeps heading-like agenda and assessment entries as list items", () => {
   const result = formatLessonPlan(`Lesson Title
 Context-Aware Lists

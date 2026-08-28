@@ -439,7 +439,7 @@ export function lessonFormattingIssues(html: string): string[] {
 
   for (const match of html.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)) {
     const paragraph = match[1] ?? "";
-    if (!/\d{1,2}:\d{2}\s*(?:[–—-]|&(?:ndash|mdash);|&#(?:8211|8212);)\s*\d{1,2}:\d{2}/i.test(paragraph)) {
+    if (!/(?:\d{1,2}:\d{2}\s*(?:[–—-]|&(?:ndash|mdash);|&#(?:8211|8212);)\s*\d{1,2}:\d{2}|\d{1,3}\s*(?:[–—-]|&(?:ndash|mdash);|&#(?:8211|8212);)\s*\d{1,3}\s*(?:min|minutes?)\b)/i.test(paragraph)) {
       continue;
     }
     if (!/<(?:strong|b)\b/i.test(paragraph)) issues.push("timed header is not bold");

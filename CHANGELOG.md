@@ -1,5 +1,24 @@
 # Changelog
 
+## 2.0.12 - 2026-08-28
+
+### Fixed
+
+- Unlabeled first-line titles are now extracted when one course subtitle or metadata line appears before the `Standards` section; the subtitle remains in the lesson body and the title is not duplicated.
+- Numeric paste entities such as `&#x44;`, `&#x55;`, and `&#x53;` are decoded before safe HTML escaping instead of appearing as literal entity text in Planbook.
+- Leading bold minute-range blocks such as `**0-5 min | Bell Ringer**Directions` now render as bold timed headers with en-dash ranges and explicit soft breaks before the directions.
+- Saved-lesson validation now requires bold and soft-break formatting for minute-range headers in addition to clock-style timestamps.
+
+### Documented
+
+- Updated the README, Codex installation guide, bundled lesson-entry skill, and agent handoff with title-plus-subtitle parsing, numeric-entity cleanup, and minute-range timing behavior.
+
+### Verified
+
+- Added regressions for a bold title followed by an ESOL course subtitle, encoded initial letters, six minute-range lesson blocks, and fail-closed minute-header verification.
+- The exact August 31 Period 1 source dry-run extracted the correct title, preserved the course subtitle, formatted six timed headings and 21 list items, removed all entity and Markdown artifacts, and reported zero formatting issues.
+- Ran all 31 automated tests, the TypeScript build, package dry run, bundled skill validation, MCP startup smoke test, and Git diff validation successfully.
+
 ## 2.0.11 - 2026-08-26
 
 ### Fixed

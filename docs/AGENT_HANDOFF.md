@@ -36,6 +36,9 @@ trailing Markdown hard-break backslashes. Agents must not clean these manually.
 An unlabeled first line is also extracted as the title when the next content is
 a `Standards` header or a standard-coded bullet. Do not add a synthetic
 `Lesson Title` label or remove that line.
+One course subtitle or metadata line may appear between that title and
+`Standards`; the MCP preserves the subtitle while removing only the title from
+the lesson body.
 Every remaining Markdown heading is preserved as a bold lesson heading even
 when its label is lesson-specific and not in the formatter's known-header list.
 Markdown tables are rendered as real HTML tables with their header and cell text
@@ -65,6 +68,9 @@ arrow entities such as `&darr;`, compares the complete
 visible body, matches list and bold structure, and rejects visible Markdown or
 malformed timed headings. It no longer accepts a save merely because its first
 120 normalized characters match.
+The formatter also decodes pasted numeric character entities such as `&#x44;`
+and converts leading bold minute ranges such as `0-5 min | Bell Ringer` into
+bold, soft-separated timed headers. Agents must pass both forms unchanged.
 Event-feed lessons inherit the date of their parent day record. Never accept a
 lesson ID returned for a neighboring day as proof that the requested cell exists.
 The MCP also refuses lesson reads and writes when Planbook's active year differs
