@@ -1,5 +1,23 @@
 # Changelog
 
+## 2.0.13 - 2026-08-28
+
+### Fixed
+
+- Exact save verification now treats Planbook's named and numeric typographic quote entities as equivalent to the original curly quotation marks and apostrophes.
+- Lessons containing text such as `“Whose pencil is this?”` and `Ana’s notebook` no longer report a false verification failure when Planbook saves the punctuation as `&ldquo;`, `&rdquo;`, and `&rsquo;`.
+
+### Documented
+
+- Updated the README, Codex installation guide, bundled lesson-entry skill, and agent handoff with typographic punctuation entity behavior.
+
+### Verified
+
+- Added a regression that accepts equivalent curly quote entities while still rejecting changed lesson words.
+- Diagnosed the live August 31 Period 1 read-back: the correct ESOL class, title, complete visible content, 14 bold elements, 21 list items, five lists, Arial formatting, and all ending materials and ESOL strategies were preserved; only curly punctuation entity encoding prevented v2.0.12 verification.
+- Rechecked that live lesson with v2.0.13 and obtained an exact structured match with six timed headings, 21 list items, the preserved ESOL subtitle, zero formatting issues, and no leaked numeric entities.
+- Ran all 32 automated tests, the TypeScript build, package dry run, bundled skill validation, MCP startup smoke test, and Git diff validation successfully.
+
 ## 2.0.12 - 2026-08-28
 
 ### Fixed

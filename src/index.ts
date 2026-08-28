@@ -12,7 +12,7 @@ import type { UpsertLessonResult } from "./types.js";
 const client = new PlanbookClient();
 
 const server = new McpServer(
-  { name: "planbook", version: "2.0.12" },
+  { name: "planbook", version: "2.0.13" },
   {
     instructions:
       "Use upsert_lesson directly for lesson entry; it resolves the class and existing lesson automatically. " +

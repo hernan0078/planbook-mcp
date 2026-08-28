@@ -92,6 +92,14 @@ test("accepts Planbook directional-arrow entities without weakening structure ch
   assert.equal(savedLessonMatches(saved.replace("<strong>Plot Sequence</strong>", "Plot Sequence"), expected), false);
 });
 
+test("accepts Planbook typographic quote entities without changing lesson text", () => {
+  const expected = '<div style="font-family: Arial, sans-serif;"><p><strong>Bell Ringer</strong></p><p>Ask: “Whose pencil is this?” It is Ana’s notebook.</p></div>';
+  const saved = '<div style="font-family: Arial, sans-serif;"><p><strong>Bell Ringer</strong></p><p>Ask: &ldquo;Whose pencil is this?&rdquo; It is Ana&rsquo;s notebook.</p></div>';
+
+  assert.equal(savedLessonMatches(saved, expected), true);
+  assert.equal(savedLessonMatches(saved.replace("pencil", "notebook"), expected), false);
+});
+
 test("rejects visible pasted whitespace entities and hard-break markers", () => {
   const leaked = '<div style="font-family: Arial, sans-serif;"><p>Use vocabulary &amp;#x20;\\</p></div>';
 

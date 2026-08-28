@@ -467,6 +467,10 @@ function visibleLessonText(html: string): string {
     .replace(/&(?:rarr|rightarrow);|&#8594;/gi, "→")
     .replace(/&(?:darr|downarrow);|&#8595;/gi, "↓")
     .replace(/&(?:harr|leftrightarrow);|&#8596;/gi, "↔")
+    .replace(/&lsquo;|&#8216;/gi, "‘")
+    .replace(/&rsquo;|&#8217;/gi, "’")
+    .replace(/&ldquo;|&#8220;/gi, "“")
+    .replace(/&rdquo;|&#8221;/gi, "”")
     .replace(/&quot;/gi, '"')
     .replace(/&#39;|&apos;/gi, "'");
 }

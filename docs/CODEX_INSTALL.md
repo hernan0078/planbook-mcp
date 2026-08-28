@@ -133,5 +133,8 @@ Also confirm copied whitespace entities such as `&#x20;`, `&#32;`, and `&nbsp;`
 and trailing Markdown hard-break backslashes are absent.
 Directional symbols may be returned by Planbook as equivalent HTML entities
 such as `&darr;`; v2.0.11 normalizes them during exact read-back verification.
+Curly quotes and apostrophes may likewise return as `&ldquo;`, `&rdquo;`, or
+`&rsquo;`; v2.0.13 normalizes those entities without weakening text or
+formatting checks.
 Reinstalling prevents future defects but does not automatically rewrite saved
 Planbook lessons.
