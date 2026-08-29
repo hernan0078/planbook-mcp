@@ -1,5 +1,23 @@
 # Changelog
 
+## 2.0.18 - 2026-08-29
+
+### Fixed
+
+- Explicit bullet and numbered groups now define their own list boundaries; following teacher/student narrative is no longer absorbed into an inferred list.
+- Common plain-text activity cues, Book/Workbook activity references, and vocabulary/grammar review labels now render as bold subsections without adding or changing lesson text.
+- Both singular `Activity` and plural `Activities` page-reference labels are recognized.
+
+### Documented
+
+- Updated the README, Codex installation guide, bundled lesson-entry skill, and agent handoff with explicit-list boundaries and plain-text activity-label formatting.
+
+### Verified
+
+- Added a regression covering explicit bullet boundaries, resumed narrative paragraphs, singular/plural Book activity labels, activity cues, and vocabulary/grammar review subsections.
+- The exact September 8 Periods 2/6 source dry run extracted the correct title, rendered all eight Book/Workbook activity labels and five review labels as bold subsections, preserved 90 source-intended list items, kept narrative after sentence frames, vocabulary, and assessment lists as paragraphs, and reported zero formatting issues or Markdown leakage.
+- Ran all 38 automated tests, the TypeScript build, package dry run, bundled skill validation, MCP startup smoke test, and Git diff validation successfully.
+
 ## 2.0.17 - 2026-08-29
 
 ### Fixed

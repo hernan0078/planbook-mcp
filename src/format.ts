@@ -12,7 +12,7 @@ const COURSE_METADATA = /^(?:ESOL|ELL)\b(?!\s+strateg(?:y|ies)\b)(?=[^|]*\d)[^|]
 const TIME_RANGE = /(?:\d{1,2}:\d{2}\s*[–—-]\s*\d{1,2}:\d{2}|\d{1,3}\s*[–—-]\s*\d{1,3}\s*(?:min|minutes?)\b)/iu;
 
 const MAJOR_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|key\s+teaching\s+notes\b.*|teacher\s+emphasis\b.*|teacher\s+review\s+guide\b.*|blooket\s+review\b.*|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*\d+\s*minutes|\s*\([^)]*\))?|part\s+\d+\b.*)$/i;
-const KNOWN_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|key\s+teaching\s+notes\b.*|teacher\s+emphasis\b.*|teacher\s+review\s+guide\b.*|blooket\s+review\b.*|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*\d+\s*minutes|\s*\([^)]*\))?|part\s+\d+\b.*|bell\s+ringer\b.*|closure\b.*|mini\s+lesson\b.*|guided\s+practice\b.*|independent\s+practice\b.*|reading\b.*|transition\b.*|assessment\s+expectations\b.*|standards\s+mastery\s+quiz\b.*|early\s+finisher\s+task\b.*)$/i;
+const KNOWN_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|key\s+teaching\s+notes\b.*|teacher\s+emphasis\b.*|teacher\s+review\s+guide\b.*|blooket\s+review\b.*|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*\d+\s*minutes|\s*\([^)]*\))?|part\s+\d+\b.*|bell\s+ringer\b.*|closure\b.*|mini\s+lesson\b.*|guided\s+practice\b.*|independent\s+practice\b.*|reading\b.*|transition\b.*|assessment\s+expectations\b.*|standards\s+mastery\s+quiz\b.*|early\s+finisher\s+task\b.*|(?:book|workbook)\s+-\s+.*\bactivit(?:y|ies)\b.*|vocabulary\s+review|grammar\s+review|a,\s*an,\s*and\s*the|comparatives\s+and\s+superlatives|adverbs|on\s+the\s+board|possible\s+sentence\s+frames|quick\s+examples|focus\s+questions(?:\s+include)?|recommended\s+prompt)$/i;
 
 function escapeHtml(value: string): string {
   return value
@@ -133,11 +133,19 @@ function implicitBulletIndexes(lines: string[]): Set<number> {
     const cue = cleanLine(lines[index] ?? "");
     if (!cue.endsWith(":") || isHeading(cue)) continue;
 
+    const firstContentIndex = lines.findIndex((line, candidateIndex) => (
+      candidateIndex > index && Boolean(cleanLine(line)) && !SEPARATOR.test(cleanLine(line))
+    ));
+    if (firstContentIndex < 0) continue;
+    const firstContent = cleanLine(lines[firstContentIndex] ?? "");
+    if (BULLET.test(firstContent) || NUMBERED.test(firstContent)) continue;
+
     const candidates: number[] = [];
     for (let next = index + 1; next < lines.length; next += 1) {
       const candidate = cleanLine(lines[next] ?? "");
       if (!candidate || SEPARATOR.test(candidate) || isHeading(candidate)) break;
       if (candidate.endsWith(":")) break;
+      if (candidates.length && /^(?:students?|teacher|class|groups?|partners?|pairs?|if)\b/i.test(candidate)) break;
       candidates.push(next);
     }
 

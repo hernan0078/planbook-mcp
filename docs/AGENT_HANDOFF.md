@@ -59,6 +59,12 @@ Within inferred semantic list sections such as `Agenda`, `Materials`, and `ESOL
 Strategies`, pipe-delimited items become separate bullets. This split does not
 apply to narrative paragraphs or explicitly marked source bullets, where the
 pipe may be meaningful text.
+When a colon cue is followed by explicit bullets or numbering, the formatter
+trusts those source markers and does not infer additional bullets from the
+following narrative. Common plain-text activity labels (`On the board`, sentence
+frames, examples, focus questions, recommended prompts, Book/Workbook activity
+references, and vocabulary/grammar review labels) render as bold subsections
+without adding or changing lesson text.
 
 ## Compact recovery flow
 

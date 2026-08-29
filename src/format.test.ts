@@ -317,6 +317,44 @@ ESOL.A6 - Direct Language | ESOL.C14 - Chunking`);
   assert.match(result.html, /<p><strong>ESOL Strategies<\/strong><\/p><ul><li>ESOL\.A6 - Direct Language<\/li><li>ESOL\.C14 - Chunking<\/li><\/ul>/);
 });
 
+test("does not absorb narrative after explicit lists and bolds activity labels", () => {
+  const result = formatLessonPlan(`Learning Activities Review
+- ELA.8.R.3.2 - Paraphrase grade-level texts.
+On the board:
+What activity helps you learn?
+Students write independently.
+Possible sentence frames:
+- I spend time __________.
+- This helps me __________.
+Students share with a partner.
+Book - Colored Pages 34-35, Activities 1-2
+Students examine the title.
+Book - Colored Page 35, Activity 3
+Students read the passage.
+Vocabulary Review
+- affect
+- process
+Teacher reviews answers.
+Grammar Review
+A, An, and The
+- first mention
+Comparatives and Superlatives
+- more and most
+Adverbs
+- always`);
+
+  assert.equal(result.title, "Learning Activities Review");
+  assert.match(result.html, /<p><strong>On the board:<\/strong><\/p>/);
+  assert.match(result.html, /<p>What activity helps you learn\?<\/p><p>Students write independently\.<\/p>/);
+  assert.match(result.html, /<p><strong>Possible sentence frames:<\/strong><\/p><ul><li>I spend time __________\.<\/li><li>This helps me __________\.<\/li><\/ul><p>Students share with a partner\.<\/p>/);
+  assert.match(result.html, /<p><strong>Book - Colored Pages 34-35, Activities 1-2<\/strong><\/p>/);
+  assert.match(result.html, /<p><strong>Book - Colored Page 35, Activity 3<\/strong><\/p>/);
+  assert.match(result.html, /<p><strong>Vocabulary Review<\/strong><\/p><ul><li>affect<\/li><li>process<\/li><\/ul><p>Teacher reviews answers\.<\/p>/);
+  assert.match(result.html, /<p><strong>Grammar Review<\/strong><\/p><p><strong>A, An, and The<\/strong><\/p>/);
+  assert.match(result.html, /<p><strong>Comparatives and Superlatives<\/strong><\/p>/);
+  assert.match(result.html, /<p><strong>Adverbs<\/strong><\/p>/);
+});
+
 test("keeps heading-like agenda and assessment entries as list items", () => {
   const result = formatLessonPlan(`Lesson Title
 Context-Aware Lists

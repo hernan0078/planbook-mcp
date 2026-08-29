@@ -139,6 +139,10 @@ and Blooket detail lines render as bullets.
 Starting in v2.0.17, pipe-delimited lines in inferred semantic list sections
 such as `Agenda`, `Materials`, and `ESOL Strategies` become separate bullets.
 Narrative text and explicitly marked source bullets keep their pipes unchanged.
+Starting in v2.0.18, explicit bullet or numbered groups no longer cause later
+teacher/student narrative to be inferred as list items. Common activity cues,
+Book/Workbook activity references, and vocabulary/grammar review labels render
+as bold subsections while preserving the source wording.
 
 After a formatting-related update, use `get_lesson` with `includeHtml: true` to
 audit lessons written by the previous version. Confirm Arial, bold major and
