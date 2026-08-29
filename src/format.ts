@@ -11,8 +11,8 @@ const ESOL_STRATEGY = /^ESOL\.[A-Z]\d+\s*[–—-]/i;
 const COURSE_METADATA = /^(?:ESOL|ELL)\b(?!\s+strateg(?:y|ies)\b)(?=[^|]*\d)[^|]*$/i;
 const TIME_RANGE = /(?:\d{1,2}:\d{2}\s*[–—-]\s*\d{1,2}:\d{2}|\d{1,3}\s*[–—-]\s*\d{1,3}\s*(?:min|minutes?)\b)/iu;
 
-const MAJOR_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|key\s+teaching\s+notes\b.*|teacher\s+emphasis\b.*|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*\d+\s*minutes|\s*\([^)]*\))?|part\s+\d+\b.*)$/i;
-const KNOWN_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|key\s+teaching\s+notes\b.*|teacher\s+emphasis\b.*|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*\d+\s*minutes|\s*\([^)]*\))?|part\s+\d+\b.*|bell\s+ringer\b.*|closure\b.*|mini\s+lesson\b.*|guided\s+practice\b.*|independent\s+practice\b.*|reading\b.*|transition\b.*|assessment\s+expectations\b.*|standards\s+mastery\s+quiz\b.*|early\s+finisher\s+task\b.*)$/i;
+const MAJOR_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|key\s+teaching\s+notes\b.*|teacher\s+emphasis\b.*|teacher\s+review\s+guide\b.*|blooket\s+review\b.*|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*\d+\s*minutes|\s*\([^)]*\))?|part\s+\d+\b.*)$/i;
+const KNOWN_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|key\s+teaching\s+notes\b.*|teacher\s+emphasis\b.*|teacher\s+review\s+guide\b.*|blooket\s+review\b.*|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*\d+\s*minutes|\s*\([^)]*\))?|part\s+\d+\b.*|bell\s+ringer\b.*|closure\b.*|mini\s+lesson\b.*|guided\s+practice\b.*|independent\s+practice\b.*|reading\b.*|transition\b.*|assessment\s+expectations\b.*|standards\s+mastery\s+quiz\b.*|early\s+finisher\s+task\b.*)$/i;
 
 function escapeHtml(value: string): string {
   return value
@@ -111,6 +111,19 @@ function markdownTableCells(value: string): string[] | undefined {
 
 function isMarkdownTableDelimiter(cells: string[] | undefined): boolean {
   return Boolean(cells?.length && cells.every((cell) => /^:?-{3,}:?$/.test(cell)));
+}
+
+function isNumberedInstructionalHeader(lines: string[], index: number): boolean {
+  const numbered = NUMBERED.exec(cleanLine(lines[index] ?? ""));
+  if (!numbered?.[1] || !/^\d+$/.test(numbered[1])) return false;
+
+  for (let next = index + 1; next < lines.length; next += 1) {
+    const candidate = cleanLine(lines[next] ?? "");
+    if (!candidate || SEPARATOR.test(candidate)) continue;
+    return /^(?:model|quick\s+check|contrast)\s*:/i.test(candidate);
+  }
+
+  return false;
 }
 
 function implicitBulletIndexes(lines: string[]): Set<number> {
@@ -349,6 +362,12 @@ export function formatLessonPlan(source: string): FormattedLesson {
 
     const numbered = NUMBERED.exec(line);
     if (numbered?.[1] && numbered[2]) {
+      if (isNumberedInstructionalHeader(body, index)) {
+        closeList();
+        headings.push(line);
+        output.push(`<p><strong>${escapeHtml(line)}</strong></p>`);
+        continue;
+      }
       addListItem("ol", numbered[2], numbered[1]);
       continue;
     }
@@ -376,6 +395,7 @@ export function formatLessonPlan(source: string): FormattedLesson {
       currentSection === "agenda" ||
       currentSection === "materials" ||
       currentSection === "pages / materials" ||
+      currentSection === "blooket review" ||
       (currentSection === "assessment" && ASSESSMENT_ITEM.test(line)) ||
       (currentSection === "esol strategies" && ESOL_STRATEGY.test(line)) ||
       inferredBullets.has(index);

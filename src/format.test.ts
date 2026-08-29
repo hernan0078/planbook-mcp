@@ -272,6 +272,30 @@ ELA.9.C.3.1 - Follow standard English grammar.`);
   assert.match(ell.html, /<p>50-Minute Lesson<\/p>/);
 });
 
+test("formats numbered instructional checkpoints and Blooket review details", () => {
+  const result = formatLessonPlan(`Grammar Review: Six Core Skills
+Standards
+ELA.9.C.3.1 - Follow standard English grammar.
+
+Teacher Review Guide - Six Grammar Checkpoints
+1. Articles: a / an / the - Choose the correct article.
+Model: I ate an orange.
+Quick check: She wants ___ umbrella.
+2. Verb Be: am / is / are - Match the subject.
+Model: We are classmates.
+
+Blooket Review
+30 multiple-choice questions
+5 questions per grammar skill`);
+
+  assert.equal(result.title, "Grammar Review: Six Core Skills");
+  assert.match(result.html, /<p><strong>Teacher Review Guide - Six Grammar Checkpoints<\/strong><\/p>/);
+  assert.match(result.html, /<p><strong>1\. Articles: a \/ an \/ the - Choose the correct article\.<\/strong><\/p>/);
+  assert.match(result.html, /<p><strong>2\. Verb Be: am \/ is \/ are - Match the subject\.<\/strong><\/p>/);
+  assert.doesNotMatch(result.html, /<ol\b/);
+  assert.match(result.html, /<p><strong>Blooket Review<\/strong><\/p><ul><li>30 multiple-choice questions<\/li><li>5 questions per grammar skill<\/li><\/ul>/);
+});
+
 test("keeps heading-like agenda and assessment entries as list items", () => {
   const result = formatLessonPlan(`Lesson Title
 Context-Aware Lists

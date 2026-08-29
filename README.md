@@ -65,6 +65,8 @@ The formatter automatically:
 - soft-separates every timed header for scanability;
 - bolds `ESOL Strategies`, `Materials`, `Agenda`, and `Pages / Materials` like other major sections;
 - bolds `Key Teaching Notes` and `Teacher Emphasis` as major instructional labels;
+- bolds `Teacher Review Guide` and `Blooket Review` sections, rendering Blooket detail lines as bullets;
+- preserves numbered instructional checkpoints followed by `Model:`, `Quick check:`, or `Contrast:` as bold subsection labels instead of restarting separate ordered lists;
 - converts semantic and source-marked lists to bullets, preserving explicitly numbered steps;
 - changes only time-range hyphens to en dashes while preserving other source punctuation;
 - replaces the lesson body instead of retaining Planbook's dummy scaffold.

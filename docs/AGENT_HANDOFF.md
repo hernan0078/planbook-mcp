@@ -50,6 +50,11 @@ Every remaining Markdown heading is preserved as a bold lesson heading even
 when its label is lesson-specific and not in the formatter's known-header list.
 Markdown tables are rendered as real HTML tables with their header and cell text
 preserved; agents must not flatten or pre-convert them.
+`Teacher Review Guide` and `Blooket Review` are bold major sections. Numbered
+instructional checkpoints whose next content begins with `Model:`, `Quick
+check:`, or `Contrast:` retain their explicit numbers as bold subsection labels
+instead of becoming disconnected ordered lists that restart at 1. Plain details
+under `Blooket Review` become bullets.
 
 ## Compact recovery flow
 

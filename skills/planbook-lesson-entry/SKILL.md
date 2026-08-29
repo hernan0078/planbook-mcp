@@ -27,6 +27,8 @@ Formatting is deterministic: all major headers, including `ESOL Strategies`, are
 
 `Key Teaching Notes` and `Teacher Emphasis` are also treated as bold major instructional labels.
 
+`Teacher Review Guide` and `Blooket Review` are bold major sections. Numbered instructional checkpoints followed by `Model:`, `Quick check:`, or `Contrast:` retain their visible numbers as bold subsection labels rather than becoming separate ordered lists that restart at 1. Plain Blooket review details become bullets.
+
 Pass lesson plans unchanged. The MCP extracts a `Lesson Title` block, a leading H1, or an unlabeled first-line title followed by a `Standards` header or standard-coded bullet. It also supports one useful duration/pages subtitle between an unlabeled title and `Standards`, preserving the subtitle in the lesson body. It removes Markdown syntax while preserving every remaining Markdown heading as a bold lesson/subsection heading, including lesson-specific labels. The agent must not strip, label, or convert the source first. It preserves source punctuation except for en dashes inside time ranges.
 
 An `ESOL` or `ELL` course label may appear before the title while a duration/pages subtitle appears after it. Pass all three lines unchanged; the MCP extracts the middle title, removes the redundant course label from the Planbook body, and preserves the useful subtitle. It also removes a leading numbered course label from pipe-delimited metadata while preserving the text after the pipe. This filtering stops at `Standards`, so ESOL references in lesson content and `ESOL Strategies` remain unchanged.

@@ -1,5 +1,23 @@
 # Changelog
 
+## 2.0.16 - 2026-08-29
+
+### Fixed
+
+- `Teacher Review Guide` and `Blooket Review` now render as bold major sections.
+- Numbered instructional checkpoints followed by `Model:`, `Quick check:`, or `Contrast:` now preserve their explicit number as a bold subsection label instead of becoming disconnected ordered lists that restart at 1.
+- Plain detail lines under `Blooket Review` now render as bullets.
+
+### Documented
+
+- Updated the README, Codex installation guide, bundled lesson-entry skill, and agent handoff with review-guide, checkpoint, and Blooket formatting behavior.
+
+### Verified
+
+- Added a regression for two numbered grammar checkpoints with model/quick-check content and a Blooket review list.
+- The exact September 10 Period 1 dry run extracted the correct title, omitted the redundant course label, preserved the review subtitle, rendered five timed headings and six bold numbered checkpoint headings, rendered all five Blooket details as bullets, preserved 21 total list items and `ESOL Strategies`, and reported zero formatting issues or Markdown leakage.
+- Ran all 36 automated tests, the TypeScript build, package dry run, bundled skill validation, MCP startup smoke test, and Git diff validation successfully.
+
 ## 2.0.15 - 2026-08-29
 
 ### Fixed

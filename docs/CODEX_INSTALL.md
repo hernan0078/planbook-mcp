@@ -132,6 +132,10 @@ lesson body while the useful duration/pages subtitle remains. This also handles
 pipe-delimited metadata such as `ESOL 1-2 HS | 50-Minute Lesson` by retaining
 only `50-Minute Lesson`. Filtering ends at `Standards`, preserving later ESOL
 instructional text and strategies.
+Starting in v2.0.16, `Teacher Review Guide` and `Blooket Review` are recognized
+as bold major sections. Numbered instructional checkpoints followed by
+`Model:`, `Quick check:`, or `Contrast:` remain bold numbered subsection labels,
+and Blooket detail lines render as bullets.
 
 After a formatting-related update, use `get_lesson` with `includeHtml: true` to
 audit lessons written by the previous version. Confirm Arial, bold major and
