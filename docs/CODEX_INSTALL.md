@@ -127,6 +127,11 @@ headers with soft breaks.
 Starting in v2.0.14, an `ESOL` or `ELL` course label may precede the title while
 a duration/pages subtitle follows it; both metadata lines remain in the lesson
 body and only the middle line becomes Planbook's lesson title.
+Starting in v2.0.15, the redundant numbered course label is omitted from the
+lesson body while the useful duration/pages subtitle remains. This also handles
+pipe-delimited metadata such as `ESOL 1-2 HS | 50-Minute Lesson` by retaining
+only `50-Minute Lesson`. Filtering ends at `Standards`, preserving later ESOL
+instructional text and strategies.
 
 After a formatting-related update, use `get_lesson` with `includeHtml: true` to
 audit lessons written by the previous version. Confirm Arial, bold major and

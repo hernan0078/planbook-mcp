@@ -36,12 +36,16 @@ trailing Markdown hard-break backslashes. Agents must not clean these manually.
 An unlabeled first line is also extracted as the title when the next content is
 a `Standards` header or a standard-coded bullet. Do not add a synthetic
 `Lesson Title` label or remove that line.
-One course subtitle or metadata line may appear between that title and
-`Standards`; the MCP preserves the subtitle while removing only the title from
-the lesson body.
+One useful duration/pages subtitle may appear between that title and
+`Standards`; the MCP preserves the subtitle while removing the title from the
+lesson body.
 An `ESOL` or `ELL` course label may also precede the lesson title while a
-duration/pages subtitle follows it. In that sequence, the MCP extracts only the
-middle title and preserves both metadata lines in the lesson body.
+duration/pages subtitle follows it. The MCP extracts the middle title, removes
+the redundant course label, and preserves the useful subtitle. The same removal
+applies when a numbered `ESOL` or `ELL` label appears by itself or before a pipe
+in leading pre-Standards metadata. The formatter stops this filtering at
+`Standards`, so objectives,
+directions, `ESOL Strategies`, and strategy codes remain untouched.
 Every remaining Markdown heading is preserved as a bold lesson heading even
 when its label is lesson-specific and not in the formatter's known-header list.
 Markdown tables are rendered as real HTML tables with their header and cell text

@@ -203,7 +203,8 @@ ELA.9.C.3.1 - Follow standard English grammar.
   assert.equal(result.title, "Possessive Adjectives and Possessive Nouns");
   assert.doesNotMatch(result.html, /\*\*|&#x(?:44|55);|&amp;#x(?:44|55);/i);
   assert.doesNotMatch(result.html, /<p>Possessive Adjectives and Possessive Nouns<\/p>/);
-  assert.match(result.html, /<p>ESOL 1-2 HS \| 50-Minute Lesson<\/p>/);
+  assert.doesNotMatch(result.html, /ESOL 1-2 HS/);
+  assert.match(result.html, /<p>50-Minute Lesson<\/p>/);
   assert.match(result.html, /<p><strong>0–5 min \| Bell Ringer -<\/strong><br>Display three classroom objects\.<\/p>/);
   assert.match(result.html, /<p><strong>5–15 min \| Direct Instruction -<\/strong><br>Use the presentation\.<\/p>/);
 });
@@ -225,11 +226,50 @@ Students explain each correction.`);
 
   assert.equal(result.title, "Proper Nouns, Common Nouns, and Capitalization");
   assert.doesNotMatch(result.html, /<p>(?:<strong>)?Proper Nouns, Common Nouns, and Capitalization/);
-  assert.match(result.html, /<p>ESOL 1-2 HS<\/p>/);
+  assert.doesNotMatch(result.html, /ESOL 1-2 HS/);
   assert.match(result.html, /<p>50-Minute Lesson \| Book p\. 8<\/p>/);
   assert.match(result.html, /<p><strong>0–5 min - Bell Ringer: What Needs a Capital\?<\/strong><br><\/p>/);
   assert.match(result.html, /<p><strong>Key Teaching Notes: English vs\. Spanish<\/strong><\/p>/);
   assert.match(result.html, /<p><strong>Teacher Emphasis<\/strong><\/p>/);
+});
+
+test("removes only leading course metadata and preserves ESOL lesson content", () => {
+  const result = formatLessonPlan(`Lesson Title
+Language Practice
+
+ESOL 3-4 - HS - P5
+
+Standards
+ELA.9.C.3.1 - Follow standard English grammar.
+
+Objectives
+- Explain how ESOL class supports language growth.
+
+ESOL Strategies
+- ESOL.A2 - Modeling`);
+
+  assert.equal(result.title, "Language Practice");
+  assert.doesNotMatch(result.html, /ESOL 3-4 - HS - P5/);
+  assert.match(result.html, /Explain how ESOL class supports language growth\./);
+  assert.match(result.html, /<p><strong>ESOL Strategies<\/strong><\/p>/);
+  assert.match(result.html, /<li>ESOL\.A2 - Modeling<\/li>/);
+});
+
+test("recognizes spaced ESOL and pipe-delimited ELL course labels", () => {
+  const spaced = formatLessonPlan(`ESOL 1 2 HS
+Spaced Course Code
+Standards
+ELA.9.C.3.1 - Follow standard English grammar.`);
+  const ell = formatLessonPlan(`ELL Grammar Review
+ELL 1 | 50-Minute Lesson
+Standards
+ELA.9.C.3.1 - Follow standard English grammar.`);
+
+  assert.equal(spaced.title, "Spaced Course Code");
+  assert.doesNotMatch(spaced.html, /ESOL 1 2 HS/);
+  assert.equal(ell.title, "ELL Grammar Review");
+  assert.doesNotMatch(ell.html, /ELL 1/);
+  assert.match(ell.html, /<p>50-Minute Lesson<\/p>/);
 });
 
 test("keeps heading-like agenda and assessment entries as list items", () => {

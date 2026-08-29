@@ -8,7 +8,7 @@ const NUMBERED = /^\s*(\d+|[A-Da-d])[.)]\s+(.+)$/u;
 const STANDARD_CODE = /^(?:[A-Z]{2,}(?:\.[A-Z0-9]+)+|[A-Z]{2,}\.[A-Z0-9.]+)\s*[–—-]/u;
 const ASSESSMENT_ITEM = /\s[–—-]\s*(?:Formative|Summative|Classwork)\s*$/i;
 const ESOL_STRATEGY = /^ESOL\.[A-Z]\d+\s*[–—-]/i;
-const COURSE_METADATA = /^(?:ESOL|ELL)\b.*(?:\bHS\b|\bP\d+\b|\bperiod\b)/i;
+const COURSE_METADATA = /^(?:ESOL|ELL)\b(?!\s+strateg(?:y|ies)\b)(?=[^|]*\d)[^|]*$/i;
 const TIME_RANGE = /(?:\d{1,2}:\d{2}\s*[–—-]\s*\d{1,2}:\d{2}|\d{1,3}\s*[–—-]\s*\d{1,3}\s*(?:min|minutes?)\b)/iu;
 
 const MAJOR_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|key\s+teaching\s+notes\b.*|teacher\s+emphasis\b.*|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*\d+\s*minutes|\s*\([^)]*\))?|part\s+\d+\b.*)$/i;
@@ -205,6 +205,31 @@ function extractTitle(lines: string[]): { title?: string; body: string[] } {
   return { title, body };
 }
 
+function removeRedundantCourseMetadata(lines: string[]): string[] {
+  const body = [...lines];
+
+  for (let index = 0; index < body.length; index += 1) {
+    const line = cleanLine(body[index] ?? "");
+    if (sectionName(line) === "standards" || isStandardEntry(body[index] ?? "")) break;
+    if (!line) continue;
+
+    const pipeIndex = line.indexOf("|");
+    if (pipeIndex >= 0) {
+      const courseLabel = line.slice(0, pipeIndex).trim();
+      const usefulMetadata = line.slice(pipeIndex + 1).trim();
+      if (COURSE_METADATA.test(courseLabel)) {
+        if (usefulMetadata) body[index] = usefulMetadata;
+        else body.splice(index--, 1);
+        continue;
+      }
+    }
+
+    if (COURSE_METADATA.test(line)) body.splice(index--, 1);
+  }
+
+  return body;
+}
+
 export function normalizeDate(value: string): string {
   const input = value.trim();
   const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(input);
@@ -237,7 +262,9 @@ function validateDateParts(year: number, month: number, day: number, original: s
 
 export function formatLessonPlan(source: string): FormattedLesson {
   const rawLines = source.replace(/\r\n?/g, "\n").split("\n");
-  const { title, body } = extractTitle(rawLines);
+  const extracted = extractTitle(rawLines);
+  const title = extracted.title;
+  const body = removeRedundantCourseMetadata(extracted.body);
   const output: string[] = ['<div style="font-family: Arial, sans-serif;">'];
   const headings: string[] = [];
   const inferredBullets = implicitBulletIndexes(body);

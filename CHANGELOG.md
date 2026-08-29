@@ -1,5 +1,23 @@
 # Changelog
 
+## 2.0.15 - 2026-08-29
+
+### Fixed
+
+- Redundant numbered `ESOL` and `ELL` course labels are now omitted from the leading lesson body because Planbook already displays the class name on each lesson card.
+- Pipe-delimited metadata such as `ESOL 1-2 HS | 50-Minute Lesson` now preserves only the useful text after the pipe.
+- Course-label filtering stops at `Standards`, preserving objectives, directions, `ESOL Strategies`, and strategy codes that legitimately mention ESOL.
+
+### Documented
+
+- Updated the README, Codex installation guide, bundled lesson-entry skill, and agent handoff with the redundant-course-label rule and its safety boundary.
+
+### Verified
+
+- Added regressions for standalone, spaced-number, and pipe-delimited `ESOL`/`ELL` course labels plus ESOL instructional content after `Standards`.
+- The exact August 31 Period 1 source dry-run omitted the standalone course label while preserving the duration/pages subtitle, both course-named materials, `ESOL Strategies`, seven timed headings, 17 list items, and all established formatting with no Markdown leakage or validation issues.
+- Ran all 35 automated tests, the TypeScript build, package dry run, bundled skill validation, MCP startup smoke test, and Git diff validation successfully.
+
 ## 2.0.14 - 2026-08-29
 
 ### Fixed

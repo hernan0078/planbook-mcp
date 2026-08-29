@@ -53,8 +53,9 @@ The formatter automatically:
 - converts Markdown tables into bordered HTML tables instead of exposing pipe and delimiter syntax;
 - removes pasted whitespace entities such as `&#x20;`, `&#32;`, and `&nbsp;`, plus trailing Markdown hard-break backslashes;
 - extracts an unlabeled first-line title when the next content is a `Standards` header or a standard-coded bullet, preventing the title from being duplicated in the lesson body;
-- extracts an unlabeled first-line title when one course subtitle or metadata line appears before `Standards`, while preserving that subtitle in the lesson body;
-- extracts the lesson title when an `ESOL` or `ELL` course label appears first and a duration/pages subtitle appears after the title, preserving both metadata lines in the lesson body;
+- extracts an unlabeled first-line title when one useful duration/pages subtitle appears before `Standards`, while preserving that subtitle in the lesson body;
+- extracts the lesson title when an `ESOL` or `ELL` course label appears first and a duration/pages subtitle appears after the title, removes the redundant course label, and preserves the useful subtitle;
+- strips a leading numbered `ESOL` or `ELL` course identifier before `Standards`, including the course-name portion of pipe-delimited metadata, without removing later ESOL instructional text or strategies;
 - decodes pasted numeric character entities such as `&#x44;` before safe HTML escaping;
 - removes separators and decorative emoji;
 - places standards in the lesson body;
