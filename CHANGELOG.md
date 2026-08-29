@@ -1,5 +1,23 @@
 # Changelog
 
+## 2.0.14 - 2026-08-29
+
+### Fixed
+
+- Lesson title extraction now supports `ESOL` or `ELL` course metadata before the title and one duration/pages subtitle after it.
+- In the sequence `course label → lesson title → subtitle → Standards`, only the lesson title is removed from the body and used for Planbook's title field; both metadata lines remain visible.
+- `Key Teaching Notes` and `Teacher Emphasis` now render as bold major instructional labels.
+
+### Documented
+
+- Updated the README, Codex installation guide, bundled lesson-entry skill, and agent handoff with the course-label-first title pattern.
+
+### Verified
+
+- Added a regression based on an `ESOL 1-2 HS` label, a proper/common nouns lesson title, a `50-Minute Lesson | Book p. 8` subtitle, a minute-range Bell Ringer, and the two new instructional labels.
+- The exact August 31 Period 1 source dry-run extracted the correct title, preserved the course label and lesson subtitle, formatted seven timed headings and 17 list items, bolded both new instructional labels, removed all entity and Markdown artifacts, and reported zero formatting issues.
+- Ran all 33 automated tests, the TypeScript build, package dry run, bundled skill validation, MCP startup smoke test, and Git diff validation successfully.
+
 ## 2.0.13 - 2026-08-28
 
 ### Fixed

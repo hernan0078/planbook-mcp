@@ -54,6 +54,7 @@ The formatter automatically:
 - removes pasted whitespace entities such as `&#x20;`, `&#32;`, and `&nbsp;`, plus trailing Markdown hard-break backslashes;
 - extracts an unlabeled first-line title when the next content is a `Standards` header or a standard-coded bullet, preventing the title from being duplicated in the lesson body;
 - extracts an unlabeled first-line title when one course subtitle or metadata line appears before `Standards`, while preserving that subtitle in the lesson body;
+- extracts the lesson title when an `ESOL` or `ELL` course label appears first and a duration/pages subtitle appears after the title, preserving both metadata lines in the lesson body;
 - decodes pasted numeric character entities such as `&#x44;` before safe HTML escaping;
 - removes separators and decorative emoji;
 - places standards in the lesson body;
@@ -62,6 +63,7 @@ The formatter automatically:
 - recognizes leading bold minute ranges such as `0-5 min | Bell Ringer`, converts the range to an en dash, and soft-separates the following directions;
 - soft-separates every timed header for scanability;
 - bolds `ESOL Strategies`, `Materials`, `Agenda`, and `Pages / Materials` like other major sections;
+- bolds `Key Teaching Notes` and `Teacher Emphasis` as major instructional labels;
 - converts semantic and source-marked lists to bullets, preserving explicitly numbered steps;
 - changes only time-range hyphens to en dashes while preserving other source punctuation;
 - replaces the lesson body instead of retaining Planbook's dummy scaffold.

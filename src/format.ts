@@ -8,10 +8,11 @@ const NUMBERED = /^\s*(\d+|[A-Da-d])[.)]\s+(.+)$/u;
 const STANDARD_CODE = /^(?:[A-Z]{2,}(?:\.[A-Z0-9]+)+|[A-Z]{2,}\.[A-Z0-9.]+)\s*[–—-]/u;
 const ASSESSMENT_ITEM = /\s[–—-]\s*(?:Formative|Summative|Classwork)\s*$/i;
 const ESOL_STRATEGY = /^ESOL\.[A-Z]\d+\s*[–—-]/i;
+const COURSE_METADATA = /^(?:ESOL|ELL)\b.*(?:\bHS\b|\bP\d+\b|\bperiod\b)/i;
 const TIME_RANGE = /(?:\d{1,2}:\d{2}\s*[–—-]\s*\d{1,2}:\d{2}|\d{1,3}\s*[–—-]\s*\d{1,3}\s*(?:min|minutes?)\b)/iu;
 
-const MAJOR_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*\d+\s*minutes|\s*\([^)]*\))?|part\s+\d+\b.*)$/i;
-const KNOWN_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*\d+\s*minutes|\s*\([^)]*\))?|part\s+\d+\b.*|bell\s+ringer\b.*|closure\b.*|mini\s+lesson\b.*|guided\s+practice\b.*|independent\s+practice\b.*|reading\b.*|transition\b.*|assessment\s+expectations\b.*|standards\s+mastery\s+quiz\b.*|early\s+finisher\s+task\b.*)$/i;
+const MAJOR_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|key\s+teaching\s+notes\b.*|teacher\s+emphasis\b.*|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*\d+\s*minutes|\s*\([^)]*\))?|part\s+\d+\b.*)$/i;
+const KNOWN_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|key\s+teaching\s+notes\b.*|teacher\s+emphasis\b.*|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*\d+\s*minutes|\s*\([^)]*\))?|part\s+\d+\b.*|bell\s+ringer\b.*|closure\b.*|mini\s+lesson\b.*|guided\s+practice\b.*|independent\s+practice\b.*|reading\b.*|transition\b.*|assessment\s+expectations\b.*|standards\s+mastery\s+quiz\b.*|early\s+finisher\s+task\b.*)$/i;
 
 function escapeHtml(value: string): string {
   return value
@@ -156,6 +157,26 @@ function extractTitle(lines: string[]): { title?: string; body: string[] } {
       .map((line, index) => ({ index, line: cleanLine(line) }))
       .filter(({ index, line }) => index > firstContentIndex && Boolean(line) && !SEPARATOR.test(line))
       .map(({ index }) => index);
+    const metadataTitleIndex = COURSE_METADATA.test(firstLine)
+      ? followingContentIndexes[0]
+      : undefined;
+    const metadataTitle = metadataTitleIndex !== undefined
+      ? cleanLine(body[metadataTitleIndex] ?? "")
+      : "";
+    const metadataTitleContextIndexes = followingContentIndexes.slice(1, 3);
+    if (
+      metadataTitleIndex !== undefined &&
+      metadataTitle &&
+      !isHeading(metadataTitle) &&
+      metadataTitleContextIndexes.some((index) => {
+        const candidate = cleanLine(body[index] ?? "");
+        return sectionName(candidate) === "standards" || isStandardEntry(body[index] ?? "");
+      })
+    ) {
+      body.splice(metadataTitleIndex, 1);
+      return { title: metadataTitle, body };
+    }
+
     const titleContextIndexes = followingContentIndexes.slice(0, 2);
     if (
       firstLine &&

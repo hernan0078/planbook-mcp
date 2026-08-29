@@ -208,6 +208,30 @@ ELA.9.C.3.1 - Follow standard English grammar.
   assert.match(result.html, /<p><strong>5–15 min \| Direct Instruction -<\/strong><br>Use the presentation\.<\/p>/);
 });
 
+test("extracts a title between an ESOL course label and a lesson subtitle", () => {
+  const result = formatLessonPlan(`**ESOL 1-2 HS**
+**Proper Nouns, Common Nouns, and Capitalization**
+*50-Minute Lesson | Book p. 8*
+
+**Standards**
+ELA.9.C.3.1 - Follow standard English grammar.
+**Lesson - 50 Minutes**
+**0-5 min - Bell Ringer: What Needs a Capital?**
+Students classify words.
+**Key Teaching Notes: English vs. Spanish**
+Students compare capitalization.
+**Teacher Emphasis**
+Students explain each correction.`);
+
+  assert.equal(result.title, "Proper Nouns, Common Nouns, and Capitalization");
+  assert.doesNotMatch(result.html, /<p>(?:<strong>)?Proper Nouns, Common Nouns, and Capitalization/);
+  assert.match(result.html, /<p>ESOL 1-2 HS<\/p>/);
+  assert.match(result.html, /<p>50-Minute Lesson \| Book p\. 8<\/p>/);
+  assert.match(result.html, /<p><strong>0–5 min - Bell Ringer: What Needs a Capital\?<\/strong><br><\/p>/);
+  assert.match(result.html, /<p><strong>Key Teaching Notes: English vs\. Spanish<\/strong><\/p>/);
+  assert.match(result.html, /<p><strong>Teacher Emphasis<\/strong><\/p>/);
+});
+
 test("keeps heading-like agenda and assessment entries as list items", () => {
   const result = formatLessonPlan(`Lesson Title
 Context-Aware Lists
