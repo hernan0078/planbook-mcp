@@ -55,3 +55,34 @@ export type UpsertLessonResult = {
   bulletCount?: number;
   htmlCharacters?: number;
 };
+
+export type LessonBlock =
+  | { type: "paragraph"; text: string }
+  | { type: "list"; ordered: boolean; items: string[] }
+  | { type: "table"; rows: string[][] };
+
+export type LessonSection = {
+  heading?: string;
+  blocks: LessonBlock[];
+};
+
+export type LessonExportFormat = "json" | "markdown" | "text" | "html";
+
+export type ExtractedLesson = {
+  found: boolean;
+  date: string;
+  period: string;
+  classId: string;
+  className: string;
+  lessonId?: string;
+  title?: string;
+  format: LessonExportFormat;
+  content?: string;
+  sections?: LessonSection[];
+};
+
+export type LessonSlot = {
+  date: string;
+  classId: string;
+  lesson?: LessonRecord;
+};

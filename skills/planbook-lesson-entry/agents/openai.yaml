@@ -1,13 +1,13 @@
 interface:
-  display_name: "Planbook Lesson Entry"
-  short_description: "Add verified lessons to Planbook in one call"
-  default_prompt: "Use $planbook-lesson-entry to add this lesson to the correct Planbook date and period."
+  display_name: "Planbook Lesson Workflow"
+  short_description: "Write or bulk extract Planbook lessons"
+  default_prompt: "Use $planbook-lesson-entry to write or extract Planbook lessons for the requested dates and periods."
 
 dependencies:
   tools:
     - type: "mcp"
       value: "planbook"
-      description: "Local Planbook lesson entry MCP server"
+      description: "Local Planbook lesson write and extraction MCP server"
       transport: "stdio"
 
 policy:

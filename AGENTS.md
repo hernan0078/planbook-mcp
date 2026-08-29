@@ -27,3 +27,11 @@ Never commit `cookies.json`, authentication tokens, cookie identifiers, or lesso
 - Remember the school rotation: A days are P1/P3/P5/P7/P8; B2 days are P1/P2/P4/P6/P8; P1 and P8 meet daily.
 - Treat Planbook's scheduled dates as authoritative and fail closed on an active-school-year mismatch.
 - Do not silently fall back to browser automation when the MCP is unavailable.
+
+## Lesson Extraction Contract
+
+- Use `extract_lesson` for one date/period and `extract_lessons` for date ranges or multiple classes.
+- Prefer structured `json` for downstream agents and PPT builders; request exact `html` only when necessary.
+- Bulk ranges are limited to 31 calendar days, default to weekdays, and omit empty slots unless requested.
+- Treat normalized Markdown/text/JSON as exports of saved Planbook state, not exact recovery of the original raw paste.
+- Keep read-only verification private: never commit or publish extracted lesson content.

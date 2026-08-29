@@ -38,7 +38,7 @@ cp "$skill_source/SKILL.md" "$skill_target/SKILL.md"
 cp "$skill_source/agents/openai.yaml" "$skill_target/agents/openai.yaml"
 
 echo
-echo "Installed the Planbook MCP and lesson-entry skill for Codex."
+echo "Installed the Planbook MCP and lesson workflow skill for Codex."
 echo "Log into Planbook in Chrome, then run:"
 echo "  cd \"$repo_dir\" && npm run refresh"
 echo "Restart Codex once so the new MCP tools load."

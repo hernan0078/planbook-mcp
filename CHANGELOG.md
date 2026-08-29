@@ -1,5 +1,29 @@
 # Changelog
 
+## 2.1.0 - 2026-08-29
+
+### Added
+
+- Added read-only `extract_lesson` for one saved lesson in structured JSON, Markdown, plain text, or exact saved HTML.
+- Added read-only `extract_lessons` for inclusive date ranges with period/class filters, weekday and empty-slot controls, stable ordering, and a 31-day safety limit.
+- Added deterministic saved-HTML parsing for headings, paragraphs, ordered/unordered lists, tables, numeric entities, arrows, and typographic punctuation.
+
+### Improved
+
+- Bulk extraction now requests each selected full-year class feed once and each required extra-lesson event feed once per date instead of repeating a full lesson lookup for every slot.
+- Structured JSON omits duplicate full HTML, reducing tokens for PPT generation and agent-to-agent workflows.
+
+### Documented
+
+- Added `docs/EXTRACTION.md` and updated the README, Codex installation guide, bundled skill, agent handoff, and agent rules with extraction formats, limits, semantics, and recovery.
+- Clarified that normalized JSON, Markdown, and text represent saved Planbook state and cannot recreate the byte-for-byte original paste.
+
+### Verified
+
+- Added regressions for section/list/table/entity parsing, all export formats, weekday and range limits, bulk class filters, and API request batching.
+- Ran all 46 automated tests, the TypeScript build, package dry run, bundled skill validation, MCP protocol/tool-schema smoke test, and Git diff validation successfully.
+- Completed privacy-safe live read-only checks for both extraction tools: structured JSON omitted duplicate content, one-lesson parsing returned ordered sections, and a three-class bulk request returned the requested slots and counts without printing or committing lesson content.
+
 ## 2.0.19 - 2026-08-29
 
 ### Fixed

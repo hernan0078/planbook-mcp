@@ -1,7 +1,7 @@
 {
   "name": "planbook-mcp",
-  "version": "2.0.19",
-  "description": "Token-efficient MCP server for creating and updating Planbook lessons",
+  "version": "2.1.0",
+  "description": "Token-efficient MCP server for writing and extracting Planbook lessons",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
@@ -13,6 +13,9 @@
     "dist/client.d.ts",
     "dist/client.js",
     "dist/client.js.map",
+    "dist/export.d.ts",
+    "dist/export.js",
+    "dist/export.js.map",
     "dist/format.d.ts",
     "dist/format.js",
     "dist/format.js.map",
@@ -27,6 +30,7 @@
     "dist/types.js.map",
     "docs/AGENT_HANDOFF.md",
     "docs/CODEX_INSTALL.md",
+    "docs/EXTRACTION.md",
     "install-codex.sh",
     "refresh-cookies.py",
     "skills/planbook-lesson-entry/SKILL.md",

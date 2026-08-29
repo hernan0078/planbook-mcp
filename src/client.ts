@@ -4,7 +4,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 import { deepRecords, extractClasses, findLesson, hasClassDate } from "./resolver.js";
-import type { JsonRecord, LessonRecord, PlanbookClass } from "./types.js";
+import type { JsonRecord, LessonRecord, LessonSlot, PlanbookClass } from "./types.js";
 
 const API_URL = "https://api.planbook.com";
 const MODULE_DIR = dirname(fileURLToPath(import.meta.url));
@@ -51,6 +51,63 @@ export class PlanbookClient {
 
   async getLesson(date: string, classId: string, yearId?: string): Promise<LessonRecord | undefined> {
     return (await this.getLessonContext(date, classId, yearId)).lesson;
+  }
+
+  async getLessonsForClasses(dates: string[], classes: PlanbookClass[]): Promise<LessonSlot[]> {
+    if (!dates.length || !classes.length) return [];
+    await this.ensureLoggedIn(false);
+
+    const targetYearId = classes[0]?.yearId || this.yearsForDate(dates[0])[0]?.id || this.yearId;
+    const targetYear = this.schoolYears.find((year) => year.id === targetYearId);
+    assertActiveSchoolYear(this.yearId, targetYearId, targetYear?.name, dates[0]!);
+    for (const item of classes) {
+      if (item.yearId && item.yearId !== targetYearId) {
+        throw new Error("Bulk extraction cannot mix classes from different school years.");
+      }
+    }
+    for (const date of dates) {
+      if (!this.yearsForDate(date).some((year) => year.id === targetYearId)) {
+        throw new Error("Bulk extraction cannot cross Planbook school years.");
+      }
+    }
+
+    const slots = new Map<string, LessonSlot & { scheduled: boolean }>();
+    for (const item of classes) {
+      const payload = await this.request("GET", "/getClassLessons", {
+        classId: item.id,
+        teacherId: this.teacherId,
+        yearId: targetYearId,
+      });
+      for (const date of dates) {
+        slots.set(slotKey(date, item.id), {
+          date,
+          classId: item.id,
+          lesson: findLesson(payload, item.id, date),
+          scheduled: hasClassDate(payload, item.id, date),
+        });
+      }
+    }
+
+    const eventDates = dates.filter((date) => classes.some((item) => {
+      const slot = slots.get(slotKey(date, item.id));
+      return slot && !slot.lesson && !slot.scheduled;
+    }));
+    for (const date of eventDates) {
+      const events = await this.request("GET", "/getLessonsEvents", {
+        date,
+        teacherId: this.teacherId,
+        yearId: targetYearId,
+      });
+      for (const item of classes) {
+        const key = slotKey(date, item.id);
+        const slot = slots.get(key);
+        if (slot && !slot.lesson && !slot.scheduled) {
+          slot.lesson = findLesson(events, item.id, date);
+        }
+      }
+    }
+
+    return [...slots.values()].map(({ scheduled: _scheduled, ...slot }) => slot);
   }
 
   private async getLessonContext(
@@ -518,6 +575,10 @@ export function buildUpdateLessonPayload(args: {
 
 function sleep(milliseconds: number): Promise<void> {
   return new Promise((resolveSleep) => setTimeout(resolveSleep, milliseconds));
+}
+
+function slotKey(date: string, classId: string): string {
+  return `${date}\u0000${classId}`;
 }
 
 function parsePlanbookDate(value: string): number {

@@ -129,3 +129,80 @@ test("fails closed when Planbook has a different school year active", () => {
     /Switch the Planbook year selector to MBA 2026-2027 in Chrome/,
   );
 });
+
+test("bulk reads each class feed once and each required event date once", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalToken = process.env.PLANBOOK_ID_TOKEN;
+  const calls: string[] = [];
+  process.env.PLANBOOK_ID_TOKEN = "test-token";
+
+  globalThis.fetch = async (input) => {
+    const url = new URL(String(input));
+    calls.push(`${url.pathname}${url.search}`);
+    if (url.pathname === "/getSettings") {
+      return jsonResponse({
+        currentYearId: "year-1",
+        userData: { teacherId: "teacher-1" },
+        years: [{
+          yearId: "year-1",
+          yearName: "2026-2027",
+          firstDay: "08/01/2026",
+          lastDay: "06/30/2027",
+        }],
+      });
+    }
+    if (url.pathname === "/getClassLessons" && url.searchParams.get("classId") === "class-1") {
+      return jsonResponse({
+        classId: "class-1",
+        lessons: [
+          { classId: "class-1", date: "08/31/2026", lessonId: "lesson-1", lessonTitle: "One", lessonText: "<p>One</p>" },
+          { classId: "class-1", date: "09/01/2026", lessonId: "0", lessonTitle: "", lessonText: "" },
+        ],
+      });
+    }
+    if (url.pathname === "/getClassLessons" && url.searchParams.get("classId") === "class-2") {
+      return jsonResponse({
+        classId: "class-2",
+        lessons: [
+          { classId: "class-2", date: "08/31/2026", lessonId: "0", lessonTitle: "", lessonText: "" },
+        ],
+      });
+    }
+    if (url.pathname === "/getLessonsEvents" && url.searchParams.get("date") === "09/01/2026") {
+      return jsonResponse({
+        day: {
+          date: "09/01/2026",
+          objects: [{ classId: "class-2", lessonId: "lesson-2", lessonTitle: "Two", lessonText: "<p>Two</p>" }],
+        },
+      });
+    }
+    return new Response("not found", { status: 404 });
+  };
+
+  try {
+    const client = new (await import("./client.js")).PlanbookClient();
+    const slots = await client.getLessonsForClasses(
+      ["08/31/2026", "09/01/2026"],
+      [
+        { id: "class-1", name: "Class - P1", yearId: "year-1" },
+        { id: "class-2", name: "Class - P2", yearId: "year-1" },
+      ],
+    );
+    assert.equal(slots.length, 4);
+    assert.equal(slots.find((slot) => slot.classId === "class-1" && slot.date === "08/31/2026")?.lesson?.title, "One");
+    assert.equal(slots.find((slot) => slot.classId === "class-2" && slot.date === "09/01/2026")?.lesson?.title, "Two");
+    assert.equal(calls.filter((call) => call.startsWith("/getClassLessons")).length, 2);
+    assert.equal(calls.filter((call) => call.startsWith("/getLessonsEvents")).length, 1);
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalToken === undefined) delete process.env.PLANBOOK_ID_TOKEN;
+    else process.env.PLANBOOK_ID_TOKEN = originalToken;
+  }
+});
+
+function jsonResponse(value: unknown): Response {
+  return new Response(JSON.stringify(value), {
+    status: 200,
+    headers: { "Content-Type": "application/json" },
+  });
+}

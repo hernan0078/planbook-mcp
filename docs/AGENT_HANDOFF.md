@@ -9,7 +9,23 @@ skill. Restart Codex after installation or any MCP/skill update.
 ## Goal
 
 Use this MCP to place a pasted lesson plan into the correct Planbook date and
-period with one tool call and a small result.
+period, or extract one or many saved lesson plans without browser automation.
+
+## Read-only extraction
+
+- Use `extract_lesson` for one date and period.
+- Use `extract_lessons` for a date range, multiple periods, or multiple classes.
+- Prefer `format: "json"` for agents, PowerPoint builders, and other deterministic automation.
+- Use `markdown` or `text` for human-readable normalized output.
+- Use `html` only when exact saved Planbook HTML is required.
+- Bulk extraction defaults to weekdays, omits empty slots, and accepts at most 31 calendar days per call.
+- `periods` and `classNames` are optional intersecting filters; narrow them when lesson bodies are large.
+- Extracted normalized content reflects the saved Planbook lesson, not the byte-for-byte original raw paste.
+
+Bulk reads fetch every selected class feed once, then use at most one extra-lesson
+event request for each date that needs it. Results are ordered by date, period,
+and class. The operation is read-only and still fails closed when Planbook's
+active school year does not match the requested range.
 
 ## Normal call
 
@@ -152,6 +168,11 @@ format summary. Dry runs do not authenticate and do not change Planbook.
 
 Do not echo the full lesson plan back to the user after a successful save. A
 confirmation with title, date, period, action, and verification state is enough.
+
+Extraction tools return concise metadata plus either `sections` for `json` or a
+single `content` string for `markdown`, `text`, and `html`. Do not duplicate full
+lesson bodies in the final user response unless the user explicitly asks to see
+them. For bulk work, report counts, range, periods/classes, and any empty slots.
 
 ## Maintenance Handoff
 

@@ -1,7 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { extractClasses, findLesson, hasClassDate, resolveClass } from "./resolver.js";
+import {
+  extractClasses,
+  findLesson,
+  hasClassDate,
+  periodLabelForClass,
+  resolveClass,
+  selectClasses,
+} from "./resolver.js";
 
 const classPayload = {
   data: {
@@ -46,6 +53,14 @@ test("asks for a class name only when a period is ambiguous", () => {
   });
   assert.throws(() => resolveClass(classes, "3"), /multiple classes/);
   assert.equal(resolveClass(classes, "3", "Writing").id, "b");
+});
+
+test("selects bulk classes by period and class-name substring", () => {
+  const classes = extractClasses(classPayload);
+  assert.deepEqual(selectClasses(classes, ["P2", "4"]).map((item) => item.id), ["20", "30"]);
+  assert.deepEqual(selectClasses(classes, [], ["advanced"]).map((item) => item.id), ["10"]);
+  assert.deepEqual(selectClasses(classes, ["3"], ["english"]).map((item) => item.id), ["10"]);
+  assert.equal(periodLabelForClass(classes[0]!), "P3");
 });
 
 test("finds an existing lesson for idempotent updates", () => {

@@ -1,11 +1,25 @@
 ---
 name: planbook-lesson-entry
-description: Enter or replace lesson plans in Planbook for the correct date and class period through the local Planbook MCP. Use whenever the user says to add, enter, upload, paste, or put a lesson in Planbook, or provides lesson-plan text with a date and period. Always use this skill for Planbook lesson entry, including multiple lessons.
+description: Enter, replace, or extract lesson plans in Planbook through the local Planbook MCP. Use for lesson entry and for single-day, multi-period, weekly, or date-range lesson exports. Always use this skill for Planbook lesson writes and reads.
 ---
 
-# Planbook Lesson Entry
+# Planbook Lesson Workflow
 
 Use the `planbook` MCP directly. Do not open Chrome or pre-format HTML unless the user explicitly requests browser entry.
+
+## Extraction Workflow
+
+1. Use `extract_lesson` when the user requests one date and period.
+2. Use `extract_lessons` for multiple dates, periods, classes, a day, or a week.
+3. Prefer `format: "json"` for PPT generation and agent-to-agent workflows. It returns ordered paragraph, list, and table blocks without duplicating saved HTML.
+4. Use `markdown` or `text` only when a human-readable document is requested. Use `html` only for exact saved Planbook HTML.
+5. Bulk extraction defaults to weekdays and nonempty lessons. Use `includeWeekends` or `includeEmpty` only when requested or operationally necessary.
+6. Keep each call within 31 calendar days and filter periods/classes when possible to control response size.
+7. Confirm the date range, class/period count, lesson count, and empty count without echoing all lesson bodies unless requested.
+
+The extraction tools are read-only. Their normalized formats represent the
+saved Planbook content and structure; they do not claim to recreate the exact
+raw Markdown or plain text originally pasted before formatting.
 
 ## Normal Workflow
 

@@ -1,17 +1,18 @@
 # Planbook MCP
 
-An unofficial, token-efficient MCP server for creating and updating lessons in
+An unofficial, token-efficient MCP server for creating, updating, and extracting lessons in
 [Planbook](https://planbook.com) through its web application's API.
 
-Version 2 is designed around one agent action: pass the date, period, and raw
-lesson plan to `upsert_lesson`. The server handles class lookup, existing-lesson
-lookup, formatting, replacement, saving, and verification.
+Version 2 provides goal-oriented write and read actions. Pass a date, period, and
+raw lesson plan to `upsert_lesson`, or use `extract_lesson` and `extract_lessons`
+to retrieve saved plans without browser automation.
 
 ## Why v2 is leaner
 
 - One normal tool call instead of `get_classes` → `get_lessons` → HTML generation → `save_lesson`.
 - Raw pasted lesson text is formatted deterministically inside the server.
 - Tool results are compact structured objects, not full Planbook API responses.
+- Bulk extraction fetches each selected class's full-year feed once and each required event feed once per date instead of repeating one lesson request per slot.
 - Existing lessons are resolved from Planbook's full-year class payload, making retries idempotent.
 - Nested event-feed lessons inherit their parent day, so an adjacent-day event can never satisfy the requested date.
 - Reads and writes fail closed when Planbook has a different school year active instead of treating the target as an empty lesson.
@@ -32,6 +33,8 @@ and API work.
 | Tool | Purpose |
 | --- | --- |
 | `upsert_lesson` | Create or replace one lesson in a single call; supports `dryRun` |
+| `extract_lesson` | Export one saved lesson as structured JSON, Markdown, text, or exact saved HTML |
+| `extract_lessons` | Bulk export a date range with period/class filters and optional empty slots |
 | `get_lesson` | Read one lesson summary by date and period; HTML is optional |
 | `list_classes` | Compact date-aware diagnostic list used only when a period is ambiguous |
 
@@ -80,6 +83,44 @@ Agents should still pass the user's raw lesson text unchanged. Markdown and past
 deterministic server behavior, so plans copied from ChatGPT, Markdown documents,
 or plain text follow the same Planbook formatting contract without agent-side HTML.
 
+## Extract lessons
+
+For one lesson, use `extract_lesson` with a date, period, and optional class name:
+
+```json
+{
+  "date": "2026-09-10",
+  "period": 2,
+  "format": "json"
+}
+```
+
+For a week or another bounded range, use `extract_lessons`:
+
+```json
+{
+  "startDate": "2026-09-08",
+  "endDate": "2026-09-11",
+  "periods": [1, 2, 6, 8],
+  "format": "json"
+}
+```
+
+`json` is the default and returns ordered sections containing paragraph, list,
+and table blocks without duplicating the full HTML. `markdown` and `text` return
+normalized human-readable content. `html` returns the exact saved Planbook lesson
+body. These exports represent Planbook's saved state; normalized formats cannot
+reconstruct the byte-for-byte raw text pasted before Planbook formatting.
+
+Bulk ranges are inclusive and limited to 31 calendar days. Weekends and empty
+class/date slots are omitted by default. Set `includeWeekends` or `includeEmpty`
+to include them. `periods` and `classNames` are optional filters and are combined
+when both are supplied. Use narrow filters when lesson bodies are large to keep
+MCP responses and downstream model context efficient.
+
+See [Extraction guide](docs/EXTRACTION.md) for schemas, output semantics, and
+agent/PPT workflow guidance.
+
 ## Install
 
 Requirements:
@@ -114,6 +155,7 @@ that has already been fixed on disk. You can then paste a lesson plan with its
 date and period and ask Codex to add it to Planbook. The skill calls
 `upsert_lesson` directly with verified overwrite enabled, so the existing lesson
 body and dummy scaffold are replaced rather than appended.
+The same skill routes read requests to `extract_lesson` or `extract_lessons`.
 
 The installer checks the normal `codex` command first and falls back to the CLI
 bundled with the ChatGPT desktop app. It updates only the `planbook` MCP entry and
@@ -167,6 +209,11 @@ For normal lesson entry, agents should call `upsert_lesson` immediately. Do not
 call `list_classes` or `get_lesson` first. If the server reports that a period is
 ambiguous, retry once with `className` from the error or from `list_classes`.
 
+For reads, use `extract_lesson` when the request names one date and period. Use
+`extract_lessons` for a day, week, date range, or multiple periods. Prefer
+structured `json` for downstream automation such as daily PowerPoint generation.
+Keep `get_lesson` for compact recovery checks and backwards compatibility.
+
 Dates accept `YYYY-MM-DD` (preferred) or `MM/DD/YYYY`. Use `dryRun: true` to test
 parsing and formatting without authenticating or changing Planbook.
 
@@ -201,7 +248,8 @@ npm test
 
 The test suite covers date validation, title extraction, timed and semantic lesson
 formatting, class resolution, ambiguity handling, exact event dates, active-year
-safety, and existing-lesson detection.
+safety, existing-lesson detection, saved-HTML parsing, export formats, bounded
+date ranges, class filters, and bulk API batching.
 
 Environment variables:
 
@@ -216,9 +264,10 @@ Environment variables:
 
 ## Migration from v1
 
-Version 2 intentionally replaces nine low-level tools with three goal-oriented
-tools. Calls to `save_lesson`, `get_lessons`, `get_settings`, and similar v1 tools
-must migrate to `upsert_lesson`, `get_lesson`, or `list_classes`.
+Version 2 intentionally replaces nine low-level tools with goal-oriented tools.
+Calls to `save_lesson`, `get_lessons`, `get_settings`, and similar v1 tools must
+migrate to `upsert_lesson`, `extract_lesson`, `extract_lessons`, `get_lesson`, or
+`list_classes`.
 
 The v1 installer contained a second stale copy of the server and the lockfile did
 not match `package.json`; both issues are removed in v2.

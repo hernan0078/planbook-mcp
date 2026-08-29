@@ -1,6 +1,6 @@
 # Install Planbook MCP In Codex On macOS
 
-This guide installs the local Planbook MCP and its lesson-entry skill so Codex can accept a pasted lesson plan and place it on the correct Planbook date and class period.
+This guide installs the local Planbook MCP and its lesson workflow skill so Codex can write lessons and perform single or bulk read-only exports.
 
 ## Requirements
 
@@ -59,6 +59,14 @@ After restarting Codex, paste a lesson with its date and period and ask:
 `Add this lesson to Planbook.`
 
 The skill calls `upsert_lesson` with verified overwrite enabled. The MCP resolves the school year and class, replaces the entire lesson body, applies Arial formatting, saves, and reads the target back for verification.
+
+To verify extraction after restarting Codex, ask:
+
+`Extract next week's Planbook lessons for Periods 1 and 8 as structured JSON.`
+
+The skill calls `extract_lesson` for one target or `extract_lessons` for a date
+range. Bulk reads are read-only, default to weekdays, and fetch each selected
+class feed once. See [EXTRACTION.md](EXTRACTION.md) for all filters and formats.
 
 ## Troubleshooting
 
@@ -146,6 +154,10 @@ as bold subsections while preserving the source wording.
 Starting in v2.0.19, implicit-list inference also stops when a new explicit list
 begins after plain prompt text. Presentation slide markers, unit-exam labels,
 and homophonic/homographic/compound pun labels render as bold subsections.
+Starting in v2.1.0, `extract_lesson` and `extract_lessons` export saved lessons as
+structured JSON, Markdown, plain text, or exact saved HTML. Bulk ranges are
+limited to 31 calendar days and fetch each class feed once. Restart Codex after
+installing so the new tools appear.
 
 After a formatting-related update, use `get_lesson` with `includeHtml: true` to
 audit lessons written by the previous version. Confirm Arial, bold major and

@@ -89,12 +89,35 @@ function periodNumber(value: string): string {
   return match?.[0] ?? normalizedText(value);
 }
 
-function classMatchesPeriod(item: PlanbookClass, requestedPeriod: string): boolean {
+export function classMatchesPeriod(item: PlanbookClass, requestedPeriod: string): boolean {
   const target = periodNumber(requestedPeriod);
   if (!target) return false;
   if (item.period && periodNumber(item.period) === target) return true;
   const escaped = target.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   return new RegExp(`(?:^|\\b)(?:p(?:eriod)?\\s*[-:]?\\s*)${escaped}(?:\\b|$)`, "i").test(item.name);
+}
+
+export function periodLabelForClass(item: PlanbookClass): string {
+  const source = item.period || item.name;
+  const match = /(?:^|\b)p(?:eriod)?\s*[-:]?\s*(\d+)(?:\b|$)/i.exec(source);
+  if (match?.[1]) return `P${match[1]}`;
+  const number = /\d+/.exec(item.period ?? "");
+  return number?.[0] ? `P${number[0]}` : item.period || "";
+}
+
+export function selectClasses(
+  classes: PlanbookClass[],
+  periods: string[] = [],
+  classNames: string[] = [],
+): PlanbookClass[] {
+  const normalizedNames = classNames.map(normalizedText).filter(Boolean);
+  return classes.filter((item) => {
+    const periodMatch = !periods.length || periods.some((period) => classMatchesPeriod(item, period));
+    const classMatch = !normalizedNames.length || normalizedNames.some(
+      (name) => normalizedText(item.name).includes(name),
+    );
+    return periodMatch && classMatch;
+  });
 }
 
 export function resolveClass(
