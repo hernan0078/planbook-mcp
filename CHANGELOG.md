@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.0.17 - 2026-08-29
+
+### Fixed
+
+- Pipe-delimited items in inferred semantic list sections such as `Agenda`, `Materials`, and `ESOL Strategies` now render as separate bullets instead of one crowded list item.
+- Narrative paragraphs and explicitly marked source bullets preserve pipe characters when they are meaningful text.
+
+### Documented
+
+- Updated the README, Codex installation guide, bundled lesson-entry skill, and agent handoff with pipe-delimited semantic-list behavior and its safety boundary.
+
+### Verified
+
+- Added a regression covering Agenda, Materials, and ESOL Strategies splitting plus preserved pipes in prose and an explicit source bullet.
+- The exact September 11 Period 1 dry run extracted `Grammar Exam`, omitted the redundant course label, preserved the assessment subtitle, formatted four timed headings, split all Agenda, Materials, and ESOL Strategies entries into 16 total bullets, removed visible separator pipes, and reported zero formatting issues or Markdown leakage.
+- Ran all 37 automated tests, the TypeScript build, package dry run, bundled skill validation, MCP startup smoke test, and Git diff validation successfully.
+
 ## 2.0.16 - 2026-08-29
 
 ### Fixed

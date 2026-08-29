@@ -304,6 +304,11 @@ export function formatLessonPlan(source: string): FormattedLesson {
     bulletCount += 1;
   };
 
+  const addSemanticListItems = (text: string) => {
+    const items = text.split(/\s+\|\s+/u).map((item) => item.trim()).filter(Boolean);
+    for (const item of items) addListItem("ul", item);
+  };
+
   for (let index = 0; index < body.length; index += 1) {
     const rawLine = body[index] ?? "";
     const boldTimedSection = leadingBoldTimedSection(rawLine);
@@ -376,7 +381,7 @@ export function formatLessonPlan(source: string): FormattedLesson {
       (currentSection === "agenda" && !MAJOR_HEADER.test(line.replace(/:\s*$/, ""))) ||
       (currentSection === "assessment" && ASSESSMENT_ITEM.test(line));
     if (contextualList) {
-      addListItem("ul", line);
+      addSemanticListItems(line);
       continue;
     }
 
@@ -400,7 +405,7 @@ export function formatLessonPlan(source: string): FormattedLesson {
       (currentSection === "esol strategies" && ESOL_STRATEGY.test(line)) ||
       inferredBullets.has(index);
     if (autoList) {
-      addListItem("ul", line);
+      addSemanticListItems(line);
       continue;
     }
 

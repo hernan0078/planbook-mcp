@@ -296,6 +296,27 @@ Blooket Review
   assert.match(result.html, /<p><strong>Blooket Review<\/strong><\/p><ul><li>30 multiple-choice questions<\/li><li>5 questions per grammar skill<\/li><\/ul>/);
 });
 
+test("splits pipe-delimited semantic lists without changing prose or source bullets", () => {
+  const result = formatLessonPlan(`Grammar Exam
+Standards
+ELA.9.C.3.1 - Follow standard English grammar.
+Agenda
+Settle In | Directions | Grammar Exam
+Lesson - 50 Minutes
+Teacher contrasts Are you? | Do you? in prose.
+- Keep this explicit A | B comparison together.
+Materials
+Student iPads | Google Form
+ESOL Strategies
+ESOL.A6 - Direct Language | ESOL.C14 - Chunking`);
+
+  assert.match(result.html, /<p><strong>Agenda<\/strong><\/p><ul><li>Settle In<\/li><li>Directions<\/li><li>Grammar Exam<\/li><\/ul>/);
+  assert.match(result.html, /Teacher contrasts Are you\? \| Do you\? in prose\./);
+  assert.match(result.html, /<li>Keep this explicit A \| B comparison together\.<\/li>/);
+  assert.match(result.html, /<p><strong>Materials<\/strong><\/p><ul><li>Student iPads<\/li><li>Google Form<\/li><\/ul>/);
+  assert.match(result.html, /<p><strong>ESOL Strategies<\/strong><\/p><ul><li>ESOL\.A6 - Direct Language<\/li><li>ESOL\.C14 - Chunking<\/li><\/ul>/);
+});
+
 test("keeps heading-like agenda and assessment entries as list items", () => {
   const result = formatLessonPlan(`Lesson Title
 Context-Aware Lists

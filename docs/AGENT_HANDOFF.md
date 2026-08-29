@@ -55,6 +55,10 @@ instructional checkpoints whose next content begins with `Model:`, `Quick
 check:`, or `Contrast:` retain their explicit numbers as bold subsection labels
 instead of becoming disconnected ordered lists that restart at 1. Plain details
 under `Blooket Review` become bullets.
+Within inferred semantic list sections such as `Agenda`, `Materials`, and `ESOL
+Strategies`, pipe-delimited items become separate bullets. This split does not
+apply to narrative paragraphs or explicitly marked source bullets, where the
+pipe may be meaningful text.
 
 ## Compact recovery flow
 

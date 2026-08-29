@@ -136,6 +136,9 @@ Starting in v2.0.16, `Teacher Review Guide` and `Blooket Review` are recognized
 as bold major sections. Numbered instructional checkpoints followed by
 `Model:`, `Quick check:`, or `Contrast:` remain bold numbered subsection labels,
 and Blooket detail lines render as bullets.
+Starting in v2.0.17, pipe-delimited lines in inferred semantic list sections
+such as `Agenda`, `Materials`, and `ESOL Strategies` become separate bullets.
+Narrative text and explicitly marked source bullets keep their pipes unchanged.
 
 After a formatting-related update, use `get_lesson` with `includeHtml: true` to
 audit lessons written by the previous version. Confirm Arial, bold major and
