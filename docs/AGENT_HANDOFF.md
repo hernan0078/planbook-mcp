@@ -65,6 +65,11 @@ following narrative. Common plain-text activity labels (`On the board`, sentence
 frames, examples, focus questions, recommended prompts, Book/Workbook activity
 references, and vocabulary/grammar review labels) render as bold subsections
 without adding or changing lesson text.
+Presentation slide markers, unit-exam labels, and homophonic/homographic/compound
+pun labels are also bold subsections. If a plain prompt is followed by a new
+explicit bullet or numbered group, implicit-list inference stops before that
+group so assessment, strategy, and other later lists remain structurally
+separate.
 
 ## Compact recovery flow
 

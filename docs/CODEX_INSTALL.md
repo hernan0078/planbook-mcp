@@ -143,6 +143,9 @@ Starting in v2.0.18, explicit bullet or numbered groups no longer cause later
 teacher/student narrative to be inferred as list items. Common activity cues,
 Book/Workbook activity references, and vocabulary/grammar review labels render
 as bold subsections while preserving the source wording.
+Starting in v2.0.19, implicit-list inference also stops when a new explicit list
+begins after plain prompt text. Presentation slide markers, unit-exam labels,
+and homophonic/homographic/compound pun labels render as bold subsections.
 
 After a formatting-related update, use `get_lesson` with `includeHtml: true` to
 audit lessons written by the previous version. Confirm Arial, bold major and

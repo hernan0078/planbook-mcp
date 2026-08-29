@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.0.19 - 2026-08-29
+
+### Fixed
+
+- Implicit-list inference now stops when a new explicit bullet or numbered group begins after plain prompt text, preserving later assessment and strategy groups as separate lists.
+- Presentation slide markers, unit-exam labels, and homophonic/homographic/compound pun labels now render as bold subsections.
+
+### Documented
+
+- Updated the README, Codex installation guide, bundled lesson-entry skill, and agent handoff with mixed prompt/list boundaries and exam/presentation/pun label formatting.
+
+### Verified
+
+- Added a regression covering mixed plain sublabels with explicit definition bullets, presentation markers, a post-exam transition, an oral prompt followed by assessment bullets, resumed narrative, and a separate ESOL strategy list.
+- The exact September 10 Periods 2/6 source dry run extracted `Unit 1 Exam + Punny Ways to Learn English`, rendered all eight target exam/presentation/pun labels as bold subsections, preserved 68 intended list items, kept the pun-purpose and post-exam notes as narrative, separated the final assessment and ESOL strategy groups, and reported zero formatting issues or Markdown leakage.
+- Ran all 39 automated tests, the TypeScript build, package dry run, bundled skill validation, MCP startup smoke test, and Git diff validation successfully.
+
 ## 2.0.18 - 2026-08-29
 
 ### Fixed

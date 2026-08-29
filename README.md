@@ -70,6 +70,8 @@ The formatter automatically:
 - splits pipe-delimited items into individual bullets inside inferred semantic list sections such as `Agenda`, `Materials`, and `ESOL Strategies`, while preserving pipes in narrative text and explicit source bullets;
 - keeps narrative after explicit bullet or numbered groups as paragraphs instead of extending an inferred list beyond its source markers;
 - bolds common lesson labels such as `On the board`, sentence frames, examples, focus questions, recommended prompts, Book/Workbook activity references, and vocabulary/grammar review subsections;
+- bolds presentation slide markers, unit-exam labels, and homophonic/homographic/compound pun labels;
+- stops implicit-list inference when a new explicit bullet or numbered group begins after plain prompt text, preserving later assessment and strategy groups as separate lists;
 - converts semantic and source-marked lists to bullets, preserving explicitly numbered steps;
 - changes only time-range hyphens to en dashes while preserving other source punctuation;
 - replaces the lesson body instead of retaining Planbook's dummy scaffold.

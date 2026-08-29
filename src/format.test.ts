@@ -355,6 +355,41 @@ Adverbs
   assert.match(result.html, /<p><strong>Adverbs<\/strong><\/p>/);
 });
 
+test("separates mixed sublabels, explicit definitions, and later assessment lists", () => {
+  const result = formatLessonPlan(`Punny Ways to Learn English
+- ELA.8.V.1.3 - Determine word meanings.
+Teacher introduces the types of puns:
+Homophonic Puns
+- Words sound alike but have different meanings.
+Homographic Puns
+- The same spelling can have different meanings.
+Compound Puns
+- Several pieces of wordplay appear together.
+The purpose is exposure and enjoyment.
+Presentation - Slides 4-7
+Teacher discusses why puns are interesting.
+After submitting, students write down:
+What pun do you know?
+This provides a transition.
+Unit Exam - Summative
+Students answer orally:
+What was your favorite pun?
+- Pun identification - Formative
+- Class Participation - Formative
+The activities after the exam are low-pressure.
+- ESOL.B6 - Role-play
+- ESOL.C19 - Multiple Meaning Words`);
+
+  assert.equal(result.title, "Punny Ways to Learn English");
+  assert.match(result.html, /<p><strong>Homophonic Puns<\/strong><\/p><ul><li>Words sound alike but have different meanings\.<\/li><\/ul>/);
+  assert.match(result.html, /<p><strong>Homographic Puns<\/strong><\/p>/);
+  assert.match(result.html, /<p><strong>Compound Puns<\/strong><\/p><ul><li>Several pieces of wordplay appear together\.<\/li><\/ul><p>The purpose is exposure and enjoyment\.<\/p>/);
+  assert.match(result.html, /<p><strong>Presentation - Slides 4-7<\/strong><\/p><p>Teacher discusses why puns are interesting\.<\/p>/);
+  assert.match(result.html, /<p>What pun do you know\?<\/p><p>This provides a transition\.<\/p>/);
+  assert.match(result.html, /<p><strong>Unit Exam - Summative<\/strong><\/p>/);
+  assert.match(result.html, /<p>What was your favorite pun\?<\/p><ul><li>Pun identification - Formative<\/li><li>Class Participation - Formative<\/li><\/ul><p>The activities after the exam are low-pressure\.<\/p><ul><li>ESOL\.B6 - Role-play<\/li><li>ESOL\.C19 - Multiple Meaning Words<\/li><\/ul>/);
+});
+
 test("keeps heading-like agenda and assessment entries as list items", () => {
   const result = formatLessonPlan(`Lesson Title
 Context-Aware Lists
