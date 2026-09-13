@@ -80,6 +80,10 @@ The formatter automatically:
 - changes only time-range hyphens to en dashes while preserving other source punctuation;
 - replaces the lesson body instead of retaining Planbook's dummy scaffold.
 
+Saved-state verification normalizes valid numeric HTML entities emitted by
+Planbook, including IPA symbols such as `ɪ`, without weakening exact text or
+formatting comparisons.
+
 Agents should still pass the user's raw lesson text unchanged. Markdown and paste-artifact cleanup is
 deterministic server behavior, so plans copied from ChatGPT, Markdown documents,
 or plain text follow the same Planbook formatting contract without agent-side HTML.

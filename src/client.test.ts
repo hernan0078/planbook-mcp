@@ -100,6 +100,14 @@ test("accepts Planbook typographic quote entities without changing lesson text",
   assert.equal(savedLessonMatches(saved.replace("pencil", "notebook"), expected), false);
 });
 
+test("accepts Planbook numeric entities for IPA symbols", () => {
+  const expected = '<div style="font-family: Arial, sans-serif;"><p>Pronounce /t/, /d/, and /ɪd/.</p></div>';
+  const saved = '<div style="font-family: Arial, sans-serif;"><p>Pronounce /t/, /d/, and /&#x26a;d/.</p></div>';
+
+  assert.equal(savedLessonMatches(saved, expected), true);
+  assert.equal(savedLessonMatches(saved.replace("&#x26a;", "&#x259;"), expected), false);
+});
+
 test("rejects visible pasted whitespace entities and hard-break markers", () => {
   const leaked = '<div style="font-family: Arial, sans-serif;"><p>Use vocabulary &amp;#x20;\\</p></div>';
 

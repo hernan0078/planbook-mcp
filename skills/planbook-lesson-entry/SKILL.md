@@ -63,6 +63,8 @@ Markdown tables must also be passed unchanged. The formatter converts them into 
 
 Directional symbols must be passed unchanged. Planbook may save arrows as equivalent HTML entities such as `&darr;`; verification normalizes those entities while still requiring the complete text and formatting structure to match.
 
+IPA and other Unicode symbols must be passed unchanged. Planbook may save them as numeric HTML entities such as `&#x26a;`; verification decodes valid numeric entities while still requiring exact text and formatting structure.
+
 Curly quotes and apostrophes must also be passed unchanged. Planbook may save them as `&ldquo;`, `&rdquo;`, or `&rsquo;`; verification normalizes those equivalent entities while still rejecting any changed words or formatting structure.
 
 ## A/B2 Schedule

@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.1.2 - 2026-09-13
+
+### Fixed
+
+- Saved-state verification now decodes valid decimal and hexadecimal HTML entities emitted by Planbook, preventing false failures for IPA symbols such as `ɪ` while retaining exact text and structure checks.
+
+### Documented
+
+- Updated the README, Codex installation guide, bundled lesson-entry skill, and agent handoff with numeric-entity verification behavior.
+
+### Verified
+
+- Added a regression proving that `/ɪd/` matches Planbook's saved `/&#x26a;d/` representation while a different numeric code point is still rejected.
+- Rechecked the exact September 24/25 source after the v2.1.1 Agenda fix: 11 timed headers were bold and soft-separated, zero timed headers were list items, and the only remaining difference was Planbook's numeric IPA entity.
+
 ## 2.1.1 - 2026-09-13
 
 ### Fixed

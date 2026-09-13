@@ -1,6 +1,6 @@
 {
   "name": "planbook-mcp",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Token-efficient MCP server for writing and extracting Planbook lessons",
   "type": "module",
   "main": "dist/index.js",

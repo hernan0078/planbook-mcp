@@ -161,6 +161,8 @@ installing so the new tools appear.
 Starting in v2.1.1, a plain timed section immediately after `Agenda` ends the
 inferred Agenda list and renders as a bold, en-dash-normalized, soft-separated
 timeline header.
+Starting in v2.1.2, saved-state verification decodes valid numeric HTML entities,
+including Planbook's numeric serialization of IPA symbols such as `ɪ`.
 
 After a formatting-related update, use `get_lesson` with `includeHtml: true` to
 audit lessons written by the previous version. Confirm Arial, bold major and

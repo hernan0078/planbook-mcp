@@ -510,8 +510,20 @@ function countTag(html: string, tag: string): number {
   return (html.match(new RegExp(`<${tag}\\b`, "gi")) ?? []).length;
 }
 
+function decodeNumericHtmlEntities(value: string): string {
+  return value.replace(
+    /&#(?:x([0-9a-f]+)|(\d+));/gi,
+    (entity, hex: string | undefined, decimal: string | undefined) => {
+      const codePoint = Number.parseInt(hex ?? decimal ?? "", hex ? 16 : 10);
+      return Number.isInteger(codePoint) && codePoint >= 0 && codePoint <= 0x10ffff
+        ? String.fromCodePoint(codePoint)
+        : entity;
+    },
+  );
+}
+
 function visibleLessonText(html: string): string {
-  return html
+  return decodeNumericHtmlEntities(html)
     .replace(/<br\s*\/?>/gi, "\n")
     .replace(/<\/(?:p|li|ul|ol)>/gi, "\n")
     .replace(/<[^>]+>/g, "")
