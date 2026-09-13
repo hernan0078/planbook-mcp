@@ -71,6 +71,7 @@ The formatter automatically:
 - bolds `Teacher Review Guide` and `Blooket Review` sections, rendering Blooket detail lines as bullets;
 - preserves numbered instructional checkpoints followed by `Model:`, `Quick check:`, or `Contrast:` as bold subsection labels instead of restarting separate ordered lists;
 - splits pipe-delimited items into individual bullets inside inferred semantic list sections such as `Agenda`, `Materials`, and `ESOL Strategies`, while preserving pipes in narrative text and explicit source bullets;
+- ends an inferred `Agenda` list when a plain timed section begins, so timeline headers remain bold and soft-separated even without an intervening `Lesson` heading;
 - keeps narrative after explicit bullet or numbered groups as paragraphs instead of extending an inferred list beyond its source markers;
 - bolds common lesson labels such as `On the board`, sentence frames, examples, focus questions, recommended prompts, Book/Workbook activity references, and vocabulary/grammar review subsections;
 - bolds presentation slide markers, unit-exam labels, and homophonic/homographic/compound pun labels;

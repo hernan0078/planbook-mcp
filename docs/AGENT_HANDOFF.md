@@ -75,6 +75,10 @@ Within inferred semantic list sections such as `Agenda`, `Materials`, and `ESOL
 Strategies`, pipe-delimited items become separate bullets. This split does not
 apply to narrative paragraphs or explicitly marked source bullets, where the
 pipe may be meaningful text.
+An inferred `Agenda` list ends when a plain timed section begins. Sources may
+place `0:00-0:05 - ...` directly after the Agenda without an intervening
+`Lesson` heading; the timed line must still render bold with an en dash and a
+soft break rather than becoming another Agenda bullet.
 When a colon cue is followed by explicit bullets or numbering, the formatter
 trusts those source markers and does not infer additional bullets from the
 following narrative. Common plain-text activity labels (`On the board`, sentence

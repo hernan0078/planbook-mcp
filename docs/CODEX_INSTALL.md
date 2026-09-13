@@ -158,6 +158,9 @@ Starting in v2.1.0, `extract_lesson` and `extract_lessons` export saved lessons 
 structured JSON, Markdown, plain text, or exact saved HTML. Bulk ranges are
 limited to 31 calendar days and fetch each class feed once. Restart Codex after
 installing so the new tools appear.
+Starting in v2.1.1, a plain timed section immediately after `Agenda` ends the
+inferred Agenda list and renders as a bold, en-dash-normalized, soft-separated
+timeline header.
 
 After a formatting-related update, use `get_lesson` with `includeHtml: true` to
 audit lessons written by the previous version. Confirm Arial, bold major and

@@ -39,6 +39,8 @@ The MCP owns school-year lookup, class resolution, existing-lesson lookup, forma
 
 Formatting is deterministic: all major headers, including `ESOL Strategies`, are bold; every timed section is bold with an explicit soft break; source bullets and explicit numbering are preserved; clear semantic lists receive bullets; narrative remains plain. Never request or reproduce Impact.
 
+A plain timed section immediately following `Agenda` ends the inferred Agenda list. It remains a bold, en-dash-normalized, soft-separated timeline header even when the source omits an intervening `Lesson` heading.
+
 `Key Teaching Notes` and `Teacher Emphasis` are also treated as bold major instructional labels.
 
 `Teacher Review Guide` and `Blooket Review` are bold major sections. Numbered instructional checkpoints followed by `Model:`, `Quick check:`, or `Contrast:` retain their visible numbers as bold subsection labels rather than becoming separate ordered lists that restart at 1. Plain Blooket review details become bullets.

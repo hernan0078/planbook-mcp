@@ -9,11 +9,12 @@ import { buildDateRange, extractLesson } from "./export.js";
 import { formatLessonPlan, normalizeDate } from "./format.js";
 import { resolveClass, selectClasses } from "./resolver.js";
 import type { UpsertLessonResult } from "./types.js";
+import { SERVER_VERSION } from "./version.js";
 
 const client = new PlanbookClient();
 
 const server = new McpServer(
-  { name: "planbook", version: "2.1.0" },
+  { name: "planbook", version: SERVER_VERSION },
   {
     instructions:
       "Use upsert_lesson directly for lesson entry; it resolves the class and existing lesson automatically. " +

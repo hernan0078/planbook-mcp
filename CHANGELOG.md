@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.1.1 - 2026-09-13
+
+### Fixed
+
+- Plain timed sections immediately following `Agenda` now terminate the inferred Agenda list and render as bold, en-dash-normalized headers with soft breaks.
+- The MCP initialization handshake now reports the same version as the published package.
+
+### Documented
+
+- Updated the README, Codex installation guide, bundled lesson-entry skill, and agent handoff with the direct Agenda-to-timeline behavior and recovery expectation.
+
+### Verified
+
+- Added a regression covering a pipe/arrow-style Agenda line followed directly by two plain timed sections and narrative directions.
+- Added a regression that requires the MCP server version constant to match `package.json`.
+- Confirmed the exact September 22/23 lesson source now keeps the Agenda as a list while rendering `0:00–0:03 - Quiz Setup` and subsequent timed sections as bold headings with soft breaks.
+
 ## 2.1.0 - 2026-08-29
 
 ### Added

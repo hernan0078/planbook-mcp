@@ -387,7 +387,9 @@ export function formatLessonPlan(source: string): FormattedLesson {
     }
 
     const contextualList =
-      (currentSection === "agenda" && !MAJOR_HEADER.test(line.replace(/:\s*$/, ""))) ||
+      (currentSection === "agenda" &&
+        !TIME_RANGE.test(line) &&
+        !MAJOR_HEADER.test(line.replace(/:\s*$/, ""))) ||
       (currentSection === "assessment" && ASSESSMENT_ITEM.test(line));
     if (contextualList) {
       addSemanticListItems(line);

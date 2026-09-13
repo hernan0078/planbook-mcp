@@ -410,6 +410,27 @@ Exit Ticket - Formative`);
   assert.match(result.html, /<p><strong>Assessment<\/strong><\/p><ul><li>Bell Ringer - Formative<\/li><li>Exit Ticket - Formative<\/li><\/ul>/);
 });
 
+test("ends an inferred Agenda list before a plain timed header", () => {
+  const result = formatLessonPlan(`Lesson Title
+Agenda Followed by Timeline
+
+Agenda
+Quiz -> guided practice -> exit ticket
+0:00-0:03 - Quiz Setup
+Students prepare for the quiz.
+0:03-0:38 - Unit Quiz
+Students complete the assessment.`);
+
+  assert.match(
+    result.html,
+    /<p><strong>Agenda<\/strong><\/p><ul><li>Quiz -&gt; guided practice -&gt; exit ticket<\/li><\/ul><p><strong>0:00–0:03 - Quiz Setup<\/strong><br><\/p>/,
+  );
+  assert.match(
+    result.html,
+    /<p>Students prepare for the quiz\.<\/p><p><strong>0:03–0:38 - Unit Quiz<\/strong><br><\/p>/,
+  );
+});
+
 test("bolds unfamiliar Markdown subsection headings", () => {
   const result = formatLessonPlan(`# Unit 2 Launch
 
