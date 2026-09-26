@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.1.3 - 2026-09-26
+
+### Fixed
+
+- Saved-state verification now normalizes Planbook's named ellipsis entities, including `&mldr;` and `&hellip;`, to the equivalent Unicode `…` character.
+
+### Documented
+
+- Updated the README, Codex installation guide, bundled lesson-entry skill, and agent handoff with named-ellipsis verification behavior.
+
+### Verified
+
+- Added a regression proving that `…` matches Planbook's saved `&mldr;` representation while changed punctuation is still rejected.
+- Rechecked the September 30 Period 1 lesson: the correct title, date, class, Arial styling, 15 bold headings, 56 list items, and all timed-section formatting matched; the ellipsis entity was the only serialization difference.
+
 ## 2.1.2 - 2026-09-13
 
 ### Fixed

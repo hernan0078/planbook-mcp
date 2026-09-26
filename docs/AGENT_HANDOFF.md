@@ -119,6 +119,9 @@ malformed timed headings. It no longer accepts a save merely because its first
 Valid numeric entities are decoded during comparison as well, so Planbook's
 numeric serialization of IPA symbols such as `ɪ` does not cause a false
 verification failure.
+Named ellipsis entities such as `&mldr;` and `&hellip;` are normalized to `…`
+during comparison so Planbook's equivalent serialization does not cause a
+false verification failure.
 The formatter also decodes pasted numeric character entities such as `&#x44;`
 and converts leading bold minute ranges such as `0-5 min | Bell Ringer` into
 bold, soft-separated timed headers. Agents must pass both forms unchanged.

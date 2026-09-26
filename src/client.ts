@@ -540,6 +540,7 @@ function visibleLessonText(html: string): string {
     .replace(/&rsquo;|&#8217;/gi, "’")
     .replace(/&ldquo;|&#8220;/gi, "“")
     .replace(/&rdquo;|&#8221;/gi, "”")
+    .replace(/&(?:mldr|hellip);|&#8230;/gi, "…")
     .replace(/&quot;/gi, '"')
     .replace(/&#39;|&apos;/gi, "'");
 }

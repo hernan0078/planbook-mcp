@@ -108,6 +108,14 @@ test("accepts Planbook numeric entities for IPA symbols", () => {
   assert.equal(savedLessonMatches(saved.replace("&#x26a;", "&#x259;"), expected), false);
 });
 
+test("accepts Planbook named entities for an ellipsis", () => {
+  const expected = '<div style="font-family: Arial, sans-serif;"><p>CleanShot 2026-09-26 at 11.50.0…</p></div>';
+  const saved = '<div style="font-family: Arial, sans-serif;"><p>CleanShot 2026-09-26 at 11.50.0&mldr;</p></div>';
+
+  assert.equal(savedLessonMatches(saved, expected), true);
+  assert.equal(savedLessonMatches(saved.replace("&mldr;", "."), expected), false);
+});
+
 test("rejects visible pasted whitespace entities and hard-break markers", () => {
   const leaked = '<div style="font-family: Arial, sans-serif;"><p>Use vocabulary &amp;#x20;\\</p></div>';
 

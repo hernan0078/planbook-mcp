@@ -19,7 +19,7 @@ to retrieve saved plans without browser automation.
 - Save requests mirror Planbook's first-party date/class/slot contract and omit browser-only identity and linked-edit flags.
 - Dates outside a class's normal sequence automatically use Planbook's extra-lesson slot instead of silently no-oping.
 - Extra lessons are discovered and verified through Planbook's date-event feed, making retries update the same record.
-- Verification compares the complete saved body and formatting structure, rejects visible Markdown, and normalizes Planbook's HTML entities, including directional arrows such as `&darr;` and typographic punctuation such as `&ldquo;` and `&rsquo;`.
+- Verification compares the complete saved body and formatting structure, rejects visible Markdown, and normalizes Planbook's HTML entities, including directional arrows such as `&darr;`, typographic punctuation such as `&ldquo;` and `&rsquo;`, and ellipses such as `&mldr;`.
 - Ambiguous classes produce a short actionable error; `list_classes` is only a fallback.
 - Session expiry is retried once after a safe Chrome-cookie refresh.
 - Save verification performs short bounded read-back retries to tolerate API propagation without agent retries.
@@ -83,6 +83,8 @@ The formatter automatically:
 Saved-state verification normalizes valid numeric HTML entities emitted by
 Planbook, including IPA symbols such as `ɪ`, without weakening exact text or
 formatting comparisons.
+It also normalizes Planbook's named ellipsis entities, including `&mldr;` and
+`&hellip;`, to the equivalent Unicode `…` character.
 
 Agents should still pass the user's raw lesson text unchanged. Markdown and paste-artifact cleanup is
 deterministic server behavior, so plans copied from ChatGPT, Markdown documents,

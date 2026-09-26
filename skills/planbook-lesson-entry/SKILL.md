@@ -67,6 +67,8 @@ IPA and other Unicode symbols must be passed unchanged. Planbook may save them a
 
 Curly quotes and apostrophes must also be passed unchanged. Planbook may save them as `&ldquo;`, `&rdquo;`, or `&rsquo;`; verification normalizes those equivalent entities while still rejecting any changed words or formatting structure.
 
+Ellipses must also be passed unchanged. Planbook may save `…` as `&mldr;` or `&hellip;`; verification normalizes those equivalent entities while still rejecting changed punctuation or lesson text.
+
 ## A/B2 Schedule
 
 - A day periods: P1, P3, P5, P7, P8.
