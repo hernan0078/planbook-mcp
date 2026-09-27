@@ -9,7 +9,7 @@ const savedHtml = `
   <ul><li>ELA.9.R.1.1 &ndash; Analyze text &amp; evidence.</li><li>ELA.K12.EE.4.1 &ndash; Collaborate.</li></ul>
   <p><strong>Bell Ringer (0:00&ndash;0:05)</strong><br>Answer: &ldquo;What do you notice?&rdquo;</p>
   <p><strong>Guided Practice (0:05&ndash;0:20)</strong><br></p>
-  <ol><li>Read the text.</li><li>Cite evidence &darr; explain.</li></ol>
+  <ol><li>Read the text.</li><li>Cite evidence &darr; explain &ne; guess.</li></ol>
   <table><tr><th>Term</th><th>Meaning</th></tr><tr><td>Theme</td><td>Message | lesson</td></tr></table>
 </div>`;
 
@@ -33,7 +33,7 @@ test("parses Planbook HTML into ordered sections, lists, paragraphs, and tables"
     {
       heading: "Guided Practice (0:05–0:20)",
       blocks: [
-        { type: "list", ordered: true, items: ["Read the text.", "Cite evidence ↓ explain."] },
+        { type: "list", ordered: true, items: ["Read the text.", "Cite evidence ↓ explain ≠ guess."] },
         { type: "table", rows: [["Term", "Meaning"], ["Theme", "Message | lesson"]] },
       ],
     },

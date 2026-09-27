@@ -541,6 +541,7 @@ function visibleLessonText(html: string): string {
     .replace(/&ldquo;|&#8220;/gi, "“")
     .replace(/&rdquo;|&#8221;/gi, "”")
     .replace(/&(?:mldr|hellip);|&#8230;/gi, "…")
+    .replace(/&ne;|&#8800;/gi, "≠")
     .replace(/&quot;/gi, '"')
     .replace(/&#39;|&apos;/gi, "'");
 }

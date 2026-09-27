@@ -165,6 +165,8 @@ Starting in v2.1.2, saved-state verification decodes valid numeric HTML entities
 including Planbook's numeric serialization of IPA symbols such as `ɪ`.
 Starting in v2.1.3, saved-state verification also normalizes named ellipsis
 entities such as `&mldr;` and `&hellip;` to the equivalent Unicode `…` character.
+Starting in v2.1.4, verification and normalized extraction treat Planbook's
+named `&ne;` entity as the equivalent Unicode `≠` character.
 
 After a formatting-related update, use `get_lesson` with `includeHtml: true` to
 audit lessons written by the previous version. Confirm Arial, bold major and

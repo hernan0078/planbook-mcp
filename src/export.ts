@@ -193,7 +193,7 @@ function inlineText(value: string): string {
 function decodeEntities(value: string): string {
   const named: Record<string, string> = {
     amp: "&", apos: "'", gt: ">", lt: "<", nbsp: " ", quot: "\"",
-    ndash: "–", mdash: "—", bull: "•", hellip: "…",
+    ndash: "–", mdash: "—", bull: "•", hellip: "…", mldr: "…", ne: "≠",
     larr: "←", leftarrow: "←", uarr: "↑", uparrow: "↑",
     rarr: "→", rightarrow: "→", darr: "↓", downarrow: "↓",
     harr: "↔", leftrightarrow: "↔", lsquo: "‘", rsquo: "’", ldquo: "“", rdquo: "”",

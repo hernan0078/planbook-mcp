@@ -116,6 +116,14 @@ test("accepts Planbook named entities for an ellipsis", () => {
   assert.equal(savedLessonMatches(saved.replace("&mldr;", "."), expected), false);
 });
 
+test("accepts Planbook's named not-equal entity without weakening text checks", () => {
+  const expected = '<div style="font-family: Arial, sans-serif;"><p>Character knowledge ≠ audience inference.</p></div>';
+  const saved = '<div style="font-family: Arial, sans-serif;"><p>Character knowledge &ne; audience inference.</p></div>';
+
+  assert.equal(savedLessonMatches(saved, expected), true);
+  assert.equal(savedLessonMatches(saved.replace("&ne;", "="), expected), false);
+});
+
 test("rejects visible pasted whitespace entities and hard-break markers", () => {
   const leaked = '<div style="font-family: Arial, sans-serif;"><p>Use vocabulary &amp;#x20;\\</p></div>';
 

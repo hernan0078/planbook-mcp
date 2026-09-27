@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.1.4 - 2026-09-27
+
+### Fixed
+
+- Saved-state verification now normalizes Planbook's named not-equal entity `&ne;` to the equivalent Unicode `≠` character.
+- Normalized JSON, Markdown, and text extraction now decodes `&ne;` while exact HTML extraction continues to preserve Planbook's saved representation.
+
+### Documented
+
+- Updated the README, Codex installation and extraction guides, bundled lesson-entry skill, and agent handoff with not-equal entity behavior.
+
+### Verified
+
+- Added regressions proving that `≠` matches Planbook's saved `&ne;` representation while a changed equality operator is still rejected.
+- Read back the October 1 Period 8 lesson and confirmed the correct date, class, title, Arial styling, complete text, lists, bold headings, and timed-section soft breaks; `&ne;` was the only serialization difference.
+
 ## 2.1.3 - 2026-09-26
 
 ### Fixed

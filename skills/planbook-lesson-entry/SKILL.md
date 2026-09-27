@@ -69,6 +69,8 @@ Curly quotes and apostrophes must also be passed unchanged. Planbook may save th
 
 Ellipses must also be passed unchanged. Planbook may save `…` as `&mldr;` or `&hellip;`; verification normalizes those equivalent entities while still rejecting changed punctuation or lesson text.
 
+Comparison symbols must also be passed unchanged. Planbook may save `≠` as `&ne;`; verification and normalized extraction treat those representations as equivalent while still rejecting changed operators or lesson text.
+
 ## A/B2 Schedule
 
 - A day periods: P1, P3, P5, P7, P8.

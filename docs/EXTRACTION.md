@@ -67,6 +67,8 @@ inline formatting.
 JSON, Markdown, and text are deterministic normalized views of saved Planbook
 HTML. They preserve lesson organization but cannot recover the byte-for-byte raw
 source supplied before the lesson was formatted and saved.
+These normalized formats decode Planbook's supported named entities, including
+`&ne;` as `≠`; `html` intentionally preserves the exact saved entity text.
 
 ## Performance And Token Use
 
