@@ -61,6 +61,7 @@ The formatter automatically:
 - strips a leading numbered `ESOL` or `ELL` course identifier before `Standards`, including the course-name portion of pipe-delimited metadata, without removing later ESOL instructional text or strategies;
 - decodes pasted numeric character entities such as `&#x44;` before safe HTML escaping;
 - removes separators and decorative emoji;
+- omits teacher-answer guidance introduced by `Expected:`, `Expected response:`, or `Expected understanding:` while preserving the prompt and recognizable following directions;
 - places standards in the lesson body;
 - uses Arial at the editor's default size;
 - bolds section and timed subsection headers;
@@ -73,6 +74,7 @@ The formatter automatically:
 - preserves numbered instructional checkpoints followed by `Model:`, `Quick check:`, or `Contrast:` as bold subsection labels instead of restarting separate ordered lists;
 - splits pipe-delimited items into individual bullets inside inferred semantic list sections such as `Agenda`, `Materials`, and `ESOL Strategies`, plus clearly introduced inline field lists such as `four columns: A | B | C`;
 - converts clearly introduced inline `(1) ...; (2) ...` groups into ordered lists and standalone `A:` / `B:` choices into lettered lists;
+- keeps blank-separated items together when a cue clearly introduces a list and automatically groups parallel labels such as `Definition:`, `Explanation:`, and `Specific example:` as bullets;
 - preserves pipes in ordinary narrative text and explicit source bullets;
 - ends an inferred `Agenda` list when a plain timed section begins, so timeline headers remain bold and soft-separated even without an intervening `Lesson` heading;
 - keeps narrative after explicit bullet or numbered groups as paragraphs instead of extending an inferred list beyond its source markers;
@@ -91,9 +93,10 @@ It also normalizes Planbook's named ellipsis entities, including `&mldr;` and
 Planbook's named not-equal entity `&ne;` is normalized to `≠` during both
 saved-state verification and JSON, Markdown, or text extraction.
 
-Agents should still pass the user's raw lesson text unchanged. Markdown and paste-artifact cleanup is
-deterministic server behavior, so plans copied from ChatGPT, Markdown documents,
-or plain text follow the same Planbook formatting contract without agent-side HTML.
+Agents should pass lesson source to the deterministic formatter instead of
+generating HTML. Apply the user's standing semantic cleanup preferences, but do
+not manually convert Markdown or formatting syntax; plans copied from ChatGPT,
+Markdown documents, or plain text follow the same Planbook formatting contract.
 
 ## Extract lessons
 

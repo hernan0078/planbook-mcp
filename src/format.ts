@@ -6,6 +6,8 @@ const SEPARATOR = /^(?:[\s\-_=—–]{3,}|⸻+)$/u;
 const BULLET = /^\s*[*•-]\s+(.+)$/u;
 const NUMBERED = /^\s*(\d+|[A-Da-d])[.)]\s+(.+)$/u;
 const LETTERED_CHOICE = /^\s*([A-Da-d]):\s+(.+)$/u;
+const EXPECTED_GUIDANCE = /\bExpected(?:\s+(?:answer|answers|response|responses|understanding))?\s*:/i;
+const PARALLEL_LABEL = /^(?:topic|section\s+gist|central\s+idea\s+candidate|definition|explanation|specific\s+example(?:\s+or\s+consequence)?|preposition|object|complete\s+phrase)\s*:/i;
 const STANDARD_CODE = /^(?:[A-Z]{2,}(?:\.[A-Z0-9]+)+|[A-Z]{2,}\.[A-Z0-9.]+)\s*[–—-]/u;
 const ASSESSMENT_ITEM = /\s[–—-]\s*(?:Formative|Summative|Classwork)\s*$/i;
 const ESOL_STRATEGY = /^ESOL\.[A-Z]\d+\s*[–—-]/i;
@@ -78,6 +80,25 @@ function normalizeTimeRanges(value: string): string {
 
 function cleanLine(value: string): string {
   return normalizeTimeRanges(stripMarkdown(stripEmoji(normalizePasteArtifacts(value)))).trim();
+}
+
+function removeExpectedGuidance(lines: string[]): string[] {
+  const directive = /(?<=[.!?])\s+(?=(?:students?|teacher|partners?|groups?|class|ask|record|require|review|discuss|continue|then|explain|display|emphasize|remind|invite|collect|use|have|accept|allow|avoid|keep|provide|circulate|do\s+not)\b)/iu;
+
+  return lines.flatMap((rawLine) => {
+    const match = EXPECTED_GUIDANCE.exec(rawLine);
+    if (!match || match.index === undefined) return [rawLine];
+
+    const prefix = rawLine.slice(0, match.index).trimEnd();
+    const guidance = rawLine.slice(match.index + match[0].length).trim();
+    const directiveIndex = guidance.search(directive);
+    const remainingDirection = directiveIndex >= 0 ? guidance.slice(directiveIndex).trim() : "";
+
+    if (prefix && remainingDirection) return [`${prefix} ${remainingDirection}`];
+    if (prefix) return [prefix];
+    if (remainingDirection) return [remainingDirection];
+    return [];
+  });
 }
 
 function isHeading(value: string): boolean {
@@ -204,15 +225,42 @@ function implicitBulletIndexes(lines: string[]): Set<number> {
     const candidates: number[] = [];
     for (let next = index + 1; next < lines.length; next += 1) {
       const candidate = cleanLine(lines[next] ?? "");
-      if (!candidate || SEPARATOR.test(candidate) || isHeading(candidate)) break;
+      if (!candidate || SEPARATOR.test(candidate)) continue;
+      if (isHeading(candidate)) break;
       if (candidate.endsWith(":")) break;
       if (candidates.length && (BULLET.test(candidate) || NUMBERED.test(candidate))) break;
-      if (candidates.length && /^(?:students?|teacher|class|groups?|partners?|pairs?|if|this)\b/i.test(candidate)) break;
+      if (
+        candidates.length &&
+        /^(?:students?|teacher|class|groups?|partners?|pairs?|ask|record|require|review|discuss|continue|then|explain|display|emphasize|remind|invite|collect|use|have|accept|allow|avoid|keep|provide|circulate|do\s+not|if|this)\b/i.test(candidate)
+      ) break;
       candidates.push(next);
     }
 
     if (candidates.length >= 2) {
       for (const candidate of candidates) indexes.add(candidate);
+    }
+  }
+
+  return indexes;
+}
+
+function parallelLabelIndexes(lines: string[]): Set<number> {
+  const indexes = new Set<number>();
+
+  for (let index = 0; index < lines.length; index += 1) {
+    if (!PARALLEL_LABEL.test(cleanLine(lines[index] ?? ""))) continue;
+
+    const group: number[] = [];
+    for (let next = index; next < lines.length; next += 1) {
+      const candidate = cleanLine(lines[next] ?? "");
+      if (!candidate || SEPARATOR.test(candidate)) continue;
+      if (!PARALLEL_LABEL.test(candidate)) break;
+      group.push(next);
+    }
+
+    if (group.length >= 2) {
+      for (const candidate of group) indexes.add(candidate);
+      index = group.at(-1) ?? index;
     }
   }
 
@@ -344,13 +392,14 @@ function validateDateParts(year: number, month: number, day: number, original: s
 }
 
 export function formatLessonPlan(source: string): FormattedLesson {
-  const rawLines = source.replace(/\r\n?/g, "\n").split("\n");
+  const rawLines = removeExpectedGuidance(source.replace(/\r\n?/g, "\n").split("\n"));
   const extracted = extractTitle(rawLines);
   const title = extracted.title;
   const body = removeRedundantCourseMetadata(extracted.body);
   const output: string[] = ['<div style="font-family: Arial, sans-serif;">'];
   const headings: string[] = [];
   const inferredBullets = implicitBulletIndexes(body);
+  for (const index of parallelLabelIndexes(body)) inferredBullets.add(index);
   let bulletCount = 0;
   let listType: "ul" | "ol" | undefined;
   let currentSection = "";

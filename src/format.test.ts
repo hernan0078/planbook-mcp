@@ -524,3 +524,41 @@ B: The article names a satellite.`);
     /<p>Relevance Challenge: Which detail directly supports the claim\?<\/p><ol type="A"><li>The article explains a health risk\.<\/li><li>The article names a satellite\.<\/li><\/ol>/,
   );
 });
+
+test("omits expected-answer guidance and organizes blank-separated parallel labels", () => {
+  const result = formatLessonPlan(`Lesson Title
+Central Idea Practice
+
+Standards
+ELA.6.R.2.2 - Analyze central ideas.
+
+Retrieval (0:00-0:05)
+Display these labels:
+
+Topic: Urban heat islands.
+
+Section gist: Plants can cool an area.
+
+Central idea candidate: Materials and vegetation affect city temperatures.
+
+Ask: What does the later section add? Expected: It adds consequences and responses.
+
+Mini Lesson (0:05-0:10)
+Definition: Tells what a phenomenon means.
+
+Explanation: Shows how or why it happens.
+
+Specific example or consequence: Shows what it looks like or why it matters.
+
+Section 1 (0:10-0:15): Definition. Ask: What is the phenomenon? Expected: It is a warmer city area. Record one paraphrase.
+
+Exit Check (0:15-0:20)
+Students answer independently.
+Expected response: Topic, detail, and explanation.`);
+
+  assert.doesNotMatch(result.html, /Expected(?: answer| response| understanding)?\s*:/i);
+  assert.match(result.html, /<p>Ask: What does the later section add\?<\/p>/);
+  assert.match(result.html, /<strong>Section 1 \(0:10–0:15\): Definition\.<\/strong><br>Ask: What is the phenomenon\? Record one paraphrase\./);
+  assert.match(result.html, /<ul><li>Topic: Urban heat islands\.<\/li><li>Section gist: Plants can cool an area\.<\/li><li>Central idea candidate: Materials and vegetation affect city temperatures\.<\/li><\/ul>/);
+  assert.match(result.html, /<ul><li>Definition: Tells what a phenomenon means\.<\/li><li>Explanation: Shows how or why it happens\.<\/li><li>Specific example or consequence: Shows what it looks like or why it matters\.<\/li><\/ul>/);
+});

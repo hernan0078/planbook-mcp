@@ -33,7 +33,7 @@ Call `upsert_lesson` with:
 
 - `date`: ISO `YYYY-MM-DD` whenever possible
 - `period`: a number or label such as `3` or `P3`
-- `lessonPlan`: the user's raw lesson text, unchanged
+- `lessonPlan`: the complete lesson source after the user's standing semantic cleanup and organization preferences
 - `title`: only when the raw plan has no `Lesson Title` block
 
 Defaults already match normal operation:
@@ -44,6 +44,12 @@ Defaults already match normal operation:
 
 Do not generate HTML. Do not call class or lesson discovery first. The MCP owns
 formatting, class resolution, full-year lesson lookup, upsert, and verification.
+Treat the supplied plan as instructional source to improve safely, not as an
+immutable visual paste. Preserve its meaning, standards, timing, and required
+activities, but omit teacher-answer scaffolds labeled `Expected:`, redundant
+course/export metadata, optional extensions, and excluded audio-track details.
+Organize clearly parallel prompts, examples, choices, fields, and steps as lists
+without inventing new content.
 Send Markdown plans unchanged: the formatter extracts a leading `#` title and
 removes Markdown heading, nested bold/italic, inline-code, and escaped-character
 markers before applying Planbook formatting.
@@ -86,6 +92,11 @@ Clearly introduced inline pipe fields such as `four columns: A | B | C` become
 bullets. A following `(1) ...; (2) ...` row group becomes an ordered list, and
 standalone `A:` / `B:` answer choices become a lettered list. Ordinary prose
 pipes and explicitly marked source bullets remain unchanged.
+Teacher-answer guidance beginning with `Expected:`, `Expected response:`, or
+`Expected understanding:` is omitted. If the same line continues with a
+recognizable student or teacher direction, that direction is retained. Blank
+lines inside an introduced list no longer split the list, and parallel labels
+such as Definition, Explanation, and Specific Example become bullets.
 When a colon cue is followed by explicit bullets or numbering, the formatter
 trusts those source markers and does not infer additional bullets from the
 following narrative. Common plain-text activity labels (`On the board`, sentence

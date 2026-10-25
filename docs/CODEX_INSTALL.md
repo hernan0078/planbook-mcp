@@ -172,6 +172,12 @@ the same line keeps only its subsection label bold and places the directions
 after the soft break as normal text. Clearly introduced inline pipe fields,
 parenthesized numbered rows, and standalone `A:` / `B:` choices render as real
 unordered, ordered, and lettered lists instead of crowded prose.
+Starting in v2.1.6, teacher-answer scaffolds beginning with `Expected:`,
+`Expected response:`, or `Expected understanding:` are omitted from the saved
+Planbook body. The formatter preserves the prompt and recognizable directions
+that follow the answer guidance. Blank lines no longer split a clearly
+introduced list, and parallel Definition/Explanation/Example labels render as
+bullets for scanability.
 
 After a formatting-related update, use `get_lesson` with `includeHtml: true` to
 audit lessons written by the previous version. Confirm Arial, bold major and

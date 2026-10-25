@@ -1,5 +1,24 @@
 # Changelog
 
+## 2.1.6 - 2026-10-25
+
+### Improved
+
+- Teacher-answer scaffolds beginning with `Expected:`, `Expected response:`, or `Expected understanding:` are omitted while the prompt and recognizable following directions are preserved.
+- Blank lines no longer split clearly introduced lists, and parallel Topic/Gist/Central Idea or Definition/Explanation/Specific Example labels now render as bullets.
+- The agent contract now treats supplied lessons as instructional source to improve safely: preserve substance and timing, remove excluded scaffolds and metadata, and organize dense parallel content without inventing new material.
+
+### Documented
+
+- Updated the repository agent rules, README, Codex installation guide, bundled lesson-entry skill, and agent handoff with the new cleanup and organization behavior.
+
+### Verified
+
+- Added a regression covering standalone and inline expected-answer guidance, preservation of a following `Record` direction, blank-separated introduced items, and parallel labeled examples.
+- Ran all 53 automated tests, package dry-run validation, bundled skill validation, Git diff validation, and an MCP protocol smoke test reporting v2.1.6 with all five tools.
+- Dry-ran the original October 26 Period 8 source with v2.1.6: all seven `Expected:` passages were omitted, the later `Record` direction remained, and the blank-separated Topic/Gist/Central Idea labels became bullets.
+- Replaced and read back the live October 26 Period 8 lesson: Planbook preserved 15 headings and 83 organized list items with zero `Expected:` passages or completed preposition answers.
+
 ## 2.1.5 - 2026-10-25
 
 ### Fixed

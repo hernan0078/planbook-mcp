@@ -20,7 +20,8 @@ Never commit `cookies.json`, authentication tokens, cookie identifiers, or lesso
 ## Lesson Entry Contract
 
 - Use the bundled `planbook-lesson-entry` skill and `upsert_lesson` MCP tool.
-- Send raw lesson text unchanged; deterministic server code owns formatting.
+- Send lesson source through deterministic server formatting rather than hand-authored HTML. Preserve instructional meaning, timing, standards, and required activities while removing teacher-answer scaffolds labeled `Expected:`, redundant course/export metadata, optional extensions, and audio-track references the user has excluded.
+- Improve scanability before saving: organize clearly parallel prompts, examples, fields, choices, and steps as bullets or numbered lists without inventing new instructional content.
 - Default to `overwrite: true` and `verify: true` so dummy text is replaced and the saved target is checked.
 - Keep Arial at Planbook's default font size.
 - Bold all major headers, including ESOL Strategies, and every timed header; preserve source lists and soft-separate timed sections.

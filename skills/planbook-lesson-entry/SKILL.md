@@ -30,18 +30,22 @@ raw Markdown or plain text originally pasted before formatting.
    - `period`: period number or label
    - `className`: only when needed to disambiguate
    - `title`: only when the raw plan lacks a `Lesson Title` block
-   - `lessonPlan`: the user's complete raw lesson plan, unchanged
+   - `lessonPlan`: the complete lesson source after applying the user's standing cleanup and organization preferences
    - `overwrite: true`
    - `verify: true`
 4. Confirm the returned date, class, period, title, action, and `verified` state.
 
 The MCP owns school-year lookup, class resolution, existing-lesson lookup, formatting, replacement, saving, and verification. It replaces the entire LESSON body, removing Planbook dummy text. It always uses Arial at the default editor size and applies the established headers, bullets, and en-dash formatting rules.
 
+Treat supplied text as instructional source to improve safely rather than an immutable visual paste. Preserve its meaning, standards, timing, and required activities. Remove teacher-answer scaffolds labeled `Expected:`, redundant course/export metadata, optional extensions, and audio-track references the user has excluded. Organize clearly parallel prompts, examples, choices, fields, and steps as bullets or numbered lists without inventing new content.
+
 Formatting is deterministic: all major headers, including `ESOL Strategies`, are bold; every timed section is bold with an explicit soft break; source bullets and explicit numbering are preserved; clear semantic lists receive bullets; narrative remains plain. Never request or reproduce Impact.
 
 A plain timed section immediately following `Agenda` ends the inferred Agenda list. It remains a bold, en-dash-normalized, soft-separated timeline header even when the source omits an intervening `Lesson` heading.
 
 A parenthesized timed subsection may continue with directions on the same line. The formatter keeps only the timed subsection label and any short function label bold, then places the directions after the soft break as normal text. Clearly introduced inline pipe fields become bullets, inline `(1) ...; (2) ...` row groups become ordered lists, and standalone `A:` / `B:` choices become lettered lists. Ordinary narrative pipes and explicitly marked source bullets remain unchanged.
+
+Teacher-answer guidance beginning with `Expected:`, `Expected response:`, or `Expected understanding:` is omitted from Planbook. The prompt and recognizable following directions remain. Blank lines inside a clearly introduced list do not break the list, and parallel labels such as Definition, Explanation, and Specific Example become bullets.
 
 `Key Teaching Notes` and `Teacher Emphasis` are also treated as bold major instructional labels.
 
@@ -53,7 +57,7 @@ When a colon cue is followed by explicit bullets or numbering, those source mark
 
 Implicit-list inference also stops when a new explicit bullet or numbered group begins after one or more plain prompt lines. Presentation slide markers, unit-exam labels, and homophonic/homographic/compound pun labels become bold subsections, while later assessment and strategy groups remain separate lists.
 
-Pass lesson plans unchanged. The MCP extracts a `Lesson Title` block, a leading H1, or an unlabeled first-line title followed by a `Standards` header or standard-coded bullet. It also supports one useful duration/pages subtitle between an unlabeled title and `Standards`, preserving the subtitle in the lesson body. It removes Markdown syntax while preserving every remaining Markdown heading as a bold lesson/subsection heading, including lesson-specific labels. The agent must not strip, label, or convert the source first. It preserves source punctuation except for en dashes inside time ranges.
+After the user's standing semantic cleanup, pass the lesson's structural syntax unchanged and never preformat it as HTML. The MCP extracts a `Lesson Title` block, a leading H1, or an unlabeled first-line title followed by a `Standards` header or standard-coded bullet. It also supports one useful duration/pages subtitle between an unlabeled title and `Standards`, preserving the subtitle in the lesson body. It removes Markdown syntax while preserving every remaining Markdown heading as a bold lesson/subsection heading, including lesson-specific labels. The agent must not manually convert formatting syntax. It preserves source punctuation except for en dashes inside time ranges.
 
 An `ESOL` or `ELL` course label may appear before the title while a duration/pages subtitle appears after it. Pass all three lines unchanged; the MCP extracts the middle title, removes the redundant course label from the Planbook body, and preserves the useful subtitle. It also removes a leading numbered course label from pipe-delimited metadata while preserving the text after the pipe. This filtering stops at `Standards`, so ESOL references in lesson content and `ESOL Strategies` remain unchanged.
 
