@@ -41,6 +41,8 @@ Formatting is deterministic: all major headers, including `ESOL Strategies`, are
 
 A plain timed section immediately following `Agenda` ends the inferred Agenda list. It remains a bold, en-dash-normalized, soft-separated timeline header even when the source omits an intervening `Lesson` heading.
 
+A parenthesized timed subsection may continue with directions on the same line. The formatter keeps only the timed subsection label and any short function label bold, then places the directions after the soft break as normal text. Clearly introduced inline pipe fields become bullets, inline `(1) ...; (2) ...` row groups become ordered lists, and standalone `A:` / `B:` choices become lettered lists. Ordinary narrative pipes and explicitly marked source bullets remain unchanged.
+
 `Key Teaching Notes` and `Teacher Emphasis` are also treated as bold major instructional labels.
 
 `Teacher Review Guide` and `Blooket Review` are bold major sections. Numbered instructional checkpoints followed by `Model:`, `Quick check:`, or `Contrast:` retain their visible numbers as bold subsection labels rather than becoming separate ordered lists that restart at 1. Plain Blooket review details become bullets.

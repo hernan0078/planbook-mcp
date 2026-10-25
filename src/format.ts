@@ -5,11 +5,13 @@ const MARKDOWN_TITLE = /^#\s+(.+)$/u;
 const SEPARATOR = /^(?:[\s\-_=—–]{3,}|⸻+)$/u;
 const BULLET = /^\s*[*•-]\s+(.+)$/u;
 const NUMBERED = /^\s*(\d+|[A-Da-d])[.)]\s+(.+)$/u;
+const LETTERED_CHOICE = /^\s*([A-Da-d]):\s+(.+)$/u;
 const STANDARD_CODE = /^(?:[A-Z]{2,}(?:\.[A-Z0-9]+)+|[A-Z]{2,}\.[A-Z0-9.]+)\s*[–—-]/u;
 const ASSESSMENT_ITEM = /\s[–—-]\s*(?:Formative|Summative|Classwork)\s*$/i;
 const ESOL_STRATEGY = /^ESOL\.[A-Z]\d+\s*[–—-]/i;
 const COURSE_METADATA = /^(?:ESOL|ELL)\b(?!\s+strateg(?:y|ies)\b)(?=[^|]*\d)[^|]*$/i;
 const TIME_RANGE = /(?:\d{1,2}:\d{2}\s*[–—-]\s*\d{1,2}:\d{2}|\d{1,3}\s*[–—-]\s*\d{1,3}\s*(?:min|minutes?)\b)/iu;
+const PARENTHESIZED_TIME_RANGE = /\((?:\d{1,2}:\d{2}\s*[–—-]\s*\d{1,2}:\d{2}|\d{1,3}\s*[–—-]\s*\d{1,3}\s*(?:min|minutes?)\b)\)/iu;
 
 const MAJOR_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|key\s+teaching\s+notes\b.*|teacher\s+emphasis\b.*|teacher\s+review\s+guide\b.*|blooket\s+review\b.*|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*\d+\s*minutes|\s*\([^)]*\))?|part\s+\d+\b.*)$/i;
 const KNOWN_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|key\s+teaching\s+notes\b.*|teacher\s+emphasis\b.*|teacher\s+review\s+guide\b.*|blooket\s+review\b.*|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*\d+\s*minutes|\s*\([^)]*\))?|part\s+\d+\b.*|bell\s+ringer\b.*|closure\b.*|mini\s+lesson\b.*|guided\s+practice\b.*|independent\s+practice\b.*|reading\b.*|transition\b.*|assessment\s+expectations\b.*|standards\s+mastery\s+quiz\b.*|early\s+finisher\s+task\b.*|(?:book|workbook)\s+-\s+.*\bactivit(?:y|ies)\b.*|presentation\s+-\s+slides?\b.*|unit\s+exam\s+-\s+summative|homophonic\s+puns|homographic\s+puns|compound\s+puns|vocabulary\s+review|grammar\s+review|a,\s*an,\s*and\s*the|comparatives\s+and\s+superlatives|adverbs|on\s+the\s+board|possible\s+sentence\s+frames|quick\s+examples|focus\s+questions(?:\s+include)?|recommended\s+prompt)$/i;
@@ -101,6 +103,65 @@ function leadingBoldTimedSection(value: string): { header: string; body: string 
   const header = cleanLine(match[1]);
   if (!TIME_RANGE.test(header)) return undefined;
   return { header, body: cleanLine(match[2] ?? "") };
+}
+
+function splitTimedSectionLine(value: string): { header: string; body: string } | undefined {
+  const line = cleanLine(value);
+  const timeRange = PARENTHESIZED_TIME_RANGE.exec(line);
+  if (!timeRange || timeRange.index === undefined) return undefined;
+
+  const timeEnd = timeRange.index + timeRange[0].length;
+  const timedHeader = line.slice(0, timeEnd).trim();
+  const trailing = line.slice(timeEnd).trim();
+  if (!trailing) return { header: timedHeader, body: "" };
+
+  const labeledBody = /^:\s*([^.!?]+[.!?])\s+(.+)$/u.exec(trailing);
+  if (labeledBody?.[1] && labeledBody[2]) {
+    return {
+      header: `${timedHeader}: ${labeledBody[1].trim()}`,
+      body: labeledBody[2].trim(),
+    };
+  }
+
+  if (trailing.startsWith(":")) return { header: line, body: "" };
+  return { header: timedHeader, body: trailing };
+}
+
+function introducedPipeList(value: string): { introduction: string; items: string[]; remainder?: string } | undefined {
+  const line = cleanLine(value);
+  const colonIndex = line.indexOf(":");
+  if (colonIndex < 1) return undefined;
+
+  const introduction = line.slice(0, colonIndex + 1).trim();
+  const items = line.slice(colonIndex + 1).trim().split(/\s+\|\s+/u).map((item) => item.trim());
+  if (items.length < 3 || items.some((item) => !item)) return undefined;
+
+  const lastItem = items.at(-1) ?? "";
+  const nextCue = /^(.*?\.)\s+([A-Z][^.!?]{0,60}:\s*\(1\)\s+.+)$/u.exec(lastItem);
+  if (nextCue?.[1] && nextCue[2]) {
+    items[items.length - 1] = nextCue[1].trim();
+    return { introduction, items, remainder: nextCue[2].trim() };
+  }
+
+  return { introduction, items };
+}
+
+function introducedNumberedList(value: string): { introduction: string; items: string[] } | undefined {
+  const line = cleanLine(value);
+  const colonIndex = line.indexOf(":");
+  if (colonIndex < 1) return undefined;
+
+  const introduction = line.slice(0, colonIndex + 1).trim();
+  const parts = line.slice(colonIndex + 1).trim().split(/;\s*(?=\(\d+\)\s)/u);
+  if (parts.length < 2) return undefined;
+
+  const items: string[] = [];
+  for (let index = 0; index < parts.length; index += 1) {
+    const match = /^\((\d+)\)\s+(.+)$/u.exec(parts[index] ?? "");
+    if (!match?.[1] || !match[2] || Number(match[1]) !== index + 1) return undefined;
+    items.push(match[2].trim());
+  }
+  return { introduction, items };
 }
 
 function markdownTableCells(value: string): string[] | undefined {
@@ -321,6 +382,7 @@ export function formatLessonPlan(source: string): FormattedLesson {
   for (let index = 0; index < body.length; index += 1) {
     const rawLine = body[index] ?? "";
     const boldTimedSection = leadingBoldTimedSection(rawLine);
+    const timedSection = boldTimedSection ? undefined : splitTimedSectionLine(rawLine);
     const markdownHeading = /^#{1,6}\s+/u.test(rawLine.trim());
     const line = cleanLine(rawLine);
     if (!line) continue;
@@ -335,6 +397,15 @@ export function formatLessonPlan(source: string): FormattedLesson {
       currentSection = sectionName(boldTimedSection.header);
       const bodyText = boldTimedSection.body ? escapeHtml(boldTimedSection.body) : "";
       output.push(`<p><strong>${escapeHtml(boldTimedSection.header)}</strong><br>${bodyText}</p>`);
+      continue;
+    }
+
+    if (timedSection) {
+      closeList();
+      headings.push(timedSection.header);
+      currentSection = sectionName(timedSection.header);
+      const bodyText = timedSection.body ? escapeHtml(timedSection.body) : "";
+      output.push(`<p><strong>${escapeHtml(timedSection.header)}</strong><br>${bodyText}</p>`);
       continue;
     }
 
@@ -383,6 +454,39 @@ export function formatLessonPlan(source: string): FormattedLesson {
         continue;
       }
       addListItem("ol", numbered[2], numbered[1]);
+      continue;
+    }
+
+    const letteredChoice = LETTERED_CHOICE.exec(line);
+    if (letteredChoice?.[1] && letteredChoice[2]) {
+      addListItem("ol", letteredChoice[2], letteredChoice[1]);
+      continue;
+    }
+
+    const inlinePipeList = introducedPipeList(rawLine);
+    if (inlinePipeList) {
+      closeList();
+      output.push(`<p>${escapeHtml(inlinePipeList.introduction)}</p>`);
+      for (const item of inlinePipeList.items) addListItem("ul", item);
+      if (inlinePipeList.remainder) {
+        const remainderList = introducedNumberedList(inlinePipeList.remainder);
+        if (remainderList) {
+          closeList();
+          output.push(`<p>${escapeHtml(remainderList.introduction)}</p>`);
+          for (const item of remainderList.items) addListItem("ol", item);
+        } else {
+          closeList();
+          output.push(`<p>${escapeHtml(inlinePipeList.remainder)}</p>`);
+        }
+      }
+      continue;
+    }
+
+    const inlineNumberedList = introducedNumberedList(rawLine);
+    if (inlineNumberedList) {
+      closeList();
+      output.push(`<p>${escapeHtml(inlineNumberedList.introduction)}</p>`);
+      for (const item of inlineNumberedList.items) addListItem("ol", item);
       continue;
     }
 

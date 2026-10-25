@@ -167,6 +167,11 @@ Starting in v2.1.3, saved-state verification also normalizes named ellipsis
 entities such as `&mldr;` and `&hellip;` to the equivalent Unicode `…` character.
 Starting in v2.1.4, verification and normalized extraction treat Planbook's
 named `&ne;` entity as the equivalent Unicode `≠` character.
+Starting in v2.1.5, a parenthesized timed subsection followed by directions on
+the same line keeps only its subsection label bold and places the directions
+after the soft break as normal text. Clearly introduced inline pipe fields,
+parenthesized numbered rows, and standalone `A:` / `B:` choices render as real
+unordered, ordered, and lettered lists instead of crowded prose.
 
 After a formatting-related update, use `get_lesson` with `includeHtml: true` to
 audit lessons written by the previous version. Confirm Arial, bold major and

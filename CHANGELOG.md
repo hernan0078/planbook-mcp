@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.1.5 - 2026-10-25
+
+### Fixed
+
+- Parenthesized timed subsections that continue with directions on the same source line now keep only the subsection label and short function label bold; directions render after the soft break as normal text.
+- Clearly introduced inline pipe fields, parenthesized numbered row groups, and standalone lettered choices now render as real unordered, ordered, and lettered lists instead of crowded prose.
+
+### Documented
+
+- Updated the README, Codex installation guide, bundled lesson-entry skill, and agent handoff with the timed-direction and inline-list behavior.
+
+### Verified
+
+- Added an exact-pattern regression covering three timed reading subsections, a four-column map, three required rows, and A/B evidence choices.
+- Ran all 52 automated tests and dry-ran the October 26 Period 8 source: only the subsection labels were bold, the directions remained normal text, and the map fields, required rows, and evidence choices rendered as separate lists.
+- Replaced and read back the October 26 Period 8 lesson: Planbook preserved 15 bold headings, 37 list items, normal-text directions beneath all three Section headers, and separate map, row, evidence-choice, and preposition lists.
+
 ## 2.1.4 - 2026-09-27
 
 ### Fixed

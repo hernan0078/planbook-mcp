@@ -485,3 +485,42 @@ test("removes pasted whitespace entities and Markdown hard-break markers", () =>
   assert.match(result.html, /<li>ELA\.9\.V\.1\.1 - Use academic vocabulary\.<\/li>/);
   assert.match(result.html, /<li>Use subject pronouns\.<\/li><li>Select am, is, and are\.<\/li>/);
 });
+
+test("separates timed subsection directions and structures introduced inline lists", () => {
+  const result = formatLessonPlan(`Lesson Title
+Central Idea Development
+
+Standards
+ELA.6.R.2.2 - Analyze central idea development.
+
+Reread R1 - Three Familiar Sections (0:13-0:28)
+Use the existing class copy.
+
+Section 1 - Opening paragraph and title (0:13-0:17): Definition. Students locate the definition and mark D in the margin.
+Section 2 - Why does this happen? (0:17-0:23): Explanation. Students mark EX beside one causal detail.
+
+Three-Section Development Map and Relevance Check (0:28-0:37)
+Partners complete a notebook map with four columns: Section | Function | One precise detail and location | How it develops the central idea. Required rows: (1) Opening - definition; (2) Why does this happen? - explanation; (3) What does it mean? - example/consequence.
+
+Relevance Challenge: Which detail directly supports the claim?
+A: The article explains a health risk.
+B: The article names a satellite.`);
+
+  assert.match(
+    result.html,
+    /<p><strong>Section 1 - Opening paragraph and title \(0:13–0:17\): Definition\.<\/strong><br>Students locate the definition and mark D in the margin\.<\/p>/,
+  );
+  assert.doesNotMatch(result.html, /<strong>[^<]*Students locate/);
+  assert.match(
+    result.html,
+    /<p>Partners complete a notebook map with four columns:<\/p><ul><li>Section<\/li><li>Function<\/li><li>One precise detail and location<\/li><li>How it develops the central idea\.<\/li><\/ul>/,
+  );
+  assert.match(
+    result.html,
+    /<p>Required rows:<\/p><ol><li>Opening - definition<\/li><li>Why does this happen\? - explanation<\/li><li>What does it mean\? - example\/consequence\.<\/li><\/ol>/,
+  );
+  assert.match(
+    result.html,
+    /<p>Relevance Challenge: Which detail directly supports the claim\?<\/p><ol type="A"><li>The article explains a health risk\.<\/li><li>The article names a satellite\.<\/li><\/ol>/,
+  );
+});

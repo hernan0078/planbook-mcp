@@ -65,12 +65,15 @@ The formatter automatically:
 - uses Arial at the editor's default size;
 - bolds section and timed subsection headers;
 - recognizes leading bold minute ranges such as `0-5 min | Bell Ringer`, converts the range to an en dash, and soft-separates the following directions;
+- separates directions that continue on the same line after a parenthesized timed subsection, keeping only the subsection label bold;
 - soft-separates every timed header for scanability;
 - bolds `ESOL Strategies`, `Materials`, `Agenda`, and `Pages / Materials` like other major sections;
 - bolds `Key Teaching Notes` and `Teacher Emphasis` as major instructional labels;
 - bolds `Teacher Review Guide` and `Blooket Review` sections, rendering Blooket detail lines as bullets;
 - preserves numbered instructional checkpoints followed by `Model:`, `Quick check:`, or `Contrast:` as bold subsection labels instead of restarting separate ordered lists;
-- splits pipe-delimited items into individual bullets inside inferred semantic list sections such as `Agenda`, `Materials`, and `ESOL Strategies`, while preserving pipes in narrative text and explicit source bullets;
+- splits pipe-delimited items into individual bullets inside inferred semantic list sections such as `Agenda`, `Materials`, and `ESOL Strategies`, plus clearly introduced inline field lists such as `four columns: A | B | C`;
+- converts clearly introduced inline `(1) ...; (2) ...` groups into ordered lists and standalone `A:` / `B:` choices into lettered lists;
+- preserves pipes in ordinary narrative text and explicit source bullets;
 - ends an inferred `Agenda` list when a plain timed section begins, so timeline headers remain bold and soft-separated even without an intervening `Lesson` heading;
 - keeps narrative after explicit bullet or numbered groups as paragraphs instead of extending an inferred list beyond its source markers;
 - bolds common lesson labels such as `On the board`, sentence frames, examples, focus questions, recommended prompts, Book/Workbook activity references, and vocabulary/grammar review subsections;

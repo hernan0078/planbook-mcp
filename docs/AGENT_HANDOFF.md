@@ -79,6 +79,13 @@ An inferred `Agenda` list ends when a plain timed section begins. Sources may
 place `0:00-0:05 - ...` directly after the Agenda without an intervening
 `Lesson` heading; the timed line must still render bold with an en dash and a
 soft break rather than becoming another Agenda bullet.
+A parenthesized timed subsection may continue with directions on the same line.
+The formatter keeps only the subsection label and any short function label
+bold, then places the directions after the soft break as normal text.
+Clearly introduced inline pipe fields such as `four columns: A | B | C` become
+bullets. A following `(1) ...; (2) ...` row group becomes an ordered list, and
+standalone `A:` / `B:` answer choices become a lettered list. Ordinary prose
+pipes and explicitly marked source bullets remain unchanged.
 When a colon cue is followed by explicit bullets or numbering, the formatter
 trusts those source markers and does not infer additional bullets from the
 following narrative. Common plain-text activity labels (`On the board`, sentence
