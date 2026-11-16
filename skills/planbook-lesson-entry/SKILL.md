@@ -33,11 +33,18 @@ raw Markdown or plain text originally pasted before formatting.
    - `lessonPlan`: the complete lesson source after applying the user's standing cleanup and organization preferences
    - `overwrite: true`
    - `verify: true`
+   - `cleanupProfile: "hernan-planbook"` for Hernan Rosario's lessons (omit it for other teachers unless they request the same cleanup)
 4. Confirm the returned date, class, period, title, action, and `verified` state.
 
 The MCP owns school-year lookup, class resolution, existing-lesson lookup, formatting, replacement, saving, and verification. It replaces the entire LESSON body, removing Planbook dummy text. It always uses Arial at the default editor size and applies the established headers, bullets, and en-dash formatting rules.
 
-Treat supplied text as instructional source to improve safely rather than an immutable visual paste. Preserve its meaning, standards, timing, and required activities. Remove teacher-answer scaffolds labeled `Expected:`, redundant course/export metadata, optional extensions, and audio-track references the user has excluded. Organize clearly parallel prompts, examples, choices, fields, and steps as bullets or numbered lists without inventing new content.
+Treat supplied text as instructional source to improve safely rather than an immutable visual paste. Preserve its meaning, standards, timing, and required activities. Remove teacher-answer scaffolds labeled `Expected:`, redundant course/export metadata, optional extensions, and audio-track references the user has excluded. For Hernan's lessons, `cleanupProfile: "hernan-planbook"` performs those removals deterministically on the server (see Cleanup Profile). Organize clearly parallel prompts, examples, choices, fields, and steps as bullets or numbered lists without inventing new content.
+
+## Cleanup Profile
+
+`cleanupProfile: "hernan-planbook"` performs Hernan's standing cleanup on the server instead of by hand. It removes export packaging (`Word Worksheets`, download lines, page counts, answer-key labels), `Class:`/`Course:`/`Textbook:` lines before `Standards`, lines and label-led sections marked `Optional` or `(optional)`, audio-track references such as `Track 2.14` or `(CD 1, Track 3)`, and answer scaffolds such as `Possible answers:`, `Sample answers:`, `Answer:`, or `Look for:`. Inside timed sections it renders ordinary cues such as `Grammar Review`, `Reading ...`, and `Focus questions include:` as normal text instead of bold headings, while Markdown headings, timed headers, major sections, and structural headers such as `Closure` stay bold.
+
+Pass the source with these items still in it; do not delete them by hand first. Still adapt any essential activity that depends on an excluded audio track before calling, because the profile only removes references and never writes a replacement. Use `dryRun: true` with the profile when unsure and check the returned `cleanup` counts. Omitting the profile keeps the v2.1.6 behavior.
 
 Formatting is deterministic: all major headers, including `ESOL Strategies`, are bold; every timed section is bold with an explicit soft break; source bullets and explicit numbering are preserved; clear semantic lists receive bullets; narrative remains plain. Never request or reproduce Impact.
 

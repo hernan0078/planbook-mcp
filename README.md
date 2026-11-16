@@ -32,7 +32,7 @@ and API work.
 
 | Tool | Purpose |
 | --- | --- |
-| `upsert_lesson` | Create or replace one lesson in a single call; supports `dryRun` |
+| `upsert_lesson` | Create or replace one lesson in a single call; supports `dryRun` and the opt-in `cleanupProfile` |
 | `extract_lesson` | Export one saved lesson as structured JSON, Markdown, text, or exact saved HTML |
 | `extract_lessons` | Bulk export a date range with period/class filters and optional empty slots |
 | `get_lesson` | Read one lesson summary by date and period; HTML is optional |
@@ -84,6 +84,27 @@ The formatter automatically:
 - converts semantic and source-marked lists to bullets, preserving explicitly numbered steps;
 - changes only time-range hyphens to en dashes while preserving other source punctuation;
 - replaces the lesson body instead of retaining Planbook's dummy scaffold.
+
+### Opt-in cleanup profile
+
+Pass `cleanupProfile: "hernan-planbook"` to `upsert_lesson` to apply a
+deterministic source cleanup before formatting. Omit it and the formatter
+behaves exactly as in v2.1.6. The profile only removes explicitly labeled
+material; it never rewrites, summarizes, or replaces instructional content.
+
+| Rule | Removes | Preserves |
+| --- | --- | --- |
+| Export packaging | `Word Worksheets`, `I created the student materials.`, `Download Student Worksheet` / `Download Teacher Answer Key`, `Answer Key`, and page counts such as `3 printable pages` that follow those lines | The lesson title and body |
+| Preamble metadata | `Class:`, `Course:`, and `Textbook:` lines before `Standards`, the first timed section, or another known section | Subtitles such as `90-Minute Lesson \| Book, pp. 20-21`, and any later `Textbook:` line |
+| Optional content | Lines that start with `Optional` or contain `(optional)` / `[optional]`; when the line is a section label, its list items and contiguous paragraph | Required work that only mentions `choice`, `extension`, or `additional` |
+| Audio tracks | Parenthetical references such as `(CD 1, Track 3)`, and lines that reference `Track 2.14`, `Audio Track`, `audio file`, or `Play the audio` | `active listening`, video activities, and other listening work |
+| Answer scaffolds | `Possible answers:`, `Sample answers:`, `Suggested responses:`, `Model answer:`, `Answer:`, `Answer key:`, and `Look for:` guidance, plus the answer list under a bare label | The prompt before the label and recognizable directions after it |
+| Timed-section cues | Bold heading treatment for ordinary cues such as `Grammar Review`, `Reading ...`, and `Focus questions include:` inside a timed section (they render as normal text; colon cues still introduce lists) | Markdown headings, timed headers, major sections, and structural headers such as `Closure` or `Guided Practice` |
+
+When an essential activity depends on an excluded audio track, adapt that
+activity before calling the tool; the profile removes the reference but never
+invents a substitute. The structured result and dry-run message include a
+`cleanup` report with per-rule counts only, never lesson text.
 
 Saved-state verification normalizes valid numeric HTML entities emitted by
 Planbook, including IPA symbols such as `ɪ`, without weakening exact text or

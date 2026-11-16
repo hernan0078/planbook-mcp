@@ -179,6 +179,15 @@ that follow the answer guidance. Blank lines no longer split a clearly
 introduced list, and parallel Definition/Explanation/Example labels render as
 bullets for scanability.
 
+Starting in v2.2.0, `upsert_lesson` accepts the opt-in
+`cleanupProfile: "hernan-planbook"`. It removes export packaging, preamble
+`Class:`/`Textbook:` lines, explicitly optional sections, audio-track references,
+and non-`Expected:` answer scaffolds, and keeps ordinary cues inside timed
+sections from becoming bold headings. Calls without the profile format exactly
+as in v2.1.6, so no migration is required. After reinstalling, restart the MCP
+client and dry-run one synthetic lesson with the profile to confirm the new
+schema loaded.
+
 After a formatting-related update, use `get_lesson` with `includeHtml: true` to
 audit lessons written by the previous version. Confirm Arial, bold major and
 timed headers, a soft break after each timed header, preserved lists, and no

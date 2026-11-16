@@ -35,6 +35,7 @@ Call `upsert_lesson` with:
 - `period`: a number or label such as `3` or `P3`
 - `lessonPlan`: the complete lesson source after the user's standing semantic cleanup and organization preferences
 - `title`: only when the raw plan has no `Lesson Title` block
+- `cleanupProfile: "hernan-planbook"`: for Hernan Rosario's lessons, so export packaging, preamble `Class:`/`Textbook:` lines, optional sections, audio-track references, and non-`Expected:` answer scaffolds are removed deterministically and ordinary cues inside timed sections are not over-promoted to bold headings. Omit it for other users unless they ask for the same cleanup.
 
 Defaults already match normal operation:
 
@@ -185,6 +186,10 @@ The server, not the agent, applies these rules:
 
 Set `dryRun: true` to validate the date, extract the title, and produce a compact
 format summary. Dry runs do not authenticate and do not change Planbook.
+Combine it with `cleanupProfile` to see the per-rule cleanup counts before a
+live write. If a count looks wrong (for example, required work was removed
+because it was labeled optional), fix the source wording before writing; never
+reconstruct removed content.
 
 ## Tool result
 
@@ -195,6 +200,7 @@ format summary. Dry runs do not authenticate and do not change Planbook.
 - title and lesson ID when available
 - `verified`
 - heading, bullet, and HTML character counts on dry runs only
+- `cleanup` when a cleanup profile was used: the profile name, removed counts for `packaging`, `metadata`, `optional`, `audio`, and `answerScaffolds`, and the number of `demotedCues`
 
 Do not echo the full lesson plan back to the user after a successful save. A
 confirmation with title, date, period, action, and verification state is enough.

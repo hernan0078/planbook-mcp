@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { PlanbookClient } from "./client.js";
 import { buildDateRange, extractLesson } from "./export.js";
+import { CLEANUP_PROFILES } from "./cleanup.js";
 import { formatLessonPlan, normalizeDate } from "./format.js";
 import { resolveClass, selectClasses } from "./resolver.js";
 import type { UpsertLessonResult } from "./types.js";
@@ -59,6 +60,17 @@ const upsertOutput = z.object({
   headings: z.array(z.string()).optional(),
   bulletCount: z.number().optional(),
   htmlCharacters: z.number().optional(),
+  cleanup: z.object({
+    profile: z.enum(CLEANUP_PROFILES),
+    removed: z.object({
+      packaging: z.number(),
+      metadata: z.number(),
+      optional: z.number(),
+      audio: z.number(),
+      answerScaffolds: z.number(),
+    }),
+    demotedCues: z.number(),
+  }).optional(),
 });
 
 server.registerTool(
@@ -76,6 +88,8 @@ server.registerTool(
       overwrite: z.boolean().default(true).describe("Replace an existing lesson on the target date"),
       verify: z.boolean().default(true).describe("Read the lesson back after saving"),
       dryRun: z.boolean().default(false).describe("Format and validate without contacting Planbook"),
+      cleanupProfile: z.enum(CLEANUP_PROFILES).optional()
+        .describe("Opt-in source cleanup; omit for unchanged formatting. hernan-planbook removes export packaging, preamble Class/Textbook lines, optional sections, audio-track references, and answer scaffolds"),
     }),
     outputSchema: upsertOutput,
     annotations: {
@@ -84,11 +98,11 @@ server.registerTool(
       openWorldHint: true,
     },
   },
-  async ({ date, period, className, title, lessonPlan, overwrite, verify, dryRun }) => {
+  async ({ date, period, className, title, lessonPlan, overwrite, verify, dryRun, cleanupProfile }) => {
     try {
       const planbookDate = normalizeDate(date);
       const periodLabel = String(period);
-      const formatted = formatLessonPlan(lessonPlan);
+      const formatted = formatLessonPlan(lessonPlan, { cleanupProfile });
       const lessonTitle = title?.trim() || formatted.title?.trim();
       if (!lessonTitle) {
         throw new Error("Lesson title is missing. Pass title or include a Lesson Title block.");
@@ -105,9 +119,10 @@ server.registerTool(
           headings: formatted.headings,
           bulletCount: formatted.bulletCount,
           htmlCharacters: formatted.html.length,
+          ...(formatted.cleanup ? { cleanup: formatted.cleanup } : {}),
         };
         return toolSuccess(
-          `Preview ready: ${lessonTitle} (${formatted.headings.length} sections, ${formatted.bulletCount} list items).`,
+          `Preview ready: ${lessonTitle} (${formatted.headings.length} sections, ${formatted.bulletCount} list items${cleanupSummary(formatted.cleanup)}).`,
           preview,
         );
       }
@@ -134,6 +149,7 @@ server.registerTool(
         lessonId: saved.lessonId,
         title: lessonTitle,
         verified: saved.verified,
+        ...(formatted.cleanup ? { cleanup: formatted.cleanup } : {}),
       };
       return toolSuccess(
         `${saved.action === "created" ? "Created" : "Updated"} ${lessonTitle} for ${planbookDate}, ${targetClass.name}${saved.verified ? " and verified it" : ""}.`,
@@ -144,6 +160,12 @@ server.registerTool(
     }
   },
 );
+
+function cleanupSummary(report: UpsertLessonResult["cleanup"]): string {
+  if (!report) return "";
+  const removed = Object.values(report.removed).reduce((sum, count) => sum + count, 0);
+  return `; ${report.profile} removed ${removed} source items and demoted ${report.demotedCues} cues`;
+}
 
 server.registerTool(
   "extract_lesson",

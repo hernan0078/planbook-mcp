@@ -1,6 +1,6 @@
 {
   "name": "planbook-mcp",
-  "version": "2.1.6",
+  "version": "2.2.0",
   "description": "Token-efficient MCP server for writing and extracting Planbook lessons",
   "type": "module",
   "main": "dist/index.js",
@@ -10,6 +10,9 @@
   "files": [
     "AGENTS.md",
     "CHANGELOG.md",
+    "dist/cleanup.d.ts",
+    "dist/cleanup.js",
+    "dist/cleanup.js.map",
     "dist/client.d.ts",
     "dist/client.js",
     "dist/client.js.map",

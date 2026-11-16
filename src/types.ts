@@ -22,12 +22,31 @@ export type LessonRecord = {
   raw: JsonRecord;
 };
 
+export type CleanupProfile = "hernan-planbook";
+
+export type CleanupReport = {
+  profile: CleanupProfile;
+  removed: {
+    packaging: number;
+    metadata: number;
+    optional: number;
+    audio: number;
+    answerScaffolds: number;
+  };
+  demotedCues: number;
+};
+
+export type FormatOptions = {
+  cleanupProfile?: CleanupProfile;
+};
+
 export type FormattedLesson = {
   title?: string;
   html: string;
   headings: string[];
   bulletCount: number;
   sourceCharacters: number;
+  cleanup?: CleanupReport;
 };
 
 export type UpsertLessonInput = {
@@ -39,6 +58,7 @@ export type UpsertLessonInput = {
   overwrite: boolean;
   verify: boolean;
   dryRun: boolean;
+  cleanupProfile?: CleanupProfile;
 };
 
 export type UpsertLessonResult = {
@@ -54,6 +74,7 @@ export type UpsertLessonResult = {
   headings?: string[];
   bulletCount?: number;
   htmlCharacters?: number;
+  cleanup?: CleanupReport;
 };
 
 export type LessonBlock =

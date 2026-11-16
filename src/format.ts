@@ -1,4 +1,5 @@
-import type { FormattedLesson } from "./types.js";
+import { applyCleanupProfile } from "./cleanup.js";
+import type { CleanupReport, FormatOptions, FormattedLesson } from "./types.js";
 
 const TITLE_LABEL = /^lesson\s+title\s*:?[\s]*$/i;
 const MARKDOWN_TITLE = /^#\s+(.+)$/u;
@@ -208,12 +209,12 @@ function isNumberedInstructionalHeader(lines: string[], index: number): boolean 
   return false;
 }
 
-function implicitBulletIndexes(lines: string[]): Set<number> {
+function implicitBulletIndexes(lines: string[], demotedCues: ReadonlySet<number> = new Set()): Set<number> {
   const indexes = new Set<number>();
 
   for (let index = 0; index < lines.length; index += 1) {
     const cue = cleanLine(lines[index] ?? "");
-    if (!cue.endsWith(":") || isHeading(cue)) continue;
+    if (!cue.endsWith(":") || (isHeading(cue) && !demotedCues.has(index))) continue;
 
     const firstContentIndex = lines.findIndex((line, candidateIndex) => (
       candidateIndex > index && Boolean(cleanLine(line)) && !SEPARATOR.test(cleanLine(line))
@@ -361,6 +362,48 @@ function removeRedundantCourseMetadata(lines: string[]): string[] {
   return body;
 }
 
+const STRUCTURAL_ACTIVITY = /^(?:bell\s+ringer|closure|mini\s+lesson|guided\s+practice|independent\s+practice|transition|assessment\s+expectations|standards\s+mastery\s+quiz|early\s+finisher\s+task|unit\s+exam)\b/i;
+
+function isMajorHeader(line: string): boolean {
+  return MAJOR_HEADER.test(line.replace(/:\s*$/, ""));
+}
+
+/**
+ * Finds ordinary instructional cues (for example "Grammar Review", "Reading ...",
+ * or "Focus questions include:") that sit inside a timed section. They match
+ * KNOWN_HEADER but are not major lesson sections, so the cleanup profile renders
+ * them as plain labels instead of bold headings. Explicit Markdown headings and
+ * timed headers always keep their heading treatment.
+ */
+function timedSectionCueIndexes(lines: string[]): Set<number> {
+  const indexes = new Set<number>();
+  let inTimedSection = false;
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const rawLine = lines[index] ?? "";
+    const line = cleanLine(rawLine);
+    if (!line || SEPARATOR.test(line)) continue;
+
+    if (leadingBoldTimedSection(rawLine) || splitTimedSectionLine(rawLine) || TIME_RANGE.test(line)) {
+      inTimedSection = true;
+      continue;
+    }
+    if (isMajorHeader(line)) {
+      inTimedSection = false;
+      continue;
+    }
+    if (/^#{1,6}\s+/u.test(rawLine.trim())) continue;
+    if (inTimedSection && isHeading(line) && !STRUCTURAL_ACTIVITY.test(line)) indexes.add(index);
+  }
+
+  return indexes;
+}
+
+function isCleanupBoundary(rawLine: string): boolean {
+  const line = cleanLine(rawLine);
+  return isHeading(line) || isStandardEntry(rawLine);
+}
+
 export function normalizeDate(value: string): string {
   const input = value.trim();
   const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(input);
@@ -391,14 +434,22 @@ function validateDateParts(year: number, month: number, day: number, original: s
   }
 }
 
-export function formatLessonPlan(source: string): FormattedLesson {
-  const rawLines = removeExpectedGuidance(source.replace(/\r\n?/g, "\n").split("\n"));
+export function formatLessonPlan(source: string, options: FormatOptions = {}): FormattedLesson {
+  let rawLines = removeExpectedGuidance(source.replace(/\r\n?/g, "\n").split("\n"));
+  let cleanup: CleanupReport | undefined;
+  if (options.cleanupProfile !== undefined) {
+    const cleaned = applyCleanupProfile(rawLines, options.cleanupProfile, isCleanupBoundary);
+    rawLines = cleaned.lines;
+    cleanup = cleaned.report;
+  }
   const extracted = extractTitle(rawLines);
   const title = extracted.title;
   const body = removeRedundantCourseMetadata(extracted.body);
   const output: string[] = ['<div style="font-family: Arial, sans-serif;">'];
   const headings: string[] = [];
-  const inferredBullets = implicitBulletIndexes(body);
+  const demotedCues = cleanup ? timedSectionCueIndexes(body) : new Set<number>();
+  if (cleanup) cleanup.demotedCues = demotedCues.size;
+  const inferredBullets = implicitBulletIndexes(body, demotedCues);
   for (const index of parallelLabelIndexes(body)) inferredBullets.add(index);
   let bulletCount = 0;
   let listType: "ul" | "ol" | undefined;
@@ -549,6 +600,12 @@ export function formatLessonPlan(source: string): FormattedLesson {
       continue;
     }
 
+    if (demotedCues.has(index)) {
+      closeList();
+      output.push(`<p>${escapeHtml(line)}</p>`);
+      continue;
+    }
+
     if (markdownHeading || isHeading(line)) {
       closeList();
       headings.push(line);
@@ -586,5 +643,6 @@ export function formatLessonPlan(source: string): FormattedLesson {
     headings,
     bulletCount,
     sourceCharacters: source.length,
+    ...(cleanup ? { cleanup } : {}),
   };
 }

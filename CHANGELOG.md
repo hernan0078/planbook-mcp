@@ -1,5 +1,26 @@
 # Changelog
 
+## 2.2.0 - 2026-11-16
+
+### Added
+
+- Opt-in `cleanupProfile: "hernan-planbook"` for `upsert_lesson`, implemented in the new `src/cleanup.ts`. It deterministically removes export packaging (worksheet/download wrappers, answer-key labels, and the page counts after them), `Class:`/`Course:`/`Textbook:` lines before the first lesson section, explicitly optional lines and label-led optional sections, audio-track references, and answer scaffolds such as `Possible answers:`, `Sample answers:`, `Answer:`, and `Look for:` (including the answer list under a bare label).
+- With the profile, ordinary cues inside a timed section (`Grammar Review`, `Reading ...`, `Focus questions include:`) render as normal text instead of bold headings, and colon cues still introduce lists. Markdown headings, timed headers, major sections, and structural headers such as `Closure` keep their bold treatment.
+- `upsert_lesson` results and dry-run messages include a `cleanup` report with per-rule removal counts and the number of demoted cues. The report never contains lesson text.
+
+### Compatibility
+
+- Calls without `cleanupProfile` format exactly as in v2.1.6; all 53 pre-existing tests pass unchanged. Unknown profile names are rejected.
+
+### Documented
+
+- Updated the README, Codex installation guide, agent handoff, and bundled lesson-entry skill with the profile's rules, preservation boundaries, and dry-run workflow.
+
+### Verified
+
+- Added 10 synthetic regressions covering packaging, metadata, optional content, audio references, answer scaffolds, contextual cue demotion, Markdown and structural-header preservation, default-behavior compatibility, and unknown-profile rejection. No live Planbook content is used in fixtures.
+- Ran all 63 automated tests, `npm pack --dry-run`, `git diff --check`, and an MCP stdio smoke test that reported v2.2.0, listed `cleanupProfile` in the `upsert_lesson` schema, and returned a synthetic dry-run cleanup report without contacting Planbook.
+
 ## 2.1.6 - 2026-10-25
 
 ### Improved
