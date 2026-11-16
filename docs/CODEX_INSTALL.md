@@ -188,6 +188,10 @@ as in v2.1.6, so no migration is required. After reinstalling, restart the MCP
 client and dry-run one synthetic lesson with the profile to confirm the new
 schema loaded.
 
+Starting in v2.2.1, descriptive Expected labels such as
+`Expected conventional meanings:` are omitted along with the guidance after
+them, in both default and profiled formatting.
+
 After a formatting-related update, use `get_lesson` with `includeHtml: true` to
 audit lessons written by the previous version. Confirm Arial, bold major and
 timed headers, a soft break after each timed header, preserved lists, and no

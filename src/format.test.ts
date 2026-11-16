@@ -562,3 +562,22 @@ Expected response: Topic, detail, and explanation.`);
   assert.match(result.html, /<ul><li>Topic: Urban heat islands\.<\/li><li>Section gist: Plants can cool an area\.<\/li><li>Central idea candidate: Materials and vegetation affect city temperatures\.<\/li><\/ul>/);
   assert.match(result.html, /<ul><li>Definition: Tells what a phenomenon means\.<\/li><li>Explanation: Shows how or why it happens\.<\/li><li>Specific example or consequence: Shows what it looks like or why it matters\.<\/li><\/ul>/);
 });
+
+test("omits expected-answer guidance with a descriptive label before the colon", () => {
+  const result = formatLessonPlan(`Lesson Title
+Idiom Practice
+
+Standards
+ELA.6.V.1.3 - Use context clues.
+
+Read in Context (0:00-0:10)
+Locate two idioms. Ask what each means word for word. Expected conventional meanings: become angry; stay quiet.
+Expected student interpretations: a sharp exchange.
+Students record one context clue.
+Expected time is about ten minutes for this step.`);
+
+  assert.doesNotMatch(result.html, /conventional meanings|student interpretations|become angry|sharp exchange/);
+  assert.match(result.html, /<br>Locate two idioms\. Ask what each means word for word\.<\/p>|<p>Locate two idioms\. Ask what each means word for word\.<\/p>/);
+  assert.match(result.html, /<p>Students record one context clue\.<\/p>/);
+  assert.match(result.html, /<p>Expected time is about ten minutes for this step\.<\/p>/);
+});

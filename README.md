@@ -61,7 +61,7 @@ The formatter automatically:
 - strips a leading numbered `ESOL` or `ELL` course identifier before `Standards`, including the course-name portion of pipe-delimited metadata, without removing later ESOL instructional text or strategies;
 - decodes pasted numeric character entities such as `&#x44;` before safe HTML escaping;
 - removes separators and decorative emoji;
-- omits teacher-answer guidance introduced by `Expected:`, `Expected response:`, or `Expected understanding:` while preserving the prompt and recognizable following directions;
+- omits teacher-answer guidance introduced by `Expected:`, `Expected response:`, `Expected understanding:`, or a descriptive label such as `Expected conventional meanings:` or `Expected student interpretations:` while preserving the prompt and recognizable following directions;
 - places standards in the lesson body;
 - uses Arial at the editor's default size;
 - bolds section and timed subsection headers;

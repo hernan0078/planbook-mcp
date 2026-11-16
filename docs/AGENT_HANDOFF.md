@@ -94,7 +94,10 @@ bullets. A following `(1) ...; (2) ...` row group becomes an ordered list, and
 standalone `A:` / `B:` answer choices become a lettered list. Ordinary prose
 pipes and explicitly marked source bullets remain unchanged.
 Teacher-answer guidance beginning with `Expected:`, `Expected response:`, or
-`Expected understanding:` is omitted. If the same line continues with a
+`Expected understanding:` is omitted, as is a descriptive label such as
+`Expected conventional meanings:` (up to two words before an answer-type noun
+such as meanings, interpretations, ideas, or explanations). Prose such as
+`Expected time is ...` without a colon label is kept. If the same line continues with a
 recognizable student or teacher direction, that direction is retained. Blank
 lines inside an introduced list no longer split the list, and parallel labels
 such as Definition, Explanation, and Specific Example become bullets.

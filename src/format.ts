@@ -7,7 +7,7 @@ const SEPARATOR = /^(?:[\s\-_=—–]{3,}|⸻+)$/u;
 const BULLET = /^\s*[*•-]\s+(.+)$/u;
 const NUMBERED = /^\s*(\d+|[A-Da-d])[.)]\s+(.+)$/u;
 const LETTERED_CHOICE = /^\s*([A-Da-d]):\s+(.+)$/u;
-const EXPECTED_GUIDANCE = /\bExpected(?:\s+(?:answer|answers|response|responses|understanding))?\s*:/i;
+const EXPECTED_GUIDANCE = /\bExpected(?:(?:\s+[A-Za-z-]+){0,2}\s+(?:answers?|responses?|understandings?|meanings?|interpretations?|ideas?|outcomes?|thinking|reasoning|explanations?))?\s*:/i;
 const PARALLEL_LABEL = /^(?:topic|section\s+gist|central\s+idea\s+candidate|definition|explanation|specific\s+example(?:\s+or\s+consequence)?|preposition|object|complete\s+phrase)\s*:/i;
 const STANDARD_CODE = /^(?:[A-Z]{2,}(?:\.[A-Z0-9]+)+|[A-Z]{2,}\.[A-Z0-9.]+)\s*[–—-]/u;
 const ASSESSMENT_ITEM = /\s[–—-]\s*(?:Formative|Summative|Classwork)\s*$/i;

@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.2.1 - 2026-11-16
+
+### Fixed
+
+- Teacher-answer guidance with a descriptive Expected label, such as `Expected conventional meanings:` or `Expected student interpretations:`, is now omitted like `Expected:`. The label allows up to two words before an answer-type noun (answers, responses, understanding, meanings, interpretations, ideas, outcomes, thinking, reasoning, explanations). Prose that merely starts with "Expected" and has no colon label is kept.
+
+### Documented
+
+- Updated the README, Codex installation guide, agent handoff, and bundled lesson-entry skill.
+
+### Verified
+
+- Added a synthetic regression covering inline and standalone descriptive labels and a preserved non-label "Expected time" sentence. Ran all 64 automated tests, `npm pack --dry-run`, `git diff --check`, skill validation, and an MCP stdio smoke test reporting v2.2.1.
+
 ## 2.2.0 - 2026-11-16
 
 ### Added
