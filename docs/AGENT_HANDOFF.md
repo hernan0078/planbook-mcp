@@ -100,7 +100,9 @@ such as meanings, interpretations, ideas, or explanations). Prose such as
 `Expected time is ...` without a colon label is kept. A parenthesized answer
 such as `(Expected: She has gone.)` is removed together with its parentheses.
 `Lesson Timeline - Exactly 50 Minutes` is a bold major header, so it ends an
-inferred Agenda list. If the same line continues with a
+inferred Agenda list. `Pages and Materials` and `Differentiation and ...`
+headers (for example `Differentiation and Game Management`) are bold major
+sections; a `Differentiation:` sentence stays normal text. If the same line continues with a
 recognizable student or teacher direction, that direction is retained. Blank
 lines inside an introduced list no longer split the list, and parallel labels
 such as Definition, Explanation, and Specific Example become bullets.

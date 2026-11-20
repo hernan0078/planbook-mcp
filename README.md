@@ -69,7 +69,7 @@ The formatter automatically:
 - separates directions that continue on the same line after a parenthesized timed subsection, keeping only the subsection label bold;
 - soft-separates every timed header for scanability;
 - bolds lesson timeline headers with a stated length, including `Lesson Timeline - Exactly 50 Minutes` and `Lesson Timeline - About 50 Minutes`, instead of absorbing them into a preceding Agenda list;
-- bolds `ESOL Strategies`, `Materials`, `Agenda`, and `Pages / Materials` like other major sections;
+- bolds `ESOL Strategies`, `Materials`, `Agenda`, `Pages / Materials`, `Pages and Materials`, and `Differentiation` (alone or as `Differentiation and ...`, such as `Differentiation and Game Management`) like other major sections;
 - bolds `Key Teaching Notes` and `Teacher Emphasis` as major instructional labels;
 - bolds `Teacher Review Guide` and `Blooket Review` sections, rendering Blooket detail lines as bullets;
 - preserves numbered instructional checkpoints followed by `Model:`, `Quick check:`, or `Contrast:` as bold subsection labels instead of restarting separate ordered lists;

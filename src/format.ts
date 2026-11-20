@@ -16,8 +16,8 @@ const COURSE_METADATA = /^(?:ESOL|ELL)\b(?!\s+strateg(?:y|ies)\b)(?=[^|]*\d)[^|]
 const TIME_RANGE = /(?:\d{1,2}:\d{2}\s*[–—-]\s*\d{1,2}:\d{2}|\d{1,3}\s*[–—-]\s*\d{1,3}\s*(?:min|minutes?)\b)/iu;
 const PARENTHESIZED_TIME_RANGE = /\((?:\d{1,2}:\d{2}\s*[–—-]\s*\d{1,2}:\d{2}|\d{1,3}\s*[–—-]\s*\d{1,3}\s*(?:min|minutes?)\b)\)/iu;
 
-const MAJOR_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|key\s+teaching\s+notes\b.*|teacher\s+emphasis\b.*|teacher\s+review\s+guide\b.*|blooket\s+review\b.*|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*(?:exactly\s+|about\s+)?\d+[\s-]*minutes?|\s*\([^)]*\))?|part\s+\d+\b.*)$/i;
-const KNOWN_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|key\s+teaching\s+notes\b.*|teacher\s+emphasis\b.*|teacher\s+review\s+guide\b.*|blooket\s+review\b.*|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*(?:exactly\s+|about\s+)?\d+[\s-]*minutes?|\s*\([^)]*\))?|part\s+\d+\b.*|bell\s+ringer\b.*|closure\b.*|mini\s+lesson\b.*|guided\s+practice\b.*|independent\s+practice\b.*|reading\b.*|transition\b.*|assessment\s+expectations\b.*|standards\s+mastery\s+quiz\b.*|early\s+finisher\s+task\b.*|(?:book|workbook)\s+-\s+.*\bactivit(?:y|ies)\b.*|presentation\s+-\s+slides?\b.*|unit\s+exam\s+-\s+summative|homophonic\s+puns|homographic\s+puns|compound\s+puns|vocabulary\s+review|grammar\s+review|a,\s*an,\s*and\s*the|comparatives\s+and\s+superlatives|adverbs|on\s+the\s+board|possible\s+sentence\s+frames|quick\s+examples|focus\s+questions(?:\s+include)?|recommended\s+prompt)$/i;
+const MAJOR_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*(?:\/|and|&)\s*materials)?|differentiation(?:\s+(?:and|&)\s+[a-z]+(?:\s+[a-z]+){0,3})?|assessment|esol\s+strategies|key\s+teaching\s+notes\b.*|teacher\s+emphasis\b.*|teacher\s+review\s+guide\b.*|blooket\s+review\b.*|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*(?:exactly\s+|about\s+)?\d+[\s-]*minutes?|\s*\([^)]*\))?|part\s+\d+\b.*)$/i;
+const KNOWN_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*(?:\/|and|&)\s*materials)?|differentiation(?:\s+(?:and|&)\s+[a-z]+(?:\s+[a-z]+){0,3})?|assessment|esol\s+strategies|key\s+teaching\s+notes\b.*|teacher\s+emphasis\b.*|teacher\s+review\s+guide\b.*|blooket\s+review\b.*|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*(?:exactly\s+|about\s+)?\d+[\s-]*minutes?|\s*\([^)]*\))?|part\s+\d+\b.*|bell\s+ringer\b.*|closure\b.*|mini\s+lesson\b.*|guided\s+practice\b.*|independent\s+practice\b.*|reading\b.*|transition\b.*|assessment\s+expectations\b.*|standards\s+mastery\s+quiz\b.*|early\s+finisher\s+task\b.*|(?:book|workbook)\s+-\s+.*\bactivit(?:y|ies)\b.*|presentation\s+-\s+slides?\b.*|unit\s+exam\s+-\s+summative|homophonic\s+puns|homographic\s+puns|compound\s+puns|vocabulary\s+review|grammar\s+review|a,\s*an,\s*and\s*the|comparatives\s+and\s+superlatives|adverbs|on\s+the\s+board|possible\s+sentence\s+frames|quick\s+examples|focus\s+questions(?:\s+include)?|recommended\s+prompt)$/i;
 
 function escapeHtml(value: string): string {
   return value
@@ -625,6 +625,7 @@ export function formatLessonPlan(source: string, options: FormatOptions = {}): F
       currentSection === "agenda" ||
       currentSection === "materials" ||
       currentSection === "pages / materials" ||
+      currentSection === "pages and materials" ||
       currentSection === "blooket review" ||
       (currentSection === "assessment" && ASSESSMENT_ITEM.test(line)) ||
       (currentSection === "esol strategies" && ESOL_STRATEGY.test(line)) ||

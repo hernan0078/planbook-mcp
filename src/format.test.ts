@@ -601,3 +601,23 @@ Students correct one sentence.
   assert.match(result.html, /<li>Correct this sentence: She has went home\.<\/li><li>Write one definition in your notebook\.<\/li>/);
   assert.match(result.html, /<ul><li>Retrieval → Blooket → Exit slip<\/li><\/ul><p><strong>Lesson Timeline - Exactly 50 Minutes<\/strong><\/p>/);
 });
+
+test("bolds Pages and Materials and Differentiation section headers but not differentiation prose", () => {
+  const result = formatLessonPlan(`Lesson Title
+Review Games
+
+Standards
+ELA.9.C.3.1 - Apply grammar conventions.
+Pages and Materials
+Book - Colored Pages: Unit 1 p. 5
+Teacher materials: projector, timer
+Differentiation and Game Management
+- Model a clue in complete sentences.
+Differentiation: give struggling readers the card first.
+Assessment
+Exit Ticket - Formative`);
+
+  assert.match(result.html, /<p><strong>Pages and Materials<\/strong><\/p><ul><li>Book - Colored Pages: Unit 1 p\. 5<\/li><li>Teacher materials: projector, timer<\/li><\/ul>/);
+  assert.match(result.html, /<p><strong>Differentiation and Game Management<\/strong><\/p><ul><li>Model a clue in complete sentences\.<\/li><\/ul>/);
+  assert.match(result.html, /<p>Differentiation: give struggling readers the card first\.<\/p>/);
+});

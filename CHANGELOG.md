@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.2.3 - 2026-11-20
+
+### Fixed
+
+- `Pages and Materials` and `Differentiation` headers, alone or as `Differentiation and ...` (for example `Differentiation and Game Management`), now render as bold major sections. `Pages and Materials` lines become bullets like `Pages / Materials`. A sentence such as `Differentiation: give ...` remains normal text.
+
+### Documented
+
+- Updated the README, Codex installation guide, agent handoff, and bundled lesson-entry skill.
+
+### Verified
+
+- Added a synthetic regression covering both headers, their lists, and preserved differentiation prose. Ran all 66 automated tests, `npm pack --dry-run`, `git diff --check`, skill validation, and an MCP stdio smoke test reporting v2.2.3.
+
 ## 2.2.2 - 2026-11-20
 
 ### Fixed
