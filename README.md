@@ -61,13 +61,14 @@ The formatter automatically:
 - strips a leading numbered `ESOL` or `ELL` course identifier before `Standards`, including the course-name portion of pipe-delimited metadata, without removing later ESOL instructional text or strategies;
 - decodes pasted numeric character entities such as `&#x44;` before safe HTML escaping;
 - removes separators and decorative emoji;
-- omits teacher-answer guidance introduced by `Expected:`, `Expected response:`, `Expected understanding:`, or a descriptive label such as `Expected conventional meanings:` or `Expected student interpretations:` while preserving the prompt and recognizable following directions;
+- omits teacher-answer guidance introduced by `Expected:`, `Expected response:`, `Expected understanding:`, or a descriptive label such as `Expected conventional meanings:` or `Expected student interpretations:` (a parenthesized answer such as `(Expected: ...)` is removed whole, parentheses included) while preserving the prompt and recognizable following directions;
 - places standards in the lesson body;
 - uses Arial at the editor's default size;
 - bolds section and timed subsection headers;
 - recognizes leading bold minute ranges such as `0-5 min | Bell Ringer`, converts the range to an en dash, and soft-separates the following directions;
 - separates directions that continue on the same line after a parenthesized timed subsection, keeping only the subsection label bold;
 - soft-separates every timed header for scanability;
+- bolds lesson timeline headers with a stated length, including `Lesson Timeline - Exactly 50 Minutes` and `Lesson Timeline - About 50 Minutes`, instead of absorbing them into a preceding Agenda list;
 - bolds `ESOL Strategies`, `Materials`, `Agenda`, and `Pages / Materials` like other major sections;
 - bolds `Key Teaching Notes` and `Teacher Emphasis` as major instructional labels;
 - bolds `Teacher Review Guide` and `Blooket Review` sections, rendering Blooket detail lines as bullets;

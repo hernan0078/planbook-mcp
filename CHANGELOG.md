@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.2.2 - 2026-11-20
+
+### Fixed
+
+- A parenthesized answer such as `(Expected: She has gone to the library twice.)` is now removed together with its parentheses. Previously the opening parenthesis was left dangling at the end of the line.
+- `Lesson Timeline - Exactly 50 Minutes` (and `About`/hyphenated-minute variants) is now a bold major header. Previously it was absorbed into a preceding Agenda list as a bullet.
+
+### Documented
+
+- Updated the README, Codex installation guide, agent handoff, and bundled lesson-entry skill.
+
+### Verified
+
+- Added a synthetic regression covering both parenthesized Expected forms and the exact-length timeline header after an Agenda line. Ran all 65 automated tests, `npm pack --dry-run`, `git diff --check`, skill validation, and an MCP stdio smoke test reporting v2.2.2.
+
 ## 2.2.1 - 2026-11-16
 
 ### Fixed

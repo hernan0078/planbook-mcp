@@ -97,7 +97,10 @@ Teacher-answer guidance beginning with `Expected:`, `Expected response:`, or
 `Expected understanding:` is omitted, as is a descriptive label such as
 `Expected conventional meanings:` (up to two words before an answer-type noun
 such as meanings, interpretations, ideas, or explanations). Prose such as
-`Expected time is ...` without a colon label is kept. If the same line continues with a
+`Expected time is ...` without a colon label is kept. A parenthesized answer
+such as `(Expected: She has gone.)` is removed together with its parentheses.
+`Lesson Timeline - Exactly 50 Minutes` is a bold major header, so it ends an
+inferred Agenda list. If the same line continues with a
 recognizable student or teacher direction, that direction is retained. Blank
 lines inside an introduced list no longer split the list, and parallel labels
 such as Definition, Explanation, and Specific Example become bullets.

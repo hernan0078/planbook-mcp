@@ -188,6 +188,10 @@ as in v2.1.6, so no migration is required. After reinstalling, restart the MCP
 client and dry-run one synthetic lesson with the profile to confirm the new
 schema loaded.
 
+Starting in v2.2.2, parenthesized Expected answers are removed with their
+parentheses, and `Lesson Timeline - Exactly 50 Minutes` renders as a bold
+header instead of an Agenda bullet.
+
 Starting in v2.2.1, descriptive Expected labels such as
 `Expected conventional meanings:` are omitted along with the guidance after
 them, in both default and profiled formatting.

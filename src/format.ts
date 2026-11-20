@@ -16,8 +16,8 @@ const COURSE_METADATA = /^(?:ESOL|ELL)\b(?!\s+strateg(?:y|ies)\b)(?=[^|]*\d)[^|]
 const TIME_RANGE = /(?:\d{1,2}:\d{2}\s*[–—-]\s*\d{1,2}:\d{2}|\d{1,3}\s*[–—-]\s*\d{1,3}\s*(?:min|minutes?)\b)/iu;
 const PARENTHESIZED_TIME_RANGE = /\((?:\d{1,2}:\d{2}\s*[–—-]\s*\d{1,2}:\d{2}|\d{1,3}\s*[–—-]\s*\d{1,3}\s*(?:min|minutes?)\b)\)/iu;
 
-const MAJOR_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|key\s+teaching\s+notes\b.*|teacher\s+emphasis\b.*|teacher\s+review\s+guide\b.*|blooket\s+review\b.*|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*\d+\s*minutes|\s*\([^)]*\))?|part\s+\d+\b.*)$/i;
-const KNOWN_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|key\s+teaching\s+notes\b.*|teacher\s+emphasis\b.*|teacher\s+review\s+guide\b.*|blooket\s+review\b.*|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*\d+\s*minutes|\s*\([^)]*\))?|part\s+\d+\b.*|bell\s+ringer\b.*|closure\b.*|mini\s+lesson\b.*|guided\s+practice\b.*|independent\s+practice\b.*|reading\b.*|transition\b.*|assessment\s+expectations\b.*|standards\s+mastery\s+quiz\b.*|early\s+finisher\s+task\b.*|(?:book|workbook)\s+-\s+.*\bactivit(?:y|ies)\b.*|presentation\s+-\s+slides?\b.*|unit\s+exam\s+-\s+summative|homophonic\s+puns|homographic\s+puns|compound\s+puns|vocabulary\s+review|grammar\s+review|a,\s*an,\s*and\s*the|comparatives\s+and\s+superlatives|adverbs|on\s+the\s+board|possible\s+sentence\s+frames|quick\s+examples|focus\s+questions(?:\s+include)?|recommended\s+prompt)$/i;
+const MAJOR_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|key\s+teaching\s+notes\b.*|teacher\s+emphasis\b.*|teacher\s+review\s+guide\b.*|blooket\s+review\b.*|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*(?:exactly\s+|about\s+)?\d+[\s-]*minutes?|\s*\([^)]*\))?|part\s+\d+\b.*)$/i;
+const KNOWN_HEADER = /^(?:standards|essential\s+question|objectives?|agenda|materials|pages(?:\s*\/\s*materials)?|assessment|esol\s+strategies|key\s+teaching\s+notes\b.*|teacher\s+emphasis\b.*|teacher\s+review\s+guide\b.*|blooket\s+review\b.*|why\s+this\s+lesson\s+works|lesson(?:\s+timeline)?(?:\s*[–—-]\s*(?:exactly\s+|about\s+)?\d+[\s-]*minutes?|\s*\([^)]*\))?|part\s+\d+\b.*|bell\s+ringer\b.*|closure\b.*|mini\s+lesson\b.*|guided\s+practice\b.*|independent\s+practice\b.*|reading\b.*|transition\b.*|assessment\s+expectations\b.*|standards\s+mastery\s+quiz\b.*|early\s+finisher\s+task\b.*|(?:book|workbook)\s+-\s+.*\bactivit(?:y|ies)\b.*|presentation\s+-\s+slides?\b.*|unit\s+exam\s+-\s+summative|homophonic\s+puns|homographic\s+puns|compound\s+puns|vocabulary\s+review|grammar\s+review|a,\s*an,\s*and\s*the|comparatives\s+and\s+superlatives|adverbs|on\s+the\s+board|possible\s+sentence\s+frames|quick\s+examples|focus\s+questions(?:\s+include)?|recommended\s+prompt)$/i;
 
 function escapeHtml(value: string): string {
   return value
@@ -84,6 +84,10 @@ function cleanLine(value: string): string {
 }
 
 function removeExpectedGuidance(lines: string[]): string[] {
+  // A parenthesized answer such as "(Expected: She has gone.)" is removed whole,
+  // so no dangling parenthesis remains before the rest of the line.
+  const parenthesized = new RegExp(`\\s*\\(\\s*${EXPECTED_GUIDANCE.source}[^()]*\\)`, "giu");
+  lines = lines.map((line) => line.replace(parenthesized, ""));
   const directive = /(?<=[.!?])\s+(?=(?:students?|teacher|partners?|groups?|class|ask|record|require|review|discuss|continue|then|explain|display|emphasize|remind|invite|collect|use|have|accept|allow|avoid|keep|provide|circulate|do\s+not)\b)/iu;
 
   return lines.flatMap((rawLine) => {

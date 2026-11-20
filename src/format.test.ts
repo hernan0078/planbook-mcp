@@ -581,3 +581,23 @@ Expected time is about ten minutes for this step.`);
   assert.match(result.html, /<p>Students record one context clue\.<\/p>/);
   assert.match(result.html, /<p>Expected time is about ten minutes for this step\.<\/p>/);
 });
+
+test("removes parenthesized expected answers whole and bolds an exact-length timeline header", () => {
+  const result = formatLessonPlan(`Lesson Title
+Grammar Games
+
+Standards
+ELA.9.C.3.1 - Apply grammar conventions.
+Agenda
+Retrieval → Blooket → Exit slip
+Lesson Timeline - Exactly 50 Minutes
+0:00-0:05 - Bell Ringer
+Students correct one sentence.
+0:05-0:10 - Exit Ticket
+1. Correct this sentence: She has went home. (Expected: She has gone home.)
+2. Write one definition (Expected answer: any accurate paraphrase) in your notebook.`);
+
+  assert.doesNotMatch(result.html, /Expected|\(\s*<|\(<\/li>|She has gone home|any accurate paraphrase/);
+  assert.match(result.html, /<li>Correct this sentence: She has went home\.<\/li><li>Write one definition in your notebook\.<\/li>/);
+  assert.match(result.html, /<ul><li>Retrieval → Blooket → Exit slip<\/li><\/ul><p><strong>Lesson Timeline - Exactly 50 Minutes<\/strong><\/p>/);
+});
